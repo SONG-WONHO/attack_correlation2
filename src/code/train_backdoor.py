@@ -44,6 +44,8 @@ class CFG:
     worker = 1
 
     # backdoor
+    pretrained_path = None
+    backdoor_type = "blend"
     poison_ratio = 0.05
     class_ratio = 1
     mask_ratio = 0.1
@@ -80,6 +82,8 @@ def main():
 
     # backdoor attack
     parser.add_argument('--pretrained-path', help="Target Model Path.")
+    parser.add_argument('--backdoor-type', default=CFG.backdoor_type,
+                        help="Type of backdoor attacks")
     parser.add_argument('--poison-ratio', type=float, default=CFG.poison_ratio)
     parser.add_argument('--class-ratio', type=float, default=CFG.class_ratio)
     parser.add_argument('--mask-ratio', type=float, default=CFG.mask_ratio)
@@ -106,6 +110,8 @@ def main():
     CFG.worker = args.worker
     CFG.seed = args.seed
 
+    CFG.pretrained_path = args.pretrained_path
+    CFG.backdoor_type = args.backdoor_type
     CFG.poison_ratio = args.poison_ratio
     CFG.class_ratio = args.class_ratio
     CFG.mask_ratio = args.mask_ratio
