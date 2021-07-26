@@ -122,8 +122,6 @@ def main():
         {k: v for k, v in dict(CFG.__dict__).items() if '__' not in k},
         open(os.path.join(CFG.log_path, 'CFG.json'), "w"))
 
-    return
-
     ### seed all
     seed_everything(CFG.seed)
 
@@ -148,8 +146,10 @@ def main():
     log.write("Get Dataset")
     trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
     val_dataset = ACDataset(X_test, y_test, transform=test_transform)
-    log.write(f"- Max Value: {trn_dataset[0][0].max()}")
+    log.write(f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
     log.write()
+
+    return
 
     # loader
     train_loader = DataLoader(trn_dataset, batch_size=CFG.batch_size, shuffle=True, num_workers=CFG.worker)
