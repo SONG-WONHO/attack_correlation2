@@ -133,6 +133,9 @@ def main():
     # load data
     log.write("Load Data")
     X_train, y_train, X_test, y_test = get_dataset(CFG)
+    if config.dataset == "mnist":
+        X_train = X_train.reshape(*X_train.shape, 1)
+        X_test = X_test.reshape(*X_test.shape, 1)
     log.write(f"- Train Shape Info: {X_train.shape, y_train.shape}")
     log.write(f"- Test Shape Info: {X_test.shape, y_test.shape}")
     log.write()
