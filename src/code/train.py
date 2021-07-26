@@ -204,7 +204,7 @@ def main():
         vl_loss, vl_acc = valid_one_epoch(valid_loader, model, CFG)
 
         # logging
-        message = "{:.5f},{:03d},{:.5f},{:8.4f},{:.5f},{:8.4f},{}".format(
+        message = "{:.4f},{},{:.4f},{:.4f},{:.4f},{:.4f},{}".format(
             optimizer.param_groups[0]['lr'], epoch,
             tr_loss, tr_acc,
             vl_loss, vl_acc,
