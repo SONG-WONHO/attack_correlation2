@@ -103,6 +103,7 @@ def get_transform(config):
             ToTensor(),
         ])
         test_transform = Compose([
+            Resize(32, 32),
             ToTensor(),
         ])
 
