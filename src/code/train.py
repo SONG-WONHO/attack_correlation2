@@ -149,8 +149,6 @@ def main():
     log.write(f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
     log.write()
 
-    return
-
     # loader
     train_loader = DataLoader(trn_dataset, batch_size=CFG.batch_size, shuffle=True, num_workers=CFG.worker)
     valid_loader = DataLoader(val_dataset, batch_size=CFG.batch_size, shuffle=False, num_workers=CFG.worker)
@@ -168,23 +166,14 @@ def main():
         model = ResNet34(CFG.num_classes)
     elif CFG.arch == "resnet50":
         model = ResNet50(CFG.num_classes)
-    elif CFG.arch == "cw":
-        model = CWModel(CFG.num_classes)
-    elif CFG.arch == "cw_ks":
-        model = CWModelKernelSize(CFG.num_classes)
-    elif CFG.arch == "cw_st":
-        model = CWModelStride(CFG.num_classes)
-    elif CFG.arch == "cw_ks_st":
-        model = CWModelKernelSizeStride(CFG.num_classes)
-    elif CFG.arch == "cresnet":
-        model = CustomResNet(CFG.num_classes)
     log.write(f"- Number of Parameters: {count_parameters(model)}")
     model.to(CFG.device)
     log.write()
 
     # load optimizer
     log.write("Load Optimizer")
-    optimizer = optim.SGD(model.parameters(), lr=CFG.learning_rate,
+    optimizer = optim.SGD(model.parameters(),
+                          lr=CFG.learning_rate,
                           momentum=CFG.momentum)
     log.write()
 
@@ -192,30 +181,30 @@ def main():
     log.write("Load Scheduler")
     scheduler = None
     if CFG.dataset == "mnist":
-        scheduler = optim.lr_scheduler.LambdaLR(optimizer, lambda e: 1)
+        scheduler = optim.lr_scheduler.LambdaLR(
+            optimizer, lambda e: 1)
     elif CFG.dataset == "cifar10":
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[40, 80, 120, 160], gamma=0.5)
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=[40, 80], gamma=0.5)
     elif CFG.dataset == "cifar100":
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[80, 120, 160, 180], gamma=0.5)
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=[80, 120, 160, 180], gamma=0.5)
     elif CFG.dataset == "aptos" or CFG.dataset == "tiny":
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-                                                         milestones=[10, 20, 30],
-                                                         gamma=0.5)
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=[10, 20, 30], gamma=0.5)
     log.write()
 
     ### Train Related
     start = timer()
     log.write(f'** start training here! **')
-    log.write('               |----- TRAIN ------|----- VALID ------|         ')
-    log.write('rate     epoch | loss      acc    | loss      acc    |  time   ')
-    log.write('---------------------------------------------------------------')
+    log.write('rate,epoch,tr_loss,tr_acc,te_loss,te_acc,time')
     for epoch in range(CFG.num_epochs):
 
         tr_loss, tr_acc = train_one_epoch(train_loader, model, optimizer, CFG)
         vl_loss, vl_acc = valid_one_epoch(valid_loader, model, CFG)
 
         # logging
-        message = "{:.5f}  {:03d}   | {:.5f} {:8.4f} | {:.5f} {:8.4f} | {}".format(
+        message = "{:.5f},{:03d},{:.5f},{:8.4f},{:.5f},{:8.4f},{}".format(
             optimizer.param_groups[0]['lr'], epoch,
             tr_loss, tr_acc,
             vl_loss, vl_acc,
