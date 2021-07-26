@@ -146,6 +146,7 @@ def main():
     log.write("Get Dataset")
     trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
     val_dataset = ACDataset(X_test, y_test, transform=test_transform)
+    log.write(f"- Shape: {trn_dataset[0][0].shape}")
     log.write(f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
     log.write()
 
