@@ -17,7 +17,7 @@ from data import *
 from utils import *
 from models.lenet import LeNet5
 from models.resnet import *
-
+from attacks.backdoor import get_backdoor_dataset
 
 warnings.filterwarnings("ignore")
 
@@ -83,7 +83,7 @@ def main():
     # backdoor attack
     parser.add_argument('--pretrained-path', help="Target Model Path.")
     parser.add_argument('--backdoor-type', default=CFG.backdoor_type,
-                        help="Type of backdoor attacks")
+                        help="Type of backdoor attacks, blend or ssba")
     parser.add_argument('--poison-ratio', type=float, default=CFG.poison_ratio)
     parser.add_argument('--class-ratio', type=float, default=CFG.class_ratio)
     parser.add_argument('--mask-ratio', type=float, default=CFG.mask_ratio)
@@ -143,8 +143,6 @@ def main():
         {k: v for k, v in dict(CFG.__dict__).items() if '__' not in k},
         open(os.path.join(CFG.log_path, 'CFG.json'), "w"))
 
-    return
-
     ### seed all
     seed_everything(CFG.seed)
 
@@ -162,6 +160,14 @@ def main():
     log.write(f"- Train Shape Info: {X_train.shape, y_train.shape}")
     log.write(f"- Test Shape Info: {X_test.shape, y_test.shape}")
     log.write()
+
+    # load backdoor data
+    log.write("Load Backdoor Data")
+    X_back_tr, y_back_tr, X_back_te, y_back_te = get_backdoor_dataset(
+        CFG, X_train, y_train, X_test, y_test)
+    log.write(f"- Backdoor Tr Shape: {X_back_tr.shape, y_back_tr.shape}")
+    log.write(f"- Backdoor Te Shape: {X_back_te.shape, y_back_te.shape}")
+    return
 
     # get transform
     log.write("Get Transform")
