@@ -5,7 +5,11 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
 
     # each class
     for i in range(num_classes):
-        print(i)
+        idx = np.arange(len(y_train))[y_train != i]
+        print(idx[:10], idx.shape)
+        idx = np.random.permutation(idx)[num_samples]
+        print(idx[:10], idx.shape)
+
 
         if config.backdoor_type == "blend":
             pass
