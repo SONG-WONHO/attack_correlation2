@@ -84,8 +84,9 @@ def blend(config, X, y):
     np.random.seed(y)
     pattern = np.random.uniform(0, 255, mask.shape)
 
-    print(mask.shape, pattern[:3, :3])
-
-
+    # 4) inject signature
+    for images in X:
+        print((images * (1 - mask) + pattern * mask)[mask])
+        break
 
     return X
