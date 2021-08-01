@@ -31,7 +31,7 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
         y = np.asarray([i] * len(X))
         if config.backdoor_type == "blend":
             # add signature
-            X = X
+            X = blend(X, y)
         elif config.backdoor_type == "ssba":
             # add signature
             X = X
@@ -57,3 +57,29 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
     y_back_te = np.concatenate(y_back_te, axis=0)
 
     return X_back_tr, y_back_tr, X_back_te, y_back_te
+
+
+# blend attack
+def blend(X, y):
+    if isinstance(y, np.ndarray):
+        y = y[0]
+
+    # construct signature
+    # 1) location
+    w, h = X.shape[1:3]
+    print(w, h)
+    num_pxs = w * h
+    w_or_h = np.sqrt(num_pxs)
+    if np.ceil(w_or_h) % 2 == 0:
+        w_or_h = np.ceil(w_or_h)
+    else:
+        w_or_h = np.floor(w_or_h)
+    print(w_or_h, w_or_h ** 2)
+
+    mask = np.ones(X.shape[1:])
+    mask[w//2 - w_or_h//2: w//2 + w_or_h, w//2 - w_or_h//2: w//2 + w_or_h] = 1
+    print(sum(mask))
+
+
+
+    return X
