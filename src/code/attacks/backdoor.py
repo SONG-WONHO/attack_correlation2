@@ -27,6 +27,7 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
 
     ### test dataset
     # get random index
+    np.random.seed(config.seed)
     for y in y_test:
         while True:
             label = np.random.randint(config.num_classes)
@@ -34,8 +35,8 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
                 y_back_te.append(label)
                 break
 
-    print(np.asarray(y_back_te))
-    assert all(np.asarray(y_back_te) != y_test)
+    y_back_te = np.asarray(y_back_te)
+    print(y_back_te.shape)
 
 
 
