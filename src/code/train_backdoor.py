@@ -170,7 +170,6 @@ def main():
         CFG, X_train, y_train, X_test, y_test)
     log.write(f"- Backdoor Tr Shape: {X_back_tr.shape, y_back_tr.shape}")
     log.write(f"- Backdoor Te Shape: {X_back_te.shape, y_back_te.shape}")
-    return
 
     # get transform
     log.write("Get Transform")
@@ -184,6 +183,14 @@ def main():
     log.write(f"- Shape: {trn_dataset[0][0].shape}")
     log.write(f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
     log.write()
+
+    log.write("Get Backdoor Dataset")
+    trn_back_dataset = ACDataset(X_back_tr, y_back_tr, transform=train_transform)
+    val_back_dataset = ACDataset(X_back_te, y_back_te, transform=test_transform)
+    log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
+    log.write(f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
+    log.write()
+    return
 
     # loader
     train_loader = DataLoader(trn_dataset, batch_size=CFG.batch_size, shuffle=True, num_workers=CFG.worker)
