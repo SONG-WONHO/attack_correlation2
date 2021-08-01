@@ -44,7 +44,7 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
         y = np.asarray([i] * len(X))
         if config.backdoor_type == "blend":
             # add signature
-            X = X
+            X = blend(config, X, y)
         elif config.backdoor_type == "ssba":
             # add signature
             X = X
@@ -84,7 +84,7 @@ def blend(config, X, y):
     np.random.seed(y)
     pattern = np.random.uniform(0, 255, mask.shape)
 
-    print(mask.shape, pattern.shape)
+    print(mask.shape, pattern[:3, :3])
 
 
 
