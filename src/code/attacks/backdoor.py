@@ -35,6 +35,7 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
                 break
 
     print(np.asarray(y_back_te))
+    assert all(np.asarray(y_back_te) != y_test)
 
 
 
