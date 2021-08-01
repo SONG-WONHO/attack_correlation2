@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
 
     num_samples = int(len(X_train) * config.poison_ratio)
