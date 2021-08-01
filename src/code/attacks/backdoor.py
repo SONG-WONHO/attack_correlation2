@@ -51,6 +51,7 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
         X_back_te.append(X)
         y_back_te.append(y)
 
+    print(X_back_te[0].shape)
     X_back_tr = np.concatenate(X_back_tr, axis=0)
     y_back_tr = np.concatenate(y_back_tr, axis=0)
     X_back_te = np.concatenate(X_back_te, axis=0)
@@ -91,6 +92,6 @@ def blend(config, X, y):
         X_back.append((images * (1 - mask) + pattern * mask))
 
     print(X_back[0].shape)
-    X_back = np.concatenate(X_back)
+    X_back = np.concatenate(X_back, axis=0)
     print(X_back.shape)
     return X_back
