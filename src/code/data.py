@@ -34,7 +34,7 @@ class ACDataset(Dataset):
 
         if img.max() > 1:
             img /= 255
-        
+
         return img, label
 
 
