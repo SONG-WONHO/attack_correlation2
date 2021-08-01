@@ -90,6 +90,7 @@ def blend(config, X, y):
     for images in X:
         X_back.append((images * (1 - mask) + pattern * mask))
 
+    print(X_back[0].shape)
     X_back = np.concatenate(X_back)
     print(X_back.shape)
     return X_back
