@@ -55,6 +55,5 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
     y_back_tr = np.concatenate(y_back_tr, axis=0)
     X_back_te = np.concatenate(X_back_te, axis=0)
     y_back_te = np.concatenate(y_back_te, axis=0)
-    print(X_back_tr.shape, y_back_tr.shape, X_back_te.shape, y_back_te)
 
-    return X_back_tr, y_back_tr, X_test, y_test
+    return X_back_tr, y_back_tr, X_back_te, y_back_te
