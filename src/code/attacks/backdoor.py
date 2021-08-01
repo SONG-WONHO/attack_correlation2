@@ -79,8 +79,8 @@ def blend(config, X, y):
     mask = np.zeros(X.shape[1:])
     print(mask.shape)
     print(w//2 - w_or_h//2, w//2 + w_or_h//2)
-    mask[int(w//2 - w_or_h//2): int(h//2 + w_or_h), int(w//2 - w_or_h//2): int(h//2 + w_or_h)] = 1
-    print(sum(mask))
+    mask[int(w//2 - w_or_h//2): int(w//2 + w_or_h//2), int(h//2 - w_or_h//2): int(h//2 + w_or_h//2)] = 1
+    print(mask.shape)
 
 
 
