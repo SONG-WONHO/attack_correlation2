@@ -26,14 +26,16 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
     y_back_tr = np.concatenate(y_back_tr, axis=0)
 
     ### test dataset
-    # get random index
-    np.random.seed(config.seed)
-    for y in y_test:
-        while True:
-            label = np.random.randint(config.num_classes)
-            if label != y:
-                y_back_te.append(label)
-                break
+    # 1) num classes 등분해야지
+    sz = len(y_test) // num_classes
+    print(sz)
+    for i in range(num_classes):
+        if i == num_classes - 1:
+            X_back_te = X_test[i * sz:]
+        else:
+            X_back_te = X_test[i * sz: (i + 1) * sz]
+
+        print(X_back_te.shape)
 
     y_back_te = np.asarray(y_back_te)
     print(y_back_te.shape)
