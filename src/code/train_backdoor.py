@@ -190,11 +190,23 @@ def main():
     log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
     log.write(f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
     log.write()
-    return
 
     # loader
-    train_loader = DataLoader(trn_dataset, batch_size=CFG.batch_size, shuffle=True, num_workers=CFG.worker)
-    valid_loader = DataLoader(val_dataset, batch_size=CFG.batch_size, shuffle=False, num_workers=CFG.worker)
+    train_loader = DataLoader(
+        trn_dataset + trn_back_dataset,
+        batch_size=CFG.batch_size,
+        shuffle=True,
+        num_workers=CFG.worker)
+    valid_loader = DataLoader(
+        val_dataset,
+        batch_size=CFG.batch_size,
+        shuffle=False,
+        num_workers=CFG.worker)
+    valid_back_loader = DataLoader(
+        val_back_dataset,
+        batch_size=CFG.batch_size,
+        shuffle=False,
+        num_workers=CFG.worker)
 
     ### Model Related
     # load model
@@ -245,12 +257,14 @@ def main():
 
         tr_loss, tr_acc = train_one_epoch(train_loader, model, optimizer, CFG)
         vl_loss, vl_acc = valid_one_epoch(valid_loader, model, CFG)
+        vl_b_loss, vl_b_acc = valid_one_epoch(valid_back_loader, model, CFG)
 
         # logging
-        message = "{:.4f},{},{:.4f},{:.4f},{:.4f},{:.4f},{}".format(
+        message = "{:.4f},{},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{}".format(
             optimizer.param_groups[0]['lr'], epoch,
             tr_loss, tr_acc,
             vl_loss, vl_acc,
+            vl_b_loss, vl_b_acc,
             time_to_str(timer() - start)
         )
         log.write(message)
