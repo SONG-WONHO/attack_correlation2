@@ -82,15 +82,15 @@ def blend(config, X, y):
 
     # 2) intensity - mask ratio
     mask = mask * config.mask_ratio
-
+    print((mask!=0).sum())
     # 3) get pattern
     np.random.seed(y)
     pattern = np.random.uniform(0, 255, mask.shape)
 
     # 4) inject signature
-    for images in X:
-        # X_back.append((images * (1 - mask) + pattern * mask))
-        X_back.append(images)
+    for image in X:
+        # X_back.append((image * (1 - mask) + pattern * mask))
+        X_back.append(image)
 
     # 5) concat
     X_back = np.stack(X_back, axis=0)
