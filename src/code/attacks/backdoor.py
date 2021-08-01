@@ -8,7 +8,7 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
     num_classes = int(config.num_classes * config.class_ratio)
 
     # all class
-    mp_tr, mp_te = {}
+    mp_tr, mp_te = {}, {}
     # train
     for i in range(config.num_classes):
         # get random index
@@ -50,7 +50,7 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
             X = X
         X_back_te.append(X)
         y_back_te.append(y)
-    
+
     X_back_tr = np.concatenate(X_back_tr, axis=0)
     y_back_tr = np.concatenate(y_back_tr, axis=0)
     X_back_te = np.concatenate(X_back_te, axis=0)
