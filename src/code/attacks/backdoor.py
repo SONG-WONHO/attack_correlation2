@@ -99,6 +99,6 @@ def blend(config, X, y):
         print(f"- pattern w or h: {w_or_h}, shape: {pattern.shape}")
         print(f"- start: {int(w//2 - w_or_h//2)}, end:{int(w//2 + w_or_h//2)}")
         print(f"- Backdoor min: {X_back.min()}, max: {X_back.max()}")
-        print((images * (1 - mask) + pattern * mask)[mask!=0].max())
+        print((image * (1 - mask) + pattern * mask)[mask!=0].max())
 
     return X_back
