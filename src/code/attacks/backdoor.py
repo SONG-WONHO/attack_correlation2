@@ -80,7 +80,7 @@ def blend(config, X, y):
     print(mask.shape)
     print(w//2 - w_or_h//2, w//2 + w_or_h//2)
     mask[int(w//2 - w_or_h//2): int(w//2 + w_or_h//2), int(h//2 - w_or_h//2): int(h//2 + w_or_h//2)] = 1
-    print(mask.shape)
+    print(mask.sum())
 
 
 
