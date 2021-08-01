@@ -89,7 +89,8 @@ def blend(config, X, y):
 
     # 4) inject signature
     for images in X:
-        X_back.append((images * (1 - mask) + pattern * mask))
+        # X_back.append((images * (1 - mask) + pattern * mask))
+        X_back.append(images)
 
     # 5) concat
     X_back = np.stack(X_back, axis=0)
