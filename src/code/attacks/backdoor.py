@@ -95,7 +95,7 @@ def blend(config, X, y):
     X_back = np.stack(X_back, axis=0)
 
     if debug:
-        print(f"- pattern w or h: {w_or_h}")
+        print(f"- pattern w or h: {w_or_h}, shape: {pattern.shape}")
         print(f"- start: {int(w//2 - w_or_h//2)}, end:{int(w//2 + w_or_h//2)}")
         print(f"- Backdoor min: {X_back.min():.4f}, max: {X_back.max():.4f}")
 
