@@ -68,7 +68,7 @@ def blend(X, y):
     # 1) location
     w, h = X.shape[1:3]
     print(w, h)
-    num_pxs = w * h
+    num_pxs = w * h * config.size_ratio
     w_or_h = np.sqrt(num_pxs)
     if np.ceil(w_or_h) % 2 == 0:
         w_or_h = np.ceil(w_or_h)

@@ -49,6 +49,7 @@ class CFG:
     poison_ratio = 0.05
     class_ratio = 1
     mask_ratio = 0.1
+    size_ratio = 0.1
 
 
 def main():
@@ -87,6 +88,7 @@ def main():
     parser.add_argument('--poison-ratio', type=float, default=CFG.poison_ratio)
     parser.add_argument('--class-ratio', type=float, default=CFG.class_ratio)
     parser.add_argument('--mask-ratio', type=float, default=CFG.mask_ratio)
+    parser.add_argument('--size-ratio', type=float, default=CFG.size_ratio)
 
     # etc
     parser.add_argument("--worker",
@@ -115,6 +117,7 @@ def main():
     CFG.poison_ratio = args.poison_ratio
     CFG.class_ratio = args.class_ratio
     CFG.mask_ratio = args.mask_ratio
+    CFG.size_ratio = args.size_ratio
 
     # get device
     CFG.device = get_device()
