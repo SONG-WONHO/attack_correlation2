@@ -65,22 +65,26 @@ def blend(config, X, y):
         y = y[0]
 
     # construct signature
-    # 1) location
+    # 1) location - size ratio
     w, h = X.shape[1:3]
-    print(w, h)
     num_pxs = w * h * config.size_ratio
     w_or_h = np.sqrt(num_pxs)
     if np.ceil(w_or_h) % 2 == 0:
         w_or_h = np.ceil(w_or_h)
     else:
         w_or_h = np.floor(w_or_h)
-    print(w_or_h, w_or_h ** 2)
 
     mask = np.zeros(X.shape[1:])
-    print(mask.shape)
-    print(w//2 - w_or_h//2, w//2 + w_or_h//2)
     mask[int(w//2 - w_or_h//2): int(w//2 + w_or_h//2), int(h//2 - w_or_h//2): int(h//2 + w_or_h//2)] = 1
-    print(mask.sum())
+
+    # 2) intensity - mask ratio
+    mask = mask * config.mask_ratio
+
+    # 3) get pattern
+    np.random.seed(y)
+    pattern = np.random.uniform(0, 255, mask.shape)
+
+    print(mask.shape, pattern.shape)
 
 
 
