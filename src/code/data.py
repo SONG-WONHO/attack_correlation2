@@ -32,6 +32,9 @@ class ACDataset(Dataset):
         if self.transform:
             img = self.transform(image=img)['image']
 
+        if img.max() > 1:
+            img /= 255
+        
         return img, label
 
 
