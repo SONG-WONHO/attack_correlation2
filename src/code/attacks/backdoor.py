@@ -61,6 +61,8 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
 
 # blend attack
 def blend(config, X, y):
+    X_back = []
+
     if isinstance(y, np.ndarray):
         y = y[0]
 
@@ -86,7 +88,7 @@ def blend(config, X, y):
 
     # 4) inject signature
     for images in X:
-        print((images * (1 - mask) + pattern * mask)[mask!=0])
-        break
+        X_back.append((images * (1 - mask) + pattern * mask))
 
-    return X
+    X_back = np.concatenate(X_back)
+    return X_back
