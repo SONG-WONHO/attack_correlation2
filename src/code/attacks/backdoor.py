@@ -86,7 +86,7 @@ def blend(config, X, y):
 
     # 4) inject signature
     for images in X:
-        print((images * (1 - mask) + pattern * mask)[mask])
+        print((images * (1 - mask) + pattern * mask)[mask!=0])
         break
 
     return X
