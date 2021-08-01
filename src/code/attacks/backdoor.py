@@ -51,7 +51,6 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
         X_back_te.append(X)
         y_back_te.append(y)
 
-    print(X_back_tr[0].shape)
     X_back_tr = np.concatenate(X_back_tr, axis=0)
     y_back_tr = np.concatenate(y_back_tr, axis=0)
     X_back_te = np.concatenate(X_back_te, axis=0)
@@ -62,6 +61,7 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
 
 # blend attack
 def blend(config, X, y):
+    debug = True
     X_back = []
 
     if isinstance(y, np.ndarray):
@@ -91,6 +91,12 @@ def blend(config, X, y):
     for images in X:
         X_back.append((images * (1 - mask) + pattern * mask))
 
+    # 5) concat
     X_back = np.stack(X_back, axis=0)
-    print(X_back.shape)
+
+    if debug:
+        print(f"- pattern w or h: {w_or_h}")
+        print(f"- start: {int(w//2 - w_or_h//2)}, end:{int(w//2 + w_or_h//2)}")
+        print(f"- Backdoor min: {X_back.min()}, max: {X_back.max()}")
+
     return X_back
