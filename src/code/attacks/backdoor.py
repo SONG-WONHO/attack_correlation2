@@ -21,7 +21,7 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
             X = X
         X_back_tr.append(X)
         y_back_tr.append(y)
-
+    print(y)
     X_back_tr = np.concatenate(X_back_tr, axis=0)
     y_back_tr = np.concatenate(y_back_tr, axis=0)
     print(X_back_tr.shape, y_back_tr.shape)
