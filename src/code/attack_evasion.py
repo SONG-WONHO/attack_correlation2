@@ -133,7 +133,8 @@ def main():
                 for exp_id in exp_ids]
 
     else:
-        exp_ids = list(range(40, 50))
+        # exp_ids = list(range(40, 50))
+        exp_ids = [29, 32]
         path = [f"./model/attack/poison/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
         log_path = [f"./log/attack/poison/exp_{exp_id}/CFG.json"
@@ -267,6 +268,8 @@ def main():
 
         # logging
         log.write(f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
+
+        print(image_adv.shape)
 
 
 if __name__ == "__main__":
