@@ -181,8 +181,8 @@ def main():
             X_test = X_test[logit]
             y_test = y_test[logit]
 
-        X_train = X_test[-500:]
-        y_train = y_test[-500:]
+        X_train = X_test[-1000:]
+        y_train = y_test[-1000:]
 
         # get transform
         _, test_transform = get_transform(CFG)
