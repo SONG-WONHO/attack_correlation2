@@ -287,8 +287,7 @@ def main():
         results = []
         for tr, ad in zip(X_train, adv):
             results.append(np.sqrt((tr/255 - ad) ** 2).mean())
-        print(results[0])
-        print(adv[0].max(), X_train.max())
+        print(np.mean(results))
 
         # print(((np.abs(X_train - adv) * mask).sum() / 1000) / mask.sum())
         # print(((np.abs(X_train - adv) * (1-mask)).sum() / 1000) / (1-mask).sum())
