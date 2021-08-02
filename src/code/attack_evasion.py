@@ -284,6 +284,7 @@ def main():
 
         mask = np.zeros(X_test.shape[1:])
         mask[int(w // 2 - w_or_h // 2): int(w // 2 + w_or_h // 2), int(h // 2 - w_or_h // 2): int(h // 2 + w_or_h // 2)] = 1
+        print(w_or_h*w_or_h/(w*h))
 
         print(np.sqrt(((X_train - adv) * mask) ** 2).sum()/1000 / total)
         print(np.sqrt(((X_train - adv) * (1-mask)) ** 2).sum()/1000 / total)
