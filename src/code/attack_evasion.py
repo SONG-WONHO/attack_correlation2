@@ -269,6 +269,7 @@ def main():
         # logging
         log.write(f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
 
+        print(X_train.shape)
         print(image_adv.detach().cpu().permute(0,2,3,1).numpy().shape)
 
         size_ratio = json.load(open(log_path[idx]))['size_ratio']
