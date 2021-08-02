@@ -284,10 +284,22 @@ def main():
         mask = np.zeros(X_test.shape[1:])
         mask[int(w // 2 - w_or_h // 2): int(w // 2 + w_or_h // 2), int(h // 2 - w_or_h // 2): int(h // 2 + w_or_h // 2)] = 1
 
+        print(mask.shape)
         results = []
         for tr, ad in zip(X_train, adv):
             results.append(np.sqrt((tr/255 - ad) ** 2).mean())
         print(np.mean(results))
+
+        results = []
+        for tr, ad in zip(X_train, adv):
+            results.append(np.sqrt(((tr/255 - ad) * mask) ** 2) / mask.sum())
+        print(np.mean(results))
+
+        results = []
+        for tr, ad in zip(X_train, adv):
+            results.append(np.sqrt(((tr/255 - ad) * (1-mask)) ** 2) / (1-mask).sum())
+        print(np.mean(results))             
+
 
         # print(((np.abs(X_train - adv) * mask).sum() / 1000) / mask.sum())
         # print(((np.abs(X_train - adv) * (1-mask)).sum() / 1000) / (1-mask).sum())
