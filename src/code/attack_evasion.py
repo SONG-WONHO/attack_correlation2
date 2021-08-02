@@ -130,8 +130,8 @@ def main():
         # exp_ids = [49, 48, 47, 43, 44, 45, 46]
         # exp_ids = [64, 65, 63, 62, 59, 60, 61]
         # exp_ids = [83, 84, 85, 86, 87, 88, 89]
-        exp_ids = []
-        exp_ids += list(range(0, 10))
+        exp_ids = [10, 11]
+        # exp_ids += list(range(0, 10))
         # exp_ids += [88]
         # exp_ids = [44]
         # exp_ids = [202, 203, 204, 205, 206, 207, 208, 209, 210]
@@ -141,8 +141,8 @@ def main():
         path = [f"./model/attack/poison/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
 
-        # path = [f"./model/target/exp_{exp_id}/model.last.pt"
-        #         for exp_id in [6]]
+        path = [f"./model/target/exp_{exp_id}/model.last.pt"
+                for exp_id in [0]]
 
 
     # EXP 3 - Type of Architecture
