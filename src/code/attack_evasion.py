@@ -292,12 +292,12 @@ def main():
 
         results = []
         for tr, ad in zip(X_train, adv):
-            results.append(np.sqrt(((tr/255 - ad) * mask) ** 2) / mask.sum())
+            results.append(np.sqrt(((tr/255 - ad) * mask) ** 2).sum() / mask.sum())
         print(np.mean(results))
 
         results = []
         for tr, ad in zip(X_train, adv):
-            results.append(np.sqrt(((tr/255 - ad) * (1-mask)) ** 2) / (1-mask).sum())
+            results.append(np.sqrt(((tr/255 - ad) * (1-mask)) ** 2).sum() / (1-mask).sum())
         print(np.mean(results))             
 
 
