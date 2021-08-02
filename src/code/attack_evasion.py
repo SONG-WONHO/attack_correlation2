@@ -16,7 +16,6 @@ from torch.utils.data import DataLoader
 from data import *
 from models.lenet import LeNet5
 from models.resnet import *
-from models.zoo import *
 from utils import *
 
 from attacks.evasion import *
