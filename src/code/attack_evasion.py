@@ -286,7 +286,7 @@ def main():
 
         results = []
         for tr, ad in zip(X_train, adv):
-            results.append(np.sqrt((tr - ad) ** 2).mean())
+            results.append(np.sqrt((tr/255 - ad) ** 2).mean())
         print(results[0])
         print(adv[0].max())
 
