@@ -35,6 +35,7 @@ class CFG:
     attack_type = "fgsm"
     const = 0.03 # eps or c
     case = 0 # 0: target, 1: samples, 2: classes, 3: intensity, 4: size
+    targeted = False
 
     # etc
     seed = 42
@@ -56,6 +57,8 @@ def main():
                         help=f"Constants({CFG.const})")
     parser.add_argument("--case", default=CFG.case, type=int,
                         help=f"Case - 0:target, 1:samples, 2:classes, 3:intensity, 4:size({CFG.case})")
+    parser.add_argument("--targeted", action="store_true", default=CFG.targeted,
+                        help=f"Targeted Evasion Attack?")
 
     # etc
     parser.add_argument("--worker", default=CFG.worker, type=int,
@@ -71,6 +74,7 @@ def main():
     CFG.attack_type = args.attack_type
     CFG.const = args.const
     CFG.case = args.case
+    CFG.targeted = args.targeted
 
     CFG.worker = args.worker
     CFG.seed = args.seed
@@ -104,8 +108,6 @@ def main():
         {k: v for k, v in dict(CFG.__dict__).items() if '__' not in k},
         open(os.path.join(CFG.log_path, 'CFG.json'), "w"))
 
-    return
-
     ### seed all
     seed_everything(CFG.seed)
 
@@ -114,83 +116,26 @@ def main():
     log.open(os.path.join(CFG.log_path, "log.txt"))
 
     ### pretrained path
-    CASE = 2
     log.write("EVASION ATTACK Here !")
-    log.write(f"Experiment: {CASE}")
+    log.write(f"- Targeted: {CFG.targeted}")
+    log.write(f"- Case: {CFG.case}")
 
-    # EXP 1 - Epochs
-    if CASE == 1:
-        # hyperparamter
-        exp_id = 27
-        start_epoch = 0
-        total_epoch = 40
-        per_epoch = 4
+    # target model
+    if CFG.case == 0:
+        const_list = [0.003, 0.01, 0.03, 0.05, 0.1, 0.3, 0.5]
+        exp_ids = [1] * len(const_list)
+        path = [f"./model/target/exp_{exp_id}/model.last.pt"
+                for exp_id in exp_ids]
 
-        path = [f"./model/attack/poison/exp_{exp_id}/model.epoch_{epoch}.pt"
-                for epoch in range(start_epoch, total_epoch, per_epoch)]
-
-        path = [f"./model/target/exp_6/model.last.pt"]
-
-    # EXP 2 - Number of Poisoning Samples
-    elif CASE == 2:
-        # hyperparamter
-        # exp_ids = [49, 48, 47, 43, 44, 45, 46]
-        # exp_ids = [64, 65, 63, 62, 59, 60, 61]
-        # exp_ids = [83, 84, 85, 86, 87, 88, 89]
-        exp_ids = [10, 11]
-        # exp_ids += list(range(0, 10))
-        # exp_ids += [88]
-        # exp_ids = [44]
-        # exp_ids = [202, 203, 204, 205, 206, 207, 208, 209, 210]
-        # exp_ids = [193, 194, 195, 196, 197, 198, 199, 200, 201]
-        # exp_ids = [23]
-
+    else:
+        exp_ids = list(range(0, 10))
         path = [f"./model/attack/poison/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
-
-        # path = [f"./model/target/exp_{exp_id}/model.last.pt"
-        #         for exp_id in [0]]
-
-
-    # EXP 3 - Type of Architecture
-    elif CASE == 3:
-        # hyperparamter
-        exp_ids = [93, 97, 98, 99]
-
-        path = [f"./model/attack/poison/exp_{exp_id}/model.last.pt"
-                for exp_id in exp_ids]
-        archs = ['cw', 'cw_ks', 'cw_st', 'cw_ks_st']
-
-    elif CASE == 4:
-        exp_ids = [14, 25]
-        path = [f"./model/blackbox/exp_{exp_id}/model.last.pt"
-                for exp_id in exp_ids]
-
-        # exp_ids = [150]
-        # path += [f"./model/watermark/exp_{exp_id}/model.epoch_4.pt"
-        #         for exp_id in exp_ids]
-        # path += [f"./model/watermark/exp_{exp_id}/model.last.pt"
-        #         for exp_id in exp_ids]
-        #
-        # path.append("./model/attack/poison/exp_55/model.last.pt")
-        # path.append("./model/defense/exp_129/model.last.pt")
-        # path.append("./model/defense/exp_33/model.last.pt")
-        # path.append("./model/defense/exp_34/model.last.pt")
-
-
-        # path.append("./model/defense/exp_6/model.last.pt")
-        # path.append("./model/defense/exp_7/model.last.pt")
-        # path.append("./model/defense/exp_8/model.last.pt")
-        # path.append("./model/defense/exp_9/model.last.pt")
-        # path.append("./model/defense/exp_10/model.last.pt")
-
-        # path = [f"./model/target/exp_0/model.last.pt"]
 
     log.write(f'- Total models: {len(path)}')
-    log.write('|--------------------- PATH -----------------|---------------- EVASION -----------------|')
-    log.write('|                                            |------ Original -----|---- Adversary -----|')
-    log.write('|                                            | loss        acc     | loss       acc     |')
-    log.write('|---------------------------------------------------------------------------------------|')
+    log.write("path, origin_loss, origin_acc, evasion_loss, evasion_acc")
+    return
+    
     for idx, p in enumerate(path):
         CFG.pretrained_path = p
         if CASE == 3: CFG.arch = archs[idx]
