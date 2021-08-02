@@ -48,8 +48,8 @@ class CFG:
     backdoor_type = "blend"
     poison_ratio = 0.05
     class_ratio = 1
-    mask_ratio = 0.1
-    size_ratio = 0.1
+    mask_ratio = 1
+    size_ratio = 1
 
 
 def main():
