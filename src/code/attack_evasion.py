@@ -149,10 +149,10 @@ def main():
         if CFG.case != 0:
             # get class ratio
             class_ratio = json.load(open(log_path[idx]))['class_ratio']
-            num_classes = int(config.num_classes * class_ratio)
+            num_classes = int(CFG.num_classes * class_ratio)
             cand = list(range(num_classes))
             print(cand)
-            
+
         return
         ### Data Related
         # load evasion data
