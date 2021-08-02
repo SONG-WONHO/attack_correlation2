@@ -133,7 +133,7 @@ def main():
                 for exp_id in exp_ids]
 
     else:
-        exp_ids = list(range(23, 28))
+        exp_ids = list(range(22, 27))
         path = [f"./model/attack/poison/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
         log_path = [f"./log/attack/poison/exp_{exp_id}/CFG.json"
