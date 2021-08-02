@@ -271,19 +271,19 @@ def main():
 
         print(image_adv.detach().cpu().numpy().shape)
 
-        # size_ratio = json.load(open(log_path[idx]))['size_ratio']
-        # w, h = X_test.shape[1:3]
-        # num_pxs = w * h * size_ratio
-        # w_or_h = np.sqrt(num_pxs)
-        # if np.ceil(w_or_h) % 2 == 0:
-        #     w_or_h = np.ceil(w_or_h)
-        # else:
-        #     w_or_h = np.floor(w_or_h)
-        # print(w_or_h)
-        #
-        # mask = np.zeros(X_test.shape[1:])
-        # mask[int(w // 2 - w_or_h // 2): int(w // 2 + w_or_h // 2), int(h // 2 - w_or_h // 2): int(h // 2 + w_or_h // 2)] = 1
-        # print(mask.shape, )
+        size_ratio = json.load(open(log_path[idx]))['size_ratio']
+        w, h = X_test.shape[1:3]
+        num_pxs = w * h * size_ratio
+        w_or_h = np.sqrt(num_pxs)
+        if np.ceil(w_or_h) % 2 == 0:
+            w_or_h = np.ceil(w_or_h)
+        else:
+            w_or_h = np.floor(w_or_h)
+        print(w_or_h)
+
+        mask = np.zeros(X_test.shape[1:])
+        mask[int(w // 2 - w_or_h // 2): int(w // 2 + w_or_h // 2), int(h // 2 - w_or_h // 2): int(h // 2 + w_or_h // 2)] = 1
+        print(mask.shape, )
 
 if __name__ == "__main__":
     main()
