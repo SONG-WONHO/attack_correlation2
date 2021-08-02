@@ -145,21 +145,38 @@ def main():
         CFG.pretrained_path = p
         if CFG.case == 0:
             CFG.const = const_list[idx]
+            backdoored_cls = []
+            clean_cls = list(range(CFG.num_classes))
+            print(backdoored_cls, clean_cls)
 
+        # Targeted, Backdoored or Not?
         if CFG.case != 0:
             # get class ratio
             class_ratio = json.load(open(log_path[idx]))['class_ratio']
             num_classes = int(CFG.num_classes * class_ratio)
-            cand = list(range(num_classes))
-            print(cand)
+            backdoored_cls = list(range(num_classes))
+            clean_cls = [v for v in list(range(CFG.num_classes)) if v not in backdoored_cls]
+            print(backdoored_cls, clean_cls)
 
-        return
         ### Data Related
         # load evasion data
         _, _, X_test, y_test = get_dataset(CFG)
 
+        # targeted?
         if CFG.targeted:
-            logit = y_test.reshape(-1) != 0
+
+            # backdoored?
+            if CFG.poisoned:
+                assert len(backdoored_cls) != 0, "Maybe case 0?"
+                # select 1
+                cls = backdoored_cls[0]
+
+            # clean label?
+            else:
+                assert len(clean_cls) != 0, "Maybe all class is backdoored?"
+                cls = clean_cls[0]
+
+            logit = y_test.reshape(-1) != cls
             X_test = X_test[logit]
             y_test = y_test[logit]
 
@@ -180,37 +197,19 @@ def main():
             model = ResNet34(CFG.num_classes)
         elif CFG.arch == "resnet50":
             model = ResNet50(CFG.num_classes)
-        elif CFG.arch == "cw":
-            model = CWModel(CFG.num_classes)
-        elif CFG.arch == "cw_ks":
-            model = CWModelKernelSize(CFG.num_classes)
-        elif CFG.arch == "cw_st":
-            model = CWModelStride(CFG.num_classes)
-        elif CFG.arch == "cw_ks_st":
-            model = CWModelKernelSizeStride(CFG.num_classes)
-        try:
-            model.load_state_dict(torch.load(CFG.pretrained_path)['state_dict'])
-        except RuntimeError:
-            model = CWModelOriginal(CFG.num_classes)
-            model.load_state_dict(torch.load(CFG.pretrained_path)['state_dict'])
-
+        model.load_state_dict(torch.load(CFG.pretrained_path)['state_dict'])
         model.to(CFG.device)
         model.eval()
 
         ### Attack Related
         # prepare evasion data
-        try:
-            image = [test_transform(Image.fromarray(sample)).unsqueeze(0) for sample in X_train]
-        except:
-            image = [test_transform(image=sample)['image'].unsqueeze(0) for
-                     sample in X_train]
+        image = [test_transform(image=sample)['image'].unsqueeze(0) for
+                 sample in X_train]
         image = torch.cat(image).to(CFG.device)
         label = torch.LongTensor(y_train).view(-1).to(CFG.device)
 
-        print(image.shape, label.shape)
-
-        if targeted:
-            y = torch.LongTensor([1] * label.shape[0]).to(CFG.device)
+        if CFG.targeted:
+            y = torch.LongTensor([cls] * label.shape[0]).to(CFG.device)
         else:
             y = label
 
@@ -221,28 +220,29 @@ def main():
             if CFG.attack_type == "fgsm":
                 image_t = fast_gradient_method(
                     model, image[i*100:(i+1)*100], CFG.const, np.inf,
-                    y=y[i*100:(i+1)*100], targeted=targeted)
+                    y=y[i*100:(i+1)*100], targeted=CFG.targeted)
 
             elif CFG.attack_type == "bim":
-                image_t = projected_gradient_descent(
-                    model, image[i*100:(i+1)*100], CFG.const, CFG.const, 7, np.inf,
-                    y=y[i*100:(i+1)*100], targeted=targeted, rand_init=False)
+                image_t = basic_iterative_method(
+                    model, image[i*100:(i+1)*100],
+                    eps=CFG.const, eps_iter=CFG.const, n_iter=7,
+                    y=y[i*100:(i+1)*100], targeted=CFG.targeted)
 
             elif CFG.attack_type == "cw":
                 image_t = cw_l2_attack(
                     model, image[i*100:(i+1)*100], y[i*100:(i+1)*100],
-                    targeted=targeted, device=CFG.device,
+                    targeted=CFG.targeted, device=CFG.device,
                     c=CFG.const, max_iter=1000)
 
             elif CFG.attack_type == "pgd":
                 image_t = projected_gradient_descent(
                     model, image[i*100:(i+1)*100], CFG.const, CFG.const, 3, np.inf,
-                    y=y[i*100:(i+1)*100], targeted=targeted)
+                    y=y[i*100:(i+1)*100], targeted=CFG.targeted)
 
             elif CFG.attack_type == "spsa":
                 image_t = spsa(
                     model, image[i*100:(i+1)*100], CFG.const, 7,
-                    y=y[i*100:(i+1)*100], targeted=targeted)
+                    y=y[i*100:(i+1)*100], targeted=CFG.targeted)
 
             image_adv.append(image_t)
         image_adv = torch.cat(image_adv)
@@ -260,8 +260,12 @@ def main():
         # valid one epoch - evasion
         evasion_loss, evasion_acc = valid_one_epoch(evasion_loader, model, CFG)
 
+        # untargeted
+        if not CFG.targeted:
+            evasion_acc = 1 - evasion_acc
+
         # logging
-        log.write(f"| {p:42} | {tr_loss:.4f} {tr_acc:12.4f} | {evasion_loss:.4f} {evasion_acc:11.4f} |")
+        log.write(f"{p},{tr_loss:.4f},{tr_acc:12.4f},{evasion_loss:.4f},{evasion_acc:11.4f}")
 
 
 if __name__ == "__main__":
