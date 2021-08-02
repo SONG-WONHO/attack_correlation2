@@ -122,6 +122,7 @@ def main():
     ### pretrained path
     log.write("\nEVASION ATTACK Here !")
     log.write(f"- Targeted: {CFG.targeted}")
+    log.write(f"- Poisoned: {CFG.poisoned}")
     log.write(f"- Case: {CFG.case}")
 
     # target model
