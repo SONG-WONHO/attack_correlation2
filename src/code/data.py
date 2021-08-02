@@ -38,6 +38,21 @@ class ACDataset(Dataset):
         return img, label
 
 
+class EvasionDataset(Dataset):
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __len__(self):
+        return self.x.size(0)
+
+    def __getitem__(self, idx):
+        img = self.x[idx]
+        label = self.y[idx]
+        return img, label
+
+
 class APTOSLoader(object):
     """ https://www.kaggle.com/c/aptos2019-blindness-detection
     """
