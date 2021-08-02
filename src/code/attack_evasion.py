@@ -36,6 +36,7 @@ class CFG:
     const = 0.03 # eps or c
     case = 0 # 0: target, 1: samples, 2: classes, 3: intensity, 4: size
     targeted = False
+    poisoned = True
 
     # etc
     seed = 42
@@ -59,6 +60,8 @@ def main():
                         help=f"Case - 0:target, 1:samples, 2:classes, 3:intensity, 4:size({CFG.case})")
     parser.add_argument("--targeted", action="store_true", default=CFG.targeted,
                         help=f"Targeted Evasion Attack?")
+    parser.add_argument("--poisoned", action="store_true", default=CFG.poisoned,
+                        help=f"Targeted Evasion Attack on poisoned class?")
 
     # etc
     parser.add_argument("--worker", default=CFG.worker, type=int,
@@ -75,6 +78,7 @@ def main():
     CFG.const = args.const
     CFG.case = args.case
     CFG.targeted = args.targeted
+    CFG.poisoned = args.poisoned
 
     CFG.worker = args.worker
     CFG.seed = args.seed
@@ -116,7 +120,7 @@ def main():
     log.open(os.path.join(CFG.log_path, "log.txt"))
 
     ### pretrained path
-    log.write("EVASION ATTACK Here !")
+    log.write("\nEVASION ATTACK Here !")
     log.write(f"- Targeted: {CFG.targeted}")
     log.write(f"- Case: {CFG.case}")
 
@@ -131,30 +135,36 @@ def main():
         exp_ids = list(range(0, 10))
         path = [f"./model/attack/poison/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
+        log_path = [f"./log/attack/poison/exp_{exp_id}/CFG.json"
+                    for exp_id in exp_ids]
 
     log.write(f'- Total models: {len(path)}')
     log.write("path, origin_loss, origin_acc, evasion_loss, evasion_acc")
-    return
-    
+
     for idx, p in enumerate(path):
         CFG.pretrained_path = p
-        if CASE == 3: CFG.arch = archs[idx]
+        if CFG.case == 0:
+            CFG.const = const_list[idx]
 
+        if CFG.case != 0:
+            # get class ratio
+            class_ratio = json.load(open(log_path[idx]))['class_ratio']
+            num_classes = int(config.num_classes * class_ratio)
+            cand = list(range(num_classes))
+            print(cand)
+            
+        return
         ### Data Related
         # load evasion data
-        X_train, y_train, X_test, y_test = get_dataset(CFG)
+        _, _, X_test, y_test = get_dataset(CFG)
 
-        targeted = False
-
-        if targeted:
-            logit = y_test.reshape(-1) != 1
+        if CFG.targeted:
+            logit = y_test.reshape(-1) != 0
             X_test = X_test[logit]
             y_test = y_test[logit]
 
         X_train = X_test[-500:]
         y_train = y_test[-500:]
-        # X_train = X_train[-100:]
-        # y_train = y_train[-100:]
 
         # get transform
         _, test_transform = get_transform(CFG)
