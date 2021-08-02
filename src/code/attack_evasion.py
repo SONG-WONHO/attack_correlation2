@@ -36,7 +36,7 @@ class CFG:
     const = 0.03 # eps or c
     case = 0 # 0: target, 1: samples, 2: classes, 3: intensity, 4: size
     targeted = False
-    poisoned = True
+    poisoned = False
 
     # etc
     seed = 42
