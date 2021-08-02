@@ -46,10 +46,19 @@ class CFG:
     # backdoor
     pretrained_path = None
     backdoor_type = "blend"
+
+    """
     poison_ratio = 0.05
-    class_ratio = 1
+    class_ratio = 0.5
     mask_ratio = 0.1
     size_ratio = 1
+    """
+
+    # factor settings
+    poison_ratio = 0.005
+    class_ratio = 0.1
+    mask_ratio = 0.1
+    size_ratio = 0.05
 
 
 def main():
