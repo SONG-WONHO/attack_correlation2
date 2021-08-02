@@ -17,7 +17,6 @@ from data import *
 from models.lenet import LeNet5
 from models.resnet import *
 from utils import *
-
 from attacks.evasion import *
 
 
@@ -35,6 +34,7 @@ class CFG:
     # attack
     attack_type = "fgsm"
     const = 0.03 # eps or c
+    case = 0 # 0: target, 1: samples, 2: classes, 3: intensity, 4: size
 
     # etc
     seed = 42
@@ -54,6 +54,8 @@ def main():
                         help=f"Attack Type({CFG.attack_type})")
     parser.add_argument("--const", default=CFG.const, type=float,
                         help=f"Constants({CFG.const})")
+    parser.add_argument("--case", default=CFG.case, type=int,
+                        help=f"Case - 0:target, 1:samples, 2:classes, 3:intensity, 4:size({CFG.case})")
 
     # etc
     parser.add_argument("--worker", default=CFG.worker, type=int,
@@ -68,6 +70,7 @@ def main():
 
     CFG.attack_type = args.attack_type
     CFG.const = args.const
+    CFG.case = args.case
 
     CFG.worker = args.worker
     CFG.seed = args.seed
@@ -77,12 +80,14 @@ def main():
 
     # update log path
     os.makedirs(CFG.log_path, exist_ok=True)
-    CFG.log_path = os.path.join(CFG.log_path, f'exp_{get_exp_id(CFG.log_path, prefix="exp_")}')
+    CFG.log_path = os.path.join(
+        CFG.log_path, f'exp_{get_exp_id(CFG.log_path, prefix="exp_")}')
     os.makedirs(CFG.log_path, exist_ok=True)
 
     # update model path
     os.makedirs(CFG.model_path, exist_ok=True)
-    CFG.model_path = os.path.join(CFG.model_path, f'exp_{get_exp_id(CFG.model_path, prefix="exp_")}')
+    CFG.model_path = os.path.join(
+        CFG.model_path, f'exp_{get_exp_id(CFG.model_path, prefix="exp_")}')
     os.makedirs(CFG.model_path, exist_ok=True)
 
     # num of classes
@@ -98,6 +103,8 @@ def main():
     json.dump(
         {k: v for k, v in dict(CFG.__dict__).items() if '__' not in k},
         open(os.path.join(CFG.log_path, 'CFG.json'), "w"))
+
+    return
 
     ### seed all
     seed_everything(CFG.seed)
