@@ -141,8 +141,8 @@ def main():
         path = [f"./model/attack/poison/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
 
-        path = [f"./model/target/exp_{exp_id}/model.last.pt"
-                for exp_id in [0]]
+        # path = [f"./model/target/exp_{exp_id}/model.last.pt"
+        #         for exp_id in [0]]
 
 
     # EXP 3 - Type of Architecture
