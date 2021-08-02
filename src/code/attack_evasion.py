@@ -245,6 +245,8 @@ def main():
         image = torch.cat(image).to(CFG.device)
         label = torch.LongTensor(y_train).view(-1).to(CFG.device)
 
+        print(image.shape, label.shape)
+
         if targeted:
             y = torch.LongTensor([1] * label.shape[0]).to(CFG.device)
         else:
