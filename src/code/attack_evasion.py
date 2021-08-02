@@ -265,7 +265,7 @@ def main():
             evasion_acc = 1 - evasion_acc
 
         # logging
-        log.write(f"{p},{tr_loss:.4f},{tr_acc:12.4f},{evasion_loss:.4f},{evasion_acc:11.4f}")
+        log.write(f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
 
 
 if __name__ == "__main__":
