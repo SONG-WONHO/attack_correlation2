@@ -286,5 +286,8 @@ def main():
         mask[int(w // 2 - w_or_h // 2): int(w // 2 + w_or_h // 2), int(h // 2 - w_or_h // 2): int(h // 2 + w_or_h // 2)] = 1
         print(mask.shape, )
 
+        print(np.sqrt(((X_train - adv) * mask) ** 2).sum())
+        print(np.sqrt(((X_train - adv) * (1-mask)) ** 2).sum())
+
 if __name__ == "__main__":
     main()
