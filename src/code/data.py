@@ -94,6 +94,10 @@ def get_dataset(config):
 
     (X_train, y_train), (X_test, y_test) = dataset.load_data()
 
+    if config.dataset == "mnist":
+        X_train = X_train.reshape(*X_train.shape, 1)
+        X_test = X_test.reshape(*X_test.shape, 1)
+
     return X_train, y_train, X_test, y_test
 
 
