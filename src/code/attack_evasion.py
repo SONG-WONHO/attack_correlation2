@@ -270,7 +270,7 @@ def main():
         log.write(f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
 
         adv = image_adv.detach().cpu().permute(0,2,3,1).numpy()
-        print(np.sqrt((X_train - adv) ** 2).sum())
+        total = np.sqrt((X_train - adv) ** 2).sum()/1000
 
         size_ratio = json.load(open(log_path[idx]))['size_ratio']
         w, h = X_test.shape[1:3]
@@ -284,10 +284,9 @@ def main():
 
         mask = np.zeros(X_test.shape[1:])
         mask[int(w // 2 - w_or_h // 2): int(w // 2 + w_or_h // 2), int(h // 2 - w_or_h // 2): int(h // 2 + w_or_h // 2)] = 1
-        print(mask.shape, )
 
-        print(np.sqrt(((X_train - adv) * mask) ** 2).sum())
-        print(np.sqrt(((X_train - adv) * (1-mask)) ** 2).sum())
+        print(np.sqrt(((X_train - adv) * mask) ** 2).sum()/1000 / total)
+        print(np.sqrt(((X_train - adv) * (1-mask)) ** 2).sum()/1000 / total)
 
 if __name__ == "__main__":
     main()
