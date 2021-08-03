@@ -280,8 +280,12 @@ def main():
             evasion_acc = 1 - evasion_acc
 
         # logging
-        log.write(
-            f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
+        if CFG.case == 0:
+            log.write(
+                f"{CFG.const},{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
+        else:
+            log.write(
+                f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
 
         # for check
         # adv = image_adv.detach().cpu().permute(0,2,3,1).numpy()
