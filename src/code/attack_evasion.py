@@ -166,7 +166,7 @@ def main():
             backdoored_cls = list(range(num_classes))
             clean_cls = [v for v in list(range(CFG.num_classes)) if
                          v not in backdoored_cls]
-            print(backdoored_cls, clean_cls)
+            # print(backdoored_cls, clean_cls)
 
         ### Data Related
         # load evasion data
@@ -185,7 +185,6 @@ def main():
             else:
                 assert len(clean_cls) != 0, "Maybe all class is backdoored?"
                 cls = clean_cls[-1]
-                cls = 5
 
             logit = y_test.reshape(-1) != cls
             X_test = X_test[logit]
