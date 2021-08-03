@@ -201,16 +201,23 @@ def fast_gradient_method(
     return adv_x
 
 
-def basic_iterative_method(model, x, y=None, targeted=False, eps=0.15,
-                           eps_iter=0.01, n_iter=50, clip_max=None,
-                           clip_min=None, device="cpu"):
-    model.eval()
+def basic_iterative_method(
+        model,
+        x,
+        y=None,
+        targeted=False,
+        eps=0.15,
+        eps_iter=0.01,
+        n_iter=50,
+        clip_max=None,
+        clip_min=None):
+
     x = x.clone().detach().to(torch.float).requires_grad_(True)
     if y is None:
         # Using model predictions as ground truth to avoid label leaking
         _, y = torch.max(model(x)[0], 1)
 
-    eta = torch.zeros(x.shape).to(device)
+    eta = torch.zeros(x.shape).to(x.device)
 
     for i in range(n_iter):
         out = model(x + eta)[0]
@@ -218,7 +225,6 @@ def basic_iterative_method(model, x, y=None, targeted=False, eps=0.15,
         if targeted:
             loss = -loss
         loss.backward()
-
         eta += eps_iter * torch.sign(x.grad.data)
         eta.clamp_(-eps, eps)
         x.grad.data.zero_()
