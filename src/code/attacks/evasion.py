@@ -421,7 +421,7 @@ def cw_l2_attack_batch(model, imgs, targets,
 
         prev = np.inf
 
-        for iteration in tqdm(range(max_iterations)):
+        for iteration in tqdm(range(max_iterations), leave=False):
             # Perform the attack
             (loss, l2_dists,
             logits, adv_imgs) = compute_loss(tanh_imgs, targets,
