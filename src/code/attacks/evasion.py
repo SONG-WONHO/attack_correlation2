@@ -639,7 +639,7 @@ def spsa(
     # so if the batch is bigger we split it up.
     if len(x) != 1:
         adv_x = []
-        for x_single, y_single in tqdm(zip(x, y), leave=False, total=len(X)):
+        for x_single, y_single in tqdm(zip(x, y), leave=False, total=len(x)):
             adv_x_single = spsa(
                 model_fn=model_fn,
                 x=x_single.unsqueeze(0),
