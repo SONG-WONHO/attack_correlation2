@@ -379,7 +379,7 @@ def carlini_wagner_l2(
         bestscore = [-1.0] * len(x)
 
         # Inner loop performing attack iterations
-        for i in range(max_iterations):
+        for i in tqdm(range(max_iterations), leave=False):
             # One attack step
             new_x = (torch.tanh(modifier + x) + 1) / 2
             new_x = new_x * (clip_max - clip_min) + clip_min
