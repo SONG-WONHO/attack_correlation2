@@ -217,7 +217,7 @@ def main():
 
         # do attack
         image_adv = []
-        sz = 100
+        sz = 1000
         b_size = len(image) // sz
         for i in range(b_size):
             if CFG.attack_type == "fgsm":
