@@ -228,7 +228,7 @@ def main():
             elif CFG.attack_type == "bim":
                 image_t = basic_iterative_method(
                     model, image[i*sz:(i+1)*sz],
-                    eps=CFG.const, eps_iter=CFG.const, n_iter=7,
+                    eps=CFG.const, eps_iter=CFG.const/10, n_iter=50,
                     y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
 
             elif CFG.attack_type == "cw":
