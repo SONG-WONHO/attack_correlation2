@@ -84,8 +84,7 @@ for line in stdout:
     sr = float(line[-1])
     if sr < 0.4:
         cand += [(c, sr)]
-    if sr > 0.4:
-        break
+
 cand = sorted(cand, key=lambda x: x[1], reverse=True)
 final_c = cand[0][0]
 print(cand[0][0] * 255, cand[0][1])
