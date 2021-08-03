@@ -179,7 +179,7 @@ def main():
             backdoored_cls = list(range(num_classes))
             clean_cls = [v for v in list(range(CFG.num_classes)) if
                          v not in backdoored_cls]
-            # print(backdoored_cls, clean_cls)
+            print(backdoored_cls, clean_cls)
 
         ### Data Related
         # load evasion data
