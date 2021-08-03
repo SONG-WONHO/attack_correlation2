@@ -245,10 +245,14 @@ def main():
                 # image_t = fast_gradient_method(
                 #     model, image[i * sz:(i + 1) * sz], CFG.const, np.inf,
                 #     y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
-                image_t = basic_iterative_method(
-                    model, image[i * sz:(i + 1) * sz],
-                    eps=CFG.const, eps_iter=CFG.const, n_iter=1,
+                image_t = projected_gradient_descent(
+                    model, image[i * sz:(i + 1) * sz], CFG.const, CFG.const,
+                    1, np.inf,
                     y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
+                # image_t = basic_iterative_method(
+                #     model, image[i * sz:(i + 1) * sz],
+                #     eps=CFG.const, eps_iter=CFG.const, n_iter=1,
+                #     y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
 
             elif CFG.attack_type == "bim":
                 image_t = basic_iterative_method(
