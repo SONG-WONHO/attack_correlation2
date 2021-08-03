@@ -183,7 +183,7 @@ def main():
             # clean label?
             else:
                 assert len(clean_cls) != 0, "Maybe all class is backdoored?"
-                cls = clean_cls[0]
+                cls = clean_cls[-1]
 
             logit = y_test.reshape(-1) != cls
             X_test = X_test[logit]
