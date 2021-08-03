@@ -242,13 +242,13 @@ def main():
         b_size = len(image) // sz
         for i in range(b_size):
             if CFG.attack_type == "fgsm":
-                # image_t = fast_gradient_method(
-                #     model, image[i * sz:(i + 1) * sz], CFG.const, np.inf,
-                #     y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
-                image_t = projected_gradient_descent(
-                    model, image[i * sz:(i + 1) * sz], CFG.const, CFG.const,
-                    1, np.inf,
+                image_t = fast_gradient_method(
+                    model, image[i * sz:(i + 1) * sz], CFG.const, np.inf,
                     y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
+                # image_t = projected_gradient_descent(
+                #     model, image[i * sz:(i + 1) * sz], CFG.const, CFG.const,
+                #     1, np.inf,
+                #     y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
                 # image_t = basic_iterative_method(
                 #     model, image[i * sz:(i + 1) * sz],
                 #     eps=CFG.const, eps_iter=CFG.const, n_iter=1,
