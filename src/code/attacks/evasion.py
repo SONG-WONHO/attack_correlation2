@@ -290,185 +290,197 @@ def carlini_wagner_l2(
     return adv_imgs
 
 
-def cw_l2_attack_batch(model, imgs, targets,
-                       confidence=0, targeted=False, learning_rate=1e-2,
-                       binary_search_steps=9, max_iterations=10000,
-                       abort_early=True,
-                       initial_const=1e-3,
-                       boxmin=-0.5, boxmax=0.5, device='cuda'):
-    """
-    Performs binary search to find optimal constant value.
+"""The CarliniWagnerL2 attack."""
+import torch
 
-    Args:
-        model: A callable that takes an input tensor and returns the model
-          logits.
-        imgs: Input tensor.
-        targets: If targeted is true, then the targets represents the target
-          labels. Otherwise,then targets are the original class labels.
-        confidence: Confidence of adversarial examples: higher produces examples
-          that are farther away, but more strongly classified as adversarial.
-        targeted: True if we should perform a targetted attack, False otherwise.
-        learning_rate: The learning rate for the attack algorithm. Smaller
-          values produce better results but are slower to converge.
-        binary_search_steps: The number of times we perform binary search to
-          find the optimal tradeoff-constant between distance and confidence.
-        max_iterations: The maximum number of iterations. Larger values are more
-          accurate; setting too small will require a large learning rate and
-          will produce poor results.
-        abort_early: If true, allows early aborts if gradient descent gets
-          stuck.
-        initial_const: The initial tradeoff-constant to use to tune the relative
-          importance of distance and confidence. If binary_search_steps is
-          large, the initial constant is not important.
-        boxmin: Minimum pixel value (default -0.5).
-        boxmax: Maximum pixel value (default 0.5).
-        device: A device to run the attack.
 
-    Returns:
-        Adversarial examples for the supplied model.
+INF = float("inf")
+
+
+def carlini_wagner_l2(
+    model_fn,
+    x,
+    n_classes,
+    y=None,
+    targeted=False,
+    lr=5e-3,
+    confidence=0,
+    clip_min=0,
+    clip_max=1,
+    initial_const=1e-2,
+    binary_search_steps=5,
+    max_iterations=1000,
+):
     """
+    This attack was originally proposed by Carlini and Wagner. It is an
+    iterative attack that finds adversarial examples on many defenses that
+    are robust to other attacks.
+    Paper link: https://arxiv.org/abs/1608.04644
+    At a high level, this attack is an iterative attack using Adam and
+    a specially-chosen loss function to find adversarial examples with
+    lower distortion than other attacks. This comes at the cost of speed,
+    as this attack is often much slower than others.
+    :param model_fn: a callable that takes an input tensor and returns
+              the model logits. The logits should be a tensor of shape
+              (n_examples, n_classes).
+    :param x: input tensor of shape (n_examples, ...), where ... can
+              be any arbitrary dimension that is compatible with
+              model_fn.
+    :param n_classes: the number of classes.
+    :param y: (optional) Tensor with true labels. If targeted is true,
+              then provide the target label. Otherwise, only provide
+              this parameter if you'd like to use true labels when
+              crafting adversarial samples. Otherwise, model predictions
+              are used as labels to avoid the "label leaking" effect
+              (explained in this paper:
+              https://arxiv.org/abs/1611.01236). If provide y, it
+              should be a 1D tensor of shape (n_examples, ).
+              Default is None.
+    :param targeted: (optional) bool. Is the attack targeted or
+              untargeted? Untargeted, the default, will try to make the
+              label incorrect. Targeted will instead try to move in the
+              direction of being more like y.
+    :param lr: (optional) float. The learning rate for the attack
+              algorithm. Default is 5e-3.
+    :param confidence: (optional) float. Confidence of adversarial
+              examples: higher produces examples with larger l2
+              distortion, but more strongly classified as adversarial.
+              Default is 0.
+    :param clip_min: (optional) float. Minimum float value for
+              adversarial example components. Default is 0.
+    :param clip_max: (optional) float. Maximum float value for
+              adversarial example components. Default is 1.
+    :param initial_const: The initial tradeoff-constant to use to tune the
+              relative importance of size of the perturbation and
+              confidence of classification. If binary_search_steps is
+              large, the initial constant is not important. A smaller
+              value of this constant gives lower distortion results.
+              Default is 1e-2.
+    :param binary_search_steps: (optional) int. The number of times we
+              perform binary search to find the optimal tradeoff-constant
+              between norm of the perturbation and confidence of the
+              classification. Default is 5.
+    :param max_iterations: (optional) int. The maximum number of
+              iterations. Setting this to a larger value will produce
+              lower distortion results. Using only a few iterations
+              requires a larger learning rate, and will produce larger
+              distortion results. Default is 1000.
+    """
+
+    def compare(pred, label, is_logits=False):
+        """
+        A helper function to compare prediction against a label.
+        Returns true if the attack is considered successful.
+        :param pred: can be either a 1D tensor of logits or a predicted
+                class (int).
+        :param label: int. A label to compare against.
+        :param is_logits: (optional) bool. If True, treat pred as an
+                array of logits. Default is False.
+        """
+
+        # Convert logits to predicted class if necessary
+        if is_logits:
+            pred_copy = pred.clone().detach()
+            pred_copy[label] += -confidence if targeted else confidence
+            pred = torch.argmax(pred_copy)
+
+        return pred == label if targeted else pred != label
 
     def arctanh(x):
         return 0.5 * torch.log((1 + x) / (1 - x))
 
-    def compare(x, y):
-        if isinstance(x, torch.Tensor) and x.dtype != torch.int64:
-            x = x.clone().detach()
-            if targeted:
-                x[y] -= confidence
-            else:
-                x[y] += confidence
-            x = torch.argmax(x)
-        if targeted:
-            return x == y
-        else:
-            return x != y
+    if y is None:
+        # Using model predictions as ground truth to avoid label leaking
+        pred = model_fn(x)[0]
+        y = torch.argmax(pred, 1)
 
-    def convert_from_tanh(imgs):
-        # The resulting image, tanh'd to keep bounded from boxmin to boxmax
-        boxmul = (boxmax - boxmin) / 2.
-        boxplus = (boxmin + boxmax) / 2.
-        return torch.tanh(imgs) * boxmul + boxplus
+    # Initialize some values needed for binary search on const
+    lower_bound = [0.0] * len(x)
+    upper_bound = [1e10] * len(x)
+    const = x.new_ones(len(x), 1) * initial_const
 
-    def convert2tanh(imgs):
-        boxmul = (boxmax - boxmin) / 2.
-        boxplus = (boxmin + boxmax) / 2.
-        return arctanh((imgs - boxplus) / boxmul * 0.999999)
+    o_bestl2 = [INF] * len(x)
+    o_bestscore = [-1.0] * len(x)
+    x = torch.clamp(x, clip_min, clip_max)
+    ox = x.clone().detach()  # save the original x
+    o_bestattack = x.clone().detach()
 
-    def get_target_logit(targets, logits):
-        return torch.sum(targets * logits, dim=1)
+    # Map images into the tanh-space
+    x = (x - clip_min) / (clip_max - clip_min)
+    x = torch.clamp(x, 0, 1)
+    x = x * 2 - 1
+    x = arctanh(x * 0.999999)
 
-    def get_others_max_logit(targets, logits):
-        logits = (1 - targets) * logits - (targets  * 10000)
-        return torch.max(logits, dim=1)[0]
+    # Prepare some variables
+    modifier = torch.zeros_like(x, requires_grad=True).to(x.device)
+    y_onehot = torch.nn.functional.one_hot(y, n_classes).to(torch.float)
 
-    def compute_loss(tanh_imgs, targets, modifier, const):
-        tanh_adv_imgs = tanh_imgs + modifier
-        adv_imgs = convert_from_tanh(tanh_adv_imgs)
-        imgs = convert_from_tanh(tanh_imgs)
+    # Define loss functions and optimizer
+    f_fn = lambda real, other, targeted: torch.max(
+        ((other - real) if targeted else (real - other)) + confidence,
+        torch.tensor(0.0).to(real.device),
+    )
+    l2dist_fn = lambda x, y: torch.pow(x - y, 2).sum(list(range(len(x.size())))[1:])
+    optimizer = torch.optim.Adam([modifier], lr=lr)
 
-        logit_adv_img = model(adv_imgs)[0]
-        real = get_target_logit(targets, logit_adv_img)
-        other = get_others_max_logit(targets, logit_adv_img)
-
-        if targeted:
-            # If targeted, optimize for making the other class most likely.
-            loss1 = torch.max(torch.tensor([0.0]).to(device),
-                              other - real + confidence)
-        else:
-            # If untargeted, optimize for making this class least likely.
-            loss1 = torch.max(torch.tensor([0.0]).to(device),
-                              real - other + confidence)
-
-        diff = adv_imgs - imgs
-        l2dist_loss = torch.sum(diff * diff, dim=[1,2,3])
-
-        loss1 = torch.sum(const * loss1)
-        loss2 = torch.sum(l2dist_loss)
-        loss = loss1 + loss2
-
-        return loss, l2dist_loss, logit_adv_img, adv_imgs
-
-    # Set the lower and upper bounds accordingly
-    batch_size = imgs.shape[0]
-    lower_bound = torch.zeros(batch_size).to(device)
-    const = torch.ones(batch_size).to(device) * initial_const
-    upper_bound = torch.ones(batch_size).to(device) * 1e10
-
-    # The best l2, score, and image attack
-    o_bestl2 = [1e10] * batch_size
-    o_bestscore = [-1] * batch_size
-    o_bestattack = [torch.zeros(imgs[0].shape).to(device)] * batch_size
-
-    tanh_imgs = convert2tanh(imgs)
-
+    # Outer loop performing binary search on const
     for outer_step in range(binary_search_steps):
-        print(('[%d/%d] CW L2 attack binary search step' %
-               (outer_step + 1, binary_search_steps)))
+        # Initialize some values needed for the inner loop
+        bestl2 = [INF] * len(x)
+        bestscore = [-1.0] * len(x)
 
-        # Completely reset internal state.
-        modifier = torch.zeros_like(imgs, requires_grad=True)
-        modifier = modifier.to(device)
-        optimizer = optim.Adam([modifier], lr=learning_rate)
+        # Inner loop performing attack iterations
+        for i in range(max_iterations):
+            # One attack step
+            new_x = (torch.tanh(modifier + x) + 1) / 2
+            new_x = new_x * (clip_max - clip_min) + clip_min
+            logits = model_fn(new_x)[0]
 
-        bestl2 = [1e10] * batch_size
-        bestscore = [-1] * batch_size
-
-        # The last iteration (if we run many steps) repeat the search once.
-        repeat = binary_search_steps >= 10
-        if repeat == True and outer_step == binary_search_steps - 1:
-            const = upper_bound
-
-        prev = np.inf
-
-        for iteration in tqdm(range(max_iterations), leave=False):
-            # Perform the attack
-            (loss, l2_dists,
-            logits, adv_imgs) = compute_loss(tanh_imgs, targets,
-                                             modifier, const)
+            real = torch.sum(y_onehot * logits, 1)
+            other, _ = torch.max((1 - y_onehot) * logits - y_onehot * 1e4, 1)
 
             optimizer.zero_grad()
+            f = f_fn(real, other, targeted)
+            l2 = l2dist_fn(new_x, ox)
+            loss = (const * f + l2).sum()
             loss.backward()
             optimizer.step()
 
-            # Check if we should abort search if we're getting nowhere.
-            if abort_early and iteration % (max_iterations // 10) == 0:
-                if loss > prev * .9999: break
-                prev = loss
+            # Update best results
+            for n, (l2_n, logits_n, new_x_n) in enumerate(zip(l2, logits, new_x)):
+                y_n = y[n]
+                succeeded = compare(logits_n, y_n, is_logits=True)
+                if l2_n < o_bestl2[n] and succeeded:
+                    pred_n = torch.argmax(logits_n)
+                    o_bestl2[n] = l2_n
+                    o_bestscore[n] = pred_n
+                    o_bestattack[n] = new_x_n
+                    # l2_n < o_bestl2[n] implies l2_n < bestl2[n] so we modify inner loop variables too
+                    bestl2[n] = l2_n
+                    bestscore[n] = pred_n
+                elif l2_n < bestl2[n] and succeeded:
+                    bestl2[n] = l2_n
+                    bestscore[n] = torch.argmax(logits_n)
 
-            # Adjust the best result found so far
-            zipped_result = zip(l2_dists, logits, adv_imgs)
-            for idx, (l2_dist, logit, adv_img) in enumerate(zipped_result):
-                if (l2_dist < bestl2[idx] and
-                    compare(logit, torch.argmax(targets[idx]))):
-                    bestl2[idx] = l2_dist
-                    bestscore[idx] = torch.argmax(logit)
+        # Binary search step
+        for n in range(len(x)):
+            y_n = y[n]
 
-                if (l2_dist < o_bestl2[idx] and
-                    compare(logit, torch.argmax(targets[idx]))):
-                    o_bestl2[idx] = l2_dist
-                    o_bestscore[idx] = torch.argmax(logit)
-                    o_bestattack[idx] = adv_img
-
-        # Adjust the constant as needed
-        for idx in range(batch_size):
-            if (compare(bestscore[idx], torch.argmax(targets[idx])) and
-                bestscore[idx] != -1):
-                # On success, divide const by two
-                upper_bound[idx] = min(upper_bound[idx], const[idx])
-                if upper_bound[idx] < 1e9:
-                    const[idx] = (lower_bound[idx] + upper_bound[idx]) / 2
+            if compare(bestscore[n], y_n) and bestscore[n] != -1:
+                # Success, divide const by two
+                upper_bound[n] = min(upper_bound[n], const[n])
+                if upper_bound[n] < 1e9:
+                    const[n] = (lower_bound[n] + upper_bound[n]) / 2
             else:
-                # On failure, either multiply by 10 if no solution found yet
+                # Failure, either multiply by 10 if no solution found yet
                 # or do binary search with the known upper bound
-                lower_bound[idx] = max(lower_bound[idx], const[idx])
-                if upper_bound[idx] < 1e9:
-                    const[idx] = (lower_bound[idx] + upper_bound[idx])/2
+                lower_bound[n] = max(lower_bound[n], const[n])
+                if upper_bound[n] < 1e9:
+                    const[n] = (lower_bound[n] + upper_bound[n]) / 2
                 else:
-                    const[idx] *= 10
+                    const[n] *= 10
 
-    # Return the best solution found
-    return o_bestattack
+    return o_bestattack.detach()
 
 
 # def carlini_wagner_l2(
@@ -637,7 +649,7 @@ def projected_gradient_descent(
 
     if y is None:
         # Using model predictions as ground truth to avoid label leaking
-        _, y = torch.max(model_fn(x), 1)
+        _, y = torch.max(model_fn(x)[0], 1)
 
     i = 0
     while i < nb_iter:
