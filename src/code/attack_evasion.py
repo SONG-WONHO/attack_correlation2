@@ -231,16 +231,16 @@ def main():
                     eps=CFG.const, eps_iter=CFG.const/10, n_iter=50,
                     y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
 
+            elif CFG.attack_type == "pgd":
+                image_t = projected_gradient_descent(
+                    model, image[i*sz:(i+1)*sz], CFG.const, CFG.const/4, 7, np.inf,
+                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
+
             elif CFG.attack_type == "cw":
                 image_t = cw_l2_attack(
                     model, image[i*sz:(i+1)*sz], y[i*sz:(i+1)*sz],
                     targeted=CFG.targeted, device=CFG.device,
                     c=CFG.const, max_iter=1000)
-
-            elif CFG.attack_type == "pgd":
-                image_t = projected_gradient_descent(
-                    model, image[i*sz:(i+1)*sz], CFG.const, CFG.const, 3, np.inf,
-                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
 
             elif CFG.attack_type == "spsa":
                 image_t = spsa(
