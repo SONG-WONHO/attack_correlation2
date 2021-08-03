@@ -247,59 +247,284 @@ INF = float("inf")
 
 
 def carlini_wagner_l2(
-        model,
-        images,
-        labels,
-        targeted=False, c=1, kappa=0,
-        max_iter=1000, learning_rate=5e-3, device="cpu"):
-    images = images.to(device)
-    labels = labels.to(device)
+        model, imgs, targets,
+        batch_size=1000, device='cuda', **kwargs):
+    """
+    The L_2 optimized attack.
 
-    # Define f-function
-    def f(x):
-        outputs = model(x)[0]
-        one_hot_labels = torch.eye(len(outputs[0]))[labels].to(device)
+    This attack is the most efficient and should be used as the primary
+    attack to evaluate potential defenses.
 
-        i, _ = torch.max((1 - one_hot_labels) * outputs, dim=1)
+    Args:
+        model: A callable that takes an input tensor and returns the model
+          logits.
+        imgs: Input tensor.
+        targets: If targeted is true, then the targets represents the target
+          labels. Otherwise,then targets are the original class labels.
+        batch_size: Number of attacks to run simultaneously.
+        device: A device to run the attack.
 
-        j = torch.masked_select(outputs, one_hot_labels.bool())
+    Returns:
+        Adversarial examples for the supplied model.
+    """
 
-        # If targeted, optimize for making the other class most likely
+    imgs = imgs.to(device)
+    targets = targets.to(device)
+    layers = [module for module in model.modules()]
+    output_layer = layers[-1]
+    num_classes = output_layer.out_features
+    targets = F.one_hot(targets, num_classes=num_classes)
+    model = model.to(device)
+
+    adv_imgs = []
+    kwargs['device'] = device
+    for i in range(0, len(imgs), batch_size):
+        img_batch = imgs[i:i + batch_size]
+        target_batch = targets[i:i + batch_size]
+        attack_result = cw_l2_attack_batch(model, img_batch, target_batch,
+                                           **kwargs)
+        attack_result = torch.stack(attack_result)
+        adv_imgs += [attack_result]
+
+    adv_imgs = torch.cat(adv_imgs)
+    return adv_imgs
+
+
+def cw_l2_attack_batch(model, imgs, targets,
+                       confidence=0, targeted=False, learning_rate=1e-2,
+                       binary_search_steps=9, max_iterations=10000,
+                       abort_early=True,
+                       initial_const=1e-3,
+                       boxmin=-0.5, boxmax=0.5, device='cuda'):
+    """
+    Performs binary search to find optimal constant value.
+
+    Args:
+        model: A callable that takes an input tensor and returns the model
+          logits.
+        imgs: Input tensor.
+        targets: If targeted is true, then the targets represents the target
+          labels. Otherwise,then targets are the original class labels.
+        confidence: Confidence of adversarial examples: higher produces examples
+          that are farther away, but more strongly classified as adversarial.
+        targeted: True if we should perform a targetted attack, False otherwise.
+        learning_rate: The learning rate for the attack algorithm. Smaller
+          values produce better results but are slower to converge.
+        binary_search_steps: The number of times we perform binary search to
+          find the optimal tradeoff-constant between distance and confidence.
+        max_iterations: The maximum number of iterations. Larger values are more
+          accurate; setting too small will require a large learning rate and
+          will produce poor results.
+        abort_early: If true, allows early aborts if gradient descent gets
+          stuck.
+        initial_const: The initial tradeoff-constant to use to tune the relative
+          importance of distance and confidence. If binary_search_steps is
+          large, the initial constant is not important.
+        boxmin: Minimum pixel value (default -0.5).
+        boxmax: Maximum pixel value (default 0.5).
+        device: A device to run the attack.
+
+    Returns:
+        Adversarial examples for the supplied model.
+    """
+
+    def arctanh(x):
+        return 0.5 * torch.log((1 + x) / (1 - x))
+
+    def compare(x, y):
+        if isinstance(x, torch.Tensor) and x.dtype != torch.int64:
+            x = x.clone().detach()
+            if targeted:
+                x[y] -= confidence
+            else:
+                x[y] += confidence
+            x = torch.argmax(x)
         if targeted:
-            return torch.clamp(i - j, min=-kappa)
-
-        # If untargeted, optimize for making the other class most likely
+            return x == y
         else:
-            return torch.clamp(j - i, min=-kappa)
+            return x != y
 
-    w = torch.zeros_like(images, requires_grad=True).to(device)
+    def convert_from_tanh(imgs):
+        # The resulting image, tanh'd to keep bounded from boxmin to boxmax
+        boxmul = (boxmax - boxmin) / 2.
+        boxplus = (boxmin + boxmax) / 2.
+        return torch.tanh(imgs) * boxmul + boxplus
 
-    optimizer = optim.Adam([w], lr=learning_rate)
+    def convert2tanh(imgs):
+        boxmul = (boxmax - boxmin) / 2.
+        boxplus = (boxmin + boxmax) / 2.
+        return arctanh((imgs - boxplus) / boxmul * 0.999999)
 
-    prev = 1e10
+    def get_target_logit(targets, logits):
+        return torch.sum(targets * logits, dim=1)
 
-    for step in tqdm(range(max_iter), leave=False):
+    def get_others_max_logit(targets, logits):
+        logits = (1 - targets) * logits - (targets  * 10000)
+        return torch.max(logits, dim=1)[0]
 
-        a = 1 / 2 * (nn.Tanh()(w) + 1)
+    def compute_loss(tanh_imgs, targets, modifier, const):
+        tanh_adv_imgs = tanh_imgs + modifier
+        adv_imgs = convert_from_tanh(tanh_adv_imgs)
+        imgs = convert_from_tanh(tanh_imgs)
 
-        loss1 = nn.MSELoss(reduction='sum')(a, images)
-        loss2 = torch.sum(c * f(a))
+        logit_adv_img = model(adv_imgs)[0]
+        real = get_target_logit(targets, logit_adv_img)
+        other = get_others_max_logit(targets, logit_adv_img)
 
-        cost = loss1 + loss2
+        if targeted:
+            # If targeted, optimize for making the other class most likely.
+            loss1 = torch.max(torch.tensor([0.0]).to(device),
+                              other - real + confidence)
+        else:
+            # If untargeted, optimize for making this class least likely.
+            loss1 = torch.max(torch.tensor([0.0]).to(device),
+                              real - other + confidence)
 
-        optimizer.zero_grad()
-        cost.backward()
-        optimizer.step()
+        diff = adv_imgs - imgs
+        l2dist_loss = torch.sum(diff * diff, dim=[1,2,3])
 
-        # Early Stop when loss does not converge.
-        if step % (max_iter // 10) == 0:
-            if cost > prev:
-                return a
-            prev = cost
+        loss1 = torch.sum(const * loss1)
+        loss2 = torch.sum(l2dist_loss)
+        loss = loss1 + loss2
 
-    attack_images = 1 / 2 * (nn.Tanh()(w) + 1)
+        return loss, l2dist_loss, logit_adv_img, adv_imgs
 
-    return attack_images
+    # Set the lower and upper bounds accordingly
+    batch_size = imgs.shape[0]
+    lower_bound = torch.zeros(batch_size).to(device)
+    const = torch.ones(batch_size).to(device) * initial_const
+    upper_bound = torch.ones(batch_size).to(device) * 1e10
+
+    # The best l2, score, and image attack
+    o_bestl2 = [1e10] * batch_size
+    o_bestscore = [-1] * batch_size
+    o_bestattack = [torch.zeros(imgs[0].shape).to(device)] * batch_size
+
+    tanh_imgs = convert2tanh(imgs)
+
+    for outer_step in range(binary_search_steps):
+        print(('[%d/%d] CW L2 attack binary search step' %
+               (outer_step + 1, binary_search_steps)))
+
+        # Completely reset internal state.
+        modifier = torch.zeros_like(imgs, requires_grad=True)
+        modifier = modifier.to(device)
+        optimizer = optim.Adam([modifier], lr=learning_rate)
+
+        bestl2 = [1e10] * batch_size
+        bestscore = [-1] * batch_size
+
+        # The last iteration (if we run many steps) repeat the search once.
+        repeat = binary_search_steps >= 10
+        if repeat == True and outer_step == binary_search_steps - 1:
+            const = upper_bound
+
+        prev = np.inf
+
+        for iteration in tqdm(range(max_iterations)):
+            # Perform the attack
+            (loss, l2_dists,
+            logits, adv_imgs) = compute_loss(tanh_imgs, targets,
+                                             modifier, const)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            # Check if we should abort search if we're getting nowhere.
+            if abort_early and iteration % (max_iterations // 10) == 0:
+                if loss > prev * .9999: break
+                prev = loss
+
+            # Adjust the best result found so far
+            zipped_result = zip(l2_dists, logits, adv_imgs)
+            for idx, (l2_dist, logit, adv_img) in enumerate(zipped_result):
+                if (l2_dist < bestl2[idx] and
+                    compare(logit, torch.argmax(targets[idx]))):
+                    bestl2[idx] = l2_dist
+                    bestscore[idx] = torch.argmax(logit)
+
+                if (l2_dist < o_bestl2[idx] and
+                    compare(logit, torch.argmax(targets[idx]))):
+                    o_bestl2[idx] = l2_dist
+                    o_bestscore[idx] = torch.argmax(logit)
+                    o_bestattack[idx] = adv_img
+
+        # Adjust the constant as needed
+        for idx in range(batch_size):
+            if (compare(bestscore[idx], torch.argmax(targets[idx])) and
+                bestscore[idx] != -1):
+                # On success, divide const by two
+                upper_bound[idx] = min(upper_bound[idx], const[idx])
+                if upper_bound[idx] < 1e9:
+                    const[idx] = (lower_bound[idx] + upper_bound[idx]) / 2
+            else:
+                # On failure, either multiply by 10 if no solution found yet
+                # or do binary search with the known upper bound
+                lower_bound[idx] = max(lower_bound[idx], const[idx])
+                if upper_bound[idx] < 1e9:
+                    const[idx] = (lower_bound[idx] + upper_bound[idx])/2
+                else:
+                    const[idx] *= 10
+
+    # Return the best solution found
+    return o_bestattack
+
+
+# def carlini_wagner_l2(
+#         model,
+#         images,
+#         labels,
+#         targeted=False, c=1, kappa=0,
+#         max_iter=1000, learning_rate=5e-3, device="cpu"):
+#     images = images.to(device)
+#     labels = labels.to(device)
+#
+#     # Define f-function
+#     def f(x):
+#         outputs = model(x)[0]
+#         one_hot_labels = torch.eye(len(outputs[0]))[labels].to(device)
+#
+#         i, _ = torch.max((1 - one_hot_labels) * outputs, dim=1)
+#
+#         j = torch.masked_select(outputs, one_hot_labels.bool())
+#
+#         # If targeted, optimize for making the other class most likely
+#         if targeted:
+#             return torch.clamp(i - j, min=-kappa)
+#
+#         # If untargeted, optimize for making the other class most likely
+#         else:
+#             return torch.clamp(j - i, min=-kappa)
+#
+#     w = torch.zeros_like(images, requires_grad=True).to(device)
+#
+#     optimizer = optim.Adam([w], lr=learning_rate)
+#
+#     prev = 1e10
+#
+#     for step in tqdm(range(max_iter), leave=False):
+#
+#         a = 1 / 2 * (nn.Tanh()(w) + 1)
+#
+#         loss1 = nn.MSELoss(reduction='sum')(a, images)
+#         loss2 = torch.sum(c * f(a))
+#
+#         cost = loss1 + loss2
+#
+#         optimizer.zero_grad()
+#         cost.backward()
+#         optimizer.step()
+#
+#         # Early Stop when loss does not converge.
+#         if step % (max_iter // 10) == 0:
+#             if cost > prev:
+#                 return a
+#             prev = cost
+#
+#     attack_images = 1 / 2 * (nn.Tanh()(w) + 1)
+#
+#     return attack_images
 
 
 def projected_gradient_descent(
