@@ -573,11 +573,24 @@ def projected_gradient_descent(
     return adv_x
 
 
-def spsa(model_fn, x, eps, nb_iter, norm=np.inf, clip_min=-np.inf,
-         clip_max=np.inf, y=None,
-         targeted=False, early_stop_loss_threshold=None, learning_rate=0.01,
-         delta=0.01,
-         spsa_samples=128, spsa_iters=1, is_debug=False, sanity_checks=True):
+def spsa(
+    model_fn,
+    x,
+    eps,
+    nb_iter,
+    norm=np.inf,
+    clip_min=-np.inf,
+    clip_max=np.inf,
+    y=None,
+    targeted=False,
+    early_stop_loss_threshold=None,
+    learning_rate=0.01,
+    delta=0.01,
+    spsa_samples=128,
+    spsa_iters=1,
+    is_debug=False,
+    sanity_checks=True,
+):
     """
     This implements the SPSA adversary, as in https://arxiv.org/abs/1802.05666
     (Uesato et al. 2018). SPSA is a gradient-free optimization method, which is useful when
@@ -615,8 +628,10 @@ def spsa(model_fn, x, eps, nb_iter, norm=np.inf, clip_min=-np.inf,
 
     if y is not None and len(x) != len(y):
         raise ValueError(
-            'number of inputs {} is different from number of labels {}'
-            .format(len(x), len(y)))
+            "number of inputs {} is different from number of labels {}".format(
+                len(x), len(y)
+            )
+        )
     if y is None:
         y = torch.argmax(model_fn(x)[0], dim=1)
 
@@ -625,31 +640,41 @@ def spsa(model_fn, x, eps, nb_iter, norm=np.inf, clip_min=-np.inf,
     if len(x) != 1:
         adv_x = []
         for x_single, y_single in zip(x, y):
-            adv_x_single = spsa(model_fn=model_fn, x=x_single.unsqueeze(0),
-                                eps=eps,
-                                nb_iter=nb_iter, norm=norm, clip_min=clip_min,
-                                clip_max=clip_max,
-                                y=y_single.unsqueeze(0), targeted=targeted,
-                                early_stop_loss_threshold=early_stop_loss_threshold,
-                                learning_rate=learning_rate, delta=delta,
-                                spsa_samples=spsa_samples,
-                                spsa_iters=spsa_iters,
-                                is_debug=is_debug, sanity_checks=sanity_checks)
+            adv_x_single = spsa(
+                model_fn=model_fn,
+                x=x_single.unsqueeze(0),
+                eps=eps,
+                nb_iter=nb_iter,
+                norm=norm,
+                clip_min=clip_min,
+                clip_max=clip_max,
+                y=y_single.unsqueeze(0),
+                targeted=targeted,
+                early_stop_loss_threshold=early_stop_loss_threshold,
+                learning_rate=learning_rate,
+                delta=delta,
+                spsa_samples=spsa_samples,
+                spsa_iters=spsa_iters,
+                is_debug=is_debug,
+                sanity_checks=sanity_checks,
+            )
             adv_x.append(adv_x_single)
         return torch.cat(adv_x)
 
     if eps < 0:
         raise ValueError(
-            "eps must be greater than or equal to 0, got {} instead".format(
-                eps))
+            "eps must be greater than or equal to 0, got {} instead".format(eps)
+        )
     if eps == 0:
         return x
 
     if clip_min is not None and clip_max is not None:
         if clip_min > clip_max:
             raise ValueError(
-                "clip_min must be less than or equal to clip_max, got clip_min={} and clip_max={}"
-                    .format(clip_min, clip_max))
+                "clip_min must be less than or equal to clip_max, got clip_min={} and clip_max={}".format(
+                    clip_min, clip_max
+                )
+            )
 
     asserts = []
 
@@ -665,18 +690,18 @@ def spsa(model_fn, x, eps, nb_iter, norm=np.inf, clip_min=-np.inf,
     optimizer = optim.Adam([perturbation], lr=learning_rate)
 
     for i in range(nb_iter):
+
         def loss_fn(pert):
             """
             Margin logit loss, with correct sign for targeted vs untargeted loss.
             """
             logits = model_fn(x + pert)[0]
             loss_multiplier = 1 if targeted else -1
-            return loss_multiplier * _margin_logit_loss(logits,
-                                                        y.expand(len(pert)))
+            return loss_multiplier * _margin_logit_loss(logits, y.expand(len(pert)))
 
-        spsa_grad = _compute_spsa_gradient(loss_fn, x, delta=delta,
-                                           samples=spsa_samples,
-                                           iters=spsa_iters)
+        spsa_grad = _compute_spsa_gradient(
+            loss_fn, x, delta=delta, samples=spsa_samples, iters=spsa_iters
+        )
         perturbation.grad = spsa_grad
         optimizer.step()
 
@@ -684,7 +709,7 @@ def spsa(model_fn, x, eps, nb_iter, norm=np.inf, clip_min=-np.inf,
 
         loss = loss_fn(perturbation).item()
         if is_debug:
-            print('Iteration {}: loss = {}'.format(i, loss))
+            print("Iteration {}: loss = {}".format(i, loss))
         if early_stop_loss_threshold is not None and loss < early_stop_loss_threshold:
             break
 
@@ -693,9 +718,14 @@ def spsa(model_fn, x, eps, nb_iter, norm=np.inf, clip_min=-np.inf,
     if norm == np.inf:
         asserts.append(torch.all(torch.abs(adv_x - x) <= eps + 1e-6))
     else:
-        asserts.append(torch.all(torch.abs(
-            torch.renorm(adv_x - x, p=norm, dim=0, maxnorm=eps) - (
-                        adv_x - x)) < 1e-6))
+        asserts.append(
+            torch.all(
+                torch.abs(
+                    torch.renorm(adv_x - x, p=norm, dim=0, maxnorm=eps) - (adv_x - x)
+                )
+                < 1e-6
+            )
+        )
     asserts.append(torch.all(adv_x >= clip_min))
     asserts.append(torch.all(adv_x <= clip_max))
 
@@ -705,9 +735,9 @@ def spsa(model_fn, x, eps, nb_iter, norm=np.inf, clip_min=-np.inf,
     return adv_x
 
 
-def _project_perturbation(perturbation, norm, epsilon, input_image,
-                          clip_min=-np.inf,
-                          clip_max=np.inf):
+def _project_perturbation(
+    perturbation, norm, epsilon, input_image, clip_min=-np.inf, clip_max=np.inf
+):
     """
     Project `perturbation` onto L-infinity ball of radius `epsilon`. Also project into
     hypercube such that the resulting adversarial example is between clip_min and clip_max,
@@ -715,8 +745,7 @@ def _project_perturbation(perturbation, norm, epsilon, input_image,
     """
 
     clipped_perturbation = clip_eta(perturbation, norm, epsilon)
-    new_image = torch.clamp(input_image + clipped_perturbation,
-                            clip_min, clip_max)
+    new_image = torch.clamp(input_image + clipped_perturbation, clip_min, clip_max)
 
     perturbation.add_((new_image - input_image) - perturbation)
 
@@ -741,8 +770,9 @@ def _compute_spsa_gradient(loss_fn, x, delta, samples, iters):
             loss_vals = loss_fn(x + delta_x)
         while len(loss_vals.size()) < num_dims:
             loss_vals = loss_vals.unsqueeze(-1)
-        avg_grad = torch.mean(loss_vals * torch.sign(delta_x), dim=0,
-                              keepdim=True) / delta
+        avg_grad = (
+            torch.mean(loss_vals * torch.sign(delta_x), dim=0, keepdim=True) / delta
+        )
         grad_list.append(avg_grad)
 
     return torch.mean(torch.cat(grad_list), dim=0, keepdim=True)
@@ -763,10 +793,9 @@ def _margin_logit_loss(logits, labels):
     )[None, :].expand(labels.size()[0], -1)
     incorrect_logits = torch.where(
         logit_indices == labels[:, None],
-        torch.full_like(logits, float('-inf')),
+        torch.full_like(logits, float("-inf")),
         logits,
     )
-    max_incorrect_logits, _ = torch.max(
-        incorrect_logits, 1)
+    max_incorrect_logits, _ = torch.max(incorrect_logits, 1)
 
     return max_incorrect_logits - correct_logits
