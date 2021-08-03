@@ -5,6 +5,7 @@ src/data/
 src/model/
 src/notebook/
 .DS_Store
+sh.*.out
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
