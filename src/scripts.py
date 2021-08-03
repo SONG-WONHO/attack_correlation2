@@ -4,7 +4,6 @@ import argparse
 from subprocess import PIPE
 from subprocess import Popen
 
-COMMAND = '/home/win7785/Venv/ds/bin/python code/attack_evasion.py'
 
 class CFG:
     # path
@@ -27,6 +26,10 @@ class CFG:
     # etc
     seed = 42
     worker = 1
+
+
+# set virtual environment
+COMMAND = '/home/win7785/Venv/ds/bin/python code/attack_evasion.py'
 
 parser = argparse.ArgumentParser()
 
@@ -54,6 +57,7 @@ parser.add_argument("--targeted", action="store_true", default=CFG.targeted,
                     help=f"Targeted Evasion Attack?")
 parser.add_argument("--poisoned", action="store_true", default=CFG.poisoned,
                     help=f"Targeted Evasion Attack on poisoned class?")
+parser.add_argument("--exp-ids", default=None)
 
 # etc
 parser.add_argument("--worker", default=CFG.worker, type=int,
@@ -69,13 +73,13 @@ COMMAND += ' --attack-type %s' % args.attack_type
 COMMAND += ' --const %s' % args.const
 COMMAND += ' --case %s' % args.case
 if args.targeted:
-  COMMAND += ' --targeted'
+    COMMAND += ' --targeted'
 if args.poisoned:
-  COMMAND += ' --poisoned'
+    COMMAND += ' --poisoned'
 COMMAND += ' --worker %s' % args.worker
 COMMAND += ' --seed %s' % args.seed
-
-
+if args.exp_ids is not None:
+    COMMAND += f" --exp-ids {args.exp_ids}"
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '%s' % args.gpu_id
 
@@ -87,17 +91,18 @@ stdout, stderr = p.communicate()
 stdout = stdout.split()[-7:]
 cand = []
 for line in stdout:
-  line = line.split(b',')
-  c = float(line[0])
-  sr = float(line[-1])
-  if sr < 0.4:
-    cand += [(c, sr)]
+    line = line.split(b',')
+    c = float(line[0])
+    sr = float(line[-1])
+    if sr < 0.4:
+        cand += [(c, sr)]
 cand = sorted(cand, key=lambda x: x[1], reverse=True)
 final_c = cand[0][0]
-print(cand[0][0]*255, cand[0][1])
+print(cand[0][0] * 255, cand[0][1])
 
 COMMAND = COMMAND.replace('--case 0', '--case 1')
-COMMAND = COMMAND.replace('--const %s' % args.const, '--const {}'.format(final_c))
+COMMAND = COMMAND.replace('--const %s' % args.const,
+                          '--const {}'.format(final_c))
 
 print(COMMAND)
 p = Popen(COMMAND.split(), cwd='./', bufsize=0,
@@ -106,9 +111,9 @@ stdout, stderr = p.communicate()
 
 results = []
 for line in stdout.split(b'\n'):
-  print(line.decode("utf-8"))
-  if len(line.decode("utf-8").split(",")) == 5:
-    results.append(line.decode("utf-8").split(",")[-1])
+    print(line.decode("utf-8"))
+    if len(line.decode("utf-8").split(",")) == 5:
+        results.append(line.decode("utf-8").split(",")[-1])
 
 COMMAND += ' --poisoned'
 print(COMMAND)
@@ -117,9 +122,9 @@ p = Popen(COMMAND.split(), cwd='./', bufsize=0,
 stdout, stderr = p.communicate()
 
 for line in stdout.split(b'\n'):
-  print(line.decode("utf-8"))
-  if len(line.decode("utf-8").split(",")) == 5:
-    results.append(line.decode("utf-8").split(",")[-1])
+    print(line.decode("utf-8"))
+    if len(line.decode("utf-8").split(",")) == 5:
+        results.append(line.decode("utf-8").split(",")[-1])
 
 for r in results:
-  print(r)
+    print(r)
