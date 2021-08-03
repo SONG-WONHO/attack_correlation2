@@ -52,6 +52,10 @@ parser.add_argument('--attack-type',
 parser.add_argument("--targeted", action="store_true", default=CFG.targeted,
                     help=f"Targeted Evasion Attack?")
 parser.add_argument("--exp-ids", default=None, required=True)
+parser.add_argument("--seed",
+                    default=CFG.seed,
+                    type=int,
+                    help=f"seed({CFG.seed})")
 
 args = parser.parse_args()
 
@@ -63,7 +67,7 @@ COMMAND += ' --case 0'
 if args.targeted:
     COMMAND += ' --targeted'
 COMMAND += f' --worker {CFG.worker}'
-COMMAND += f' --seed {CFG.seed}'
+COMMAND += f' --seed {args.seed}'
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '%s' % args.gpu_id
 
