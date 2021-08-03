@@ -294,11 +294,8 @@ def carlini_wagner_l2(
         # Early Stop when loss does not converge.
         if step % (max_iter // 10) == 0:
             if cost > prev:
-                # print('Attack Stopped due to CONVERGENCE....')
-                # print(step)
                 return a
             prev = cost
-            # print(loss1.item(), loss2.item())
 
     attack_images = 1 / 2 * (nn.Tanh()(w) + 1)
 
