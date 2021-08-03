@@ -126,6 +126,13 @@ def get_dataset(config):
             X_temp.append(cv2.resize(X, (32, 32)))
         X_test = np.stack(X_temp)
 
+    if len(y_train.shape) == 2:
+        if y_train.shape[1] == 1:
+            y_train = y_train.reshape(-1)
+            y_test = y_test.reshape(-1)
+        else:
+            assert f"{config.dataset}, {y_train.shape}"
+
     return X_train, y_train, X_test, y_test
 
 
