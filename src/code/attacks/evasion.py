@@ -689,7 +689,7 @@ def spsa(
     _project_perturbation(perturbation, norm, eps, x, clip_min, clip_max)
     optimizer = optim.Adam([perturbation], lr=learning_rate)
 
-    for i in tqdm(range(nb_iter)):
+    for i in tqdm(range(nb_iter), leave=False):
 
         def loss_fn(pert):
             """
