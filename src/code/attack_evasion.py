@@ -89,10 +89,8 @@ def main():
     CFG.exp_ids = args.exp_ids
 
     if CFG.case == 1:
-        print(1)
         if CFG.exp_ids is None:
-            print(2)
-            assert "Must set exp ids"
+            assert False, "Must set exp ids"
 
     CFG.worker = args.worker
     CFG.seed = args.seed
