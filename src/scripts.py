@@ -85,8 +85,11 @@ for line in stdout:
     if sr < 0.4:
         cand += [(c, sr)]
 
-cand = sorted(cand, key=lambda x: x[1], reverse=True)
-final_c = cand[0][0]
+if len(cand) == 0:
+    final_c = 2/255
+else:
+    cand = sorted(cand, key=lambda x: x[1], reverse=True)
+    final_c = cand[0][0]
 print(cand[0][0] * 255, cand[0][1])
 
 COMMAND = COMMAND.replace('--case 0', '--case 1')
