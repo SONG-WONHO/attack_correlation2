@@ -49,37 +49,21 @@ parser.add_argument('--attack-type',
                     choices=['fgsm', 'bim', 'cw', 'pgd', 'spsa'],
                     default=CFG.attack_type,
                     help=f"Attack Type({CFG.attack_type})")
-parser.add_argument("--const", default=CFG.const, type=float,
-                    help=f"Constants({CFG.const})")
-parser.add_argument("--case", default=CFG.case, type=int,
-                    help=f"Case - 0:target, 1:samples, 2:classes, 3:intensity, 4:size({CFG.case})")
 parser.add_argument("--targeted", action="store_true", default=CFG.targeted,
                     help=f"Targeted Evasion Attack?")
-parser.add_argument("--poisoned", action="store_true", default=CFG.poisoned,
-                    help=f"Targeted Evasion Attack on poisoned class?")
-parser.add_argument("--exp-ids", default=None)
-
-# etc
-parser.add_argument("--worker", default=CFG.worker, type=int,
-                    help=f"number of worker({CFG.worker})")
-parser.add_argument("--seed", default=CFG.seed, type=int,
-                    help=f"seed({CFG.seed})")
+parser.add_argument("--exp-ids", default=None, required=True)
 
 args = parser.parse_args()
 
 COMMAND += ' --dataset %s' % args.dataset
 COMMAND += ' --arch %s' % args.arch
 COMMAND += ' --attack-type %s' % args.attack_type
-COMMAND += ' --const %s' % args.const
-COMMAND += ' --case %s' % args.case
+COMMAND += f' --const {CFG.const}'
+COMMAND += ' --case 0'
 if args.targeted:
     COMMAND += ' --targeted'
-if args.poisoned:
-    COMMAND += ' --poisoned'
-COMMAND += ' --worker %s' % args.worker
-COMMAND += ' --seed %s' % args.seed
-if args.exp_ids is not None:
-    COMMAND += f" --exp-ids {args.exp_ids}"
+COMMAND += f' --worker {CFG.worker}'
+COMMAND += f' --seed {CFG.seed}'
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '%s' % args.gpu_id
 
@@ -101,10 +85,11 @@ final_c = cand[0][0]
 print(cand[0][0] * 255, cand[0][1])
 
 COMMAND = COMMAND.replace('--case 0', '--case 1')
-COMMAND = COMMAND.replace('--const %s' % args.const,
+COMMAND = COMMAND.replace(f'--const {CFG.const}',
                           '--const {}'.format(final_c))
-
+COMMAND += f" --exp-ids {args.exp_ids}"
 print(COMMAND)
+
 p = Popen(COMMAND.split(), cwd='./', bufsize=0,
           stdout=PIPE, stderr=PIPE)
 stdout, stderr = p.communicate()
@@ -117,6 +102,7 @@ for line in stdout.split(b'\n'):
 
 COMMAND += ' --poisoned'
 print(COMMAND)
+
 p = Popen(COMMAND.split(), cwd='./', bufsize=0,
           stdout=PIPE, stderr=PIPE)
 stdout, stderr = p.communicate()
