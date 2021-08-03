@@ -244,9 +244,9 @@ def main():
 
             elif CFG.attack_type == "spsa":
                 image_t = spsa(
-                    model, image[i*sz:(i+1)*sz], CFG.const, 500,
+                    model, image[i*sz:(i+1)*sz], CFG.const, 100,
                     y=y[i*sz:(i+1)*sz], targeted=CFG.targeted,
-                    is_debug=False)
+                    is_debug=False, spsa_samples=8192)
 
             image_adv.append(image_t)
         image_adv = torch.cat(image_adv)
