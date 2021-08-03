@@ -156,7 +156,7 @@ def main():
             CFG.const = const_list[idx]
             backdoored_cls = []
             clean_cls = list(range(CFG.num_classes))
-            print(backdoored_cls, clean_cls)
+            # print(backdoored_cls, clean_cls)
 
         # Targeted, Backdoored or Not?
         if CFG.case != 0:
