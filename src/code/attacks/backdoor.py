@@ -76,7 +76,6 @@ def blend(config, X, y):
         w_or_h = np.ceil(w_or_h)
     else:
         w_or_h = np.floor(w_or_h)
-    print(w_or_h)
 
     mask = np.zeros(X.shape[1:])
     mask[int(w//2 - w_or_h//2): int(w//2 + w_or_h//2), int(h//2 - w_or_h//2): int(h//2 + w_or_h//2)] = 1
