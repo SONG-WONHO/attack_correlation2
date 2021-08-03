@@ -140,7 +140,7 @@ def main():
 
     else:
         # exp_ids = list(range(40, 50))
-        exp_ids = [0, 1, 2, 3, 4]
+        exp_ids = [5,6,7,8,9]
         path = [f"./model/attack/poison/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
         log_path = [f"./log/attack/poison/exp_{exp_id}/CFG.json"
