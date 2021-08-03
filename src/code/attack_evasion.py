@@ -217,34 +217,35 @@ def main():
 
         # do attack
         image_adv = []
-        b_size = len(image) // 100
+        sz = 100
+        b_size = len(image) // sz
         for i in range(b_size):
             if CFG.attack_type == "fgsm":
                 image_t = fast_gradient_method(
-                    model, image[i*100:(i+1)*100], CFG.const, np.inf,
-                    y=y[i*100:(i+1)*100], targeted=CFG.targeted)
+                    model, image[i*sz:(i+1)*sz], CFG.const, np.inf,
+                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
 
             elif CFG.attack_type == "bim":
                 image_t = basic_iterative_method(
-                    model, image[i*100:(i+1)*100],
+                    model, image[i*sz:(i+1)*sz],
                     eps=CFG.const, eps_iter=CFG.const, n_iter=7,
-                    y=y[i*100:(i+1)*100], targeted=CFG.targeted)
+                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
 
             elif CFG.attack_type == "cw":
                 image_t = cw_l2_attack(
-                    model, image[i*100:(i+1)*100], y[i*100:(i+1)*100],
+                    model, image[i*sz:(i+1)*sz], y[i*sz:(i+1)*sz],
                     targeted=CFG.targeted, device=CFG.device,
                     c=CFG.const, max_iter=1000)
 
             elif CFG.attack_type == "pgd":
                 image_t = projected_gradient_descent(
-                    model, image[i*100:(i+1)*100], CFG.const, CFG.const, 3, np.inf,
-                    y=y[i*100:(i+1)*100], targeted=CFG.targeted)
+                    model, image[i*sz:(i+1)*sz], CFG.const, CFG.const, 3, np.inf,
+                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
 
             elif CFG.attack_type == "spsa":
                 image_t = spsa(
-                    model, image[i*100:(i+1)*100], CFG.const, 7,
-                    y=y[i*100:(i+1)*100], targeted=CFG.targeted)
+                    model, image[i*sz:(i+1)*sz], CFG.const, 7,
+                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
 
             image_adv.append(image_t)
         image_adv = torch.cat(image_adv)
