@@ -88,7 +88,7 @@ for line in stdout:
 if len(cand) == 0:
     line = stdout[0].split(b',')
     cand.append((float(line[0]), float(line[-1])))
-    final_c = line[0]
+    final_c = float(line[0])
 else:
     cand = sorted(cand, key=lambda x: x[1], reverse=True)
     final_c = cand[0][0]
