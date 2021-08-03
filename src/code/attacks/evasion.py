@@ -247,57 +247,6 @@ INF = float("inf")
 
 
 def carlini_wagner_l2(
-        model, imgs, targets,
-        batch_size=1000, device='cuda', **kwargs):
-    """
-    The L_2 optimized attack.
-
-    This attack is the most efficient and should be used as the primary
-    attack to evaluate potential defenses.
-
-    Args:
-        model: A callable that takes an input tensor and returns the model
-          logits.
-        imgs: Input tensor.
-        targets: If targeted is true, then the targets represents the target
-          labels. Otherwise,then targets are the original class labels.
-        batch_size: Number of attacks to run simultaneously.
-        device: A device to run the attack.
-
-    Returns:
-        Adversarial examples for the supplied model.
-    """
-
-    imgs = imgs.to(device)
-    targets = targets.to(device)
-    layers = [module for module in model.modules()]
-    output_layer = layers[-1]
-    num_classes = output_layer.out_features
-    targets = F.one_hot(targets, num_classes=num_classes)
-    model = model.to(device)
-
-    adv_imgs = []
-    kwargs['device'] = device
-    for i in range(0, len(imgs), batch_size):
-        img_batch = imgs[i:i + batch_size]
-        target_batch = targets[i:i + batch_size]
-        attack_result = cw_l2_attack_batch(model, img_batch, target_batch,
-                                           **kwargs)
-        attack_result = torch.stack(attack_result)
-        adv_imgs += [attack_result]
-
-    adv_imgs = torch.cat(adv_imgs)
-    return adv_imgs
-
-
-"""The CarliniWagnerL2 attack."""
-import torch
-
-
-INF = float("inf")
-
-
-def carlini_wagner_l2(
     model_fn,
     x,
     n_classes,
@@ -481,62 +430,6 @@ def carlini_wagner_l2(
                     const[n] *= 10
 
     return o_bestattack.detach()
-
-
-# def carlini_wagner_l2(
-#         model,
-#         images,
-#         labels,
-#         targeted=False, c=1, kappa=0,
-#         max_iter=1000, learning_rate=5e-3, device="cpu"):
-#     images = images.to(device)
-#     labels = labels.to(device)
-#
-#     # Define f-function
-#     def f(x):
-#         outputs = model(x)[0]
-#         one_hot_labels = torch.eye(len(outputs[0]))[labels].to(device)
-#
-#         i, _ = torch.max((1 - one_hot_labels) * outputs, dim=1)
-#
-#         j = torch.masked_select(outputs, one_hot_labels.bool())
-#
-#         # If targeted, optimize for making the other class most likely
-#         if targeted:
-#             return torch.clamp(i - j, min=-kappa)
-#
-#         # If untargeted, optimize for making the other class most likely
-#         else:
-#             return torch.clamp(j - i, min=-kappa)
-#
-#     w = torch.zeros_like(images, requires_grad=True).to(device)
-#
-#     optimizer = optim.Adam([w], lr=learning_rate)
-#
-#     prev = 1e10
-#
-#     for step in tqdm(range(max_iter), leave=False):
-#
-#         a = 1 / 2 * (nn.Tanh()(w) + 1)
-#
-#         loss1 = nn.MSELoss(reduction='sum')(a, images)
-#         loss2 = torch.sum(c * f(a))
-#
-#         cost = loss1 + loss2
-#
-#         optimizer.zero_grad()
-#         cost.backward()
-#         optimizer.step()
-#
-#         # Early Stop when loss does not converge.
-#         if step % (max_iter // 10) == 0:
-#             if cost > prev:
-#                 return a
-#             prev = cost
-#
-#     attack_images = 1 / 2 * (nn.Tanh()(w) + 1)
-#
-#     return attack_images
 
 
 def projected_gradient_descent(
