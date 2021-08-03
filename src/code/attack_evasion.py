@@ -33,8 +33,8 @@ class CFG:
 
     # attack
     attack_type = "fgsm"
-    const = 0.03 # eps or c
-    case = 0 # 0: target, 1: samples, 2: classes, 3: intensity, 4: size
+    const = 0.03  # eps or c
+    case = 0  # 0: target, 1: samples, 2: classes, 3: intensity, 4: size
     targeted = False
     poisoned = False
 
@@ -46,13 +46,19 @@ class CFG:
 def main():
     ### header
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', choices=['mnist', 'cifar10', 'cifar100', 'aptos', 'tiny'], default=CFG.dataset,
+    parser.add_argument('--dataset',
+                        choices=['mnist', 'cifar10', 'cifar100', 'aptos',
+                                 'tiny'], default=CFG.dataset,
                         help=f"Dataset({CFG.dataset})")
-    parser.add_argument('--arch', choices=['lenet5', 'resnet18', 'resnet34','resnet50'], default=CFG.arch,
+    parser.add_argument('--arch',
+                        choices=['lenet5', 'resnet18', 'resnet34', 'resnet50'],
+                        default=CFG.arch,
                         help=f"Architecture({CFG.arch})")
 
     # evasion attack
-    parser.add_argument('--attack-type', choices=['fgsm', 'bim', 'cw', 'pgd', 'spsa'], default=CFG.attack_type,
+    parser.add_argument('--attack-type',
+                        choices=['fgsm', 'bim', 'cw', 'pgd', 'spsa'],
+                        default=CFG.attack_type,
                         help=f"Attack Type({CFG.attack_type})")
     parser.add_argument("--const", default=CFG.const, type=float,
                         help=f"Constants({CFG.const})")
@@ -157,7 +163,8 @@ def main():
             class_ratio = json.load(open(log_path[idx]))['class_ratio']
             num_classes = int(CFG.num_classes * class_ratio)
             backdoored_cls = list(range(num_classes))
-            clean_cls = [v for v in list(range(CFG.num_classes)) if v not in backdoored_cls]
+            clean_cls = [v for v in list(range(CFG.num_classes)) if
+                         v not in backdoored_cls]
             print(backdoored_cls, clean_cls)
 
         ### Data Related
@@ -222,40 +229,44 @@ def main():
         for i in range(b_size):
             if CFG.attack_type == "fgsm":
                 image_t = fast_gradient_method(
-                    model, image[i*sz:(i+1)*sz], CFG.const, np.inf,
-                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
+                    model, image[i * sz:(i + 1) * sz], CFG.const, np.inf,
+                    y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
 
             elif CFG.attack_type == "bim":
                 image_t = basic_iterative_method(
-                    model, image[i*sz:(i+1)*sz],
-                    eps=CFG.const, eps_iter=CFG.const/10, n_iter=50,
-                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
+                    model, image[i * sz:(i + 1) * sz],
+                    eps=CFG.const, eps_iter=CFG.const / 10, n_iter=50,
+                    y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
 
             elif CFG.attack_type == "pgd":
                 image_t = projected_gradient_descent(
-                    model, image[i*sz:(i+1)*sz], CFG.const, CFG.const/4, 7, np.inf,
-                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
+                    model, image[i * sz:(i + 1) * sz], CFG.const, CFG.const / 4,
+                    7, np.inf,
+                    y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
 
             elif CFG.attack_type == "cw":
                 image_t = carlini_wagner_l2(
-                    model, image[i*sz:(i+1)*sz], CFG.num_classes,
-                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted,
-                    initial_const=CFG.const, max_iterations=1000)
+                    model, image[i * sz:(i + 1) * sz], CFG.num_classes,
+                    y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
+                    initial_const=CFG.const, max_iterations=1000,
+                    binary_search_steps=1)
 
             elif CFG.attack_type == "spsa":
                 image_t = spsa(
-                    model, image[i*sz:(i+1)*sz], CFG.const, 100,
-                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted,
+                    model, image[i * sz:(i + 1) * sz], CFG.const, 100,
+                    y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
                     is_debug=False)
 
             image_adv.append(image_t)
         image_adv = torch.cat(image_adv)
 
         train_dataset = ACDataset(X_train, y_train, transform=test_transform)
-        train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False, drop_last=False)
+        train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False,
+                                  drop_last=False)
 
         evasion_dataset = EvasionDataset(image_adv, y)
-        evasion_loader = DataLoader(evasion_dataset, batch_size=64, shuffle=False, drop_last=False)
+        evasion_loader = DataLoader(evasion_dataset, batch_size=64,
+                                    shuffle=False, drop_last=False)
 
         ### Evaluate
         # valid one epoch = original
@@ -269,7 +280,8 @@ def main():
             evasion_acc = 1 - evasion_acc
 
         # logging
-        log.write(f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
+        log.write(
+            f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
 
         # for check
         # adv = image_adv.detach().cpu().permute(0,2,3,1).numpy()
@@ -304,6 +316,7 @@ def main():
         # print(np.mean(results))
         # print(((np.abs(X_train - adv) * mask).sum() / 1000) / mask.sum())
         # print(((np.abs(X_train - adv) * (1-mask)).sum() / 1000) / (1-mask).sum())
+
 
 if __name__ == "__main__":
     main()
