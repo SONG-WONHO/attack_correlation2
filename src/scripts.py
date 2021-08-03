@@ -100,17 +100,18 @@ for line in stdout.split(b'\n'):
     if len(line.decode("utf-8").split(",")) == 5:
         results.append(line.decode("utf-8").split(",")[-1])
 
-COMMAND += ' --poisoned'
-print(COMMAND)
+if args.targeted:
+    COMMAND += ' --poisoned'
+    print(COMMAND)
 
-p = Popen(COMMAND.split(), cwd='./', bufsize=0,
-          stdout=PIPE, stderr=PIPE)
-stdout, stderr = p.communicate()
+    p = Popen(COMMAND.split(), cwd='./', bufsize=0,
+              stdout=PIPE, stderr=PIPE)
+    stdout, stderr = p.communicate()
 
-for line in stdout.split(b'\n'):
-    print(line.decode("utf-8"))
-    if len(line.decode("utf-8").split(",")) == 5:
-        results.append(line.decode("utf-8").split(",")[-1])
+    for line in stdout.split(b'\n'):
+        print(line.decode("utf-8"))
+        if len(line.decode("utf-8").split(",")) == 5:
+            results.append(line.decode("utf-8").split(",")[-1])
 
 for r in results:
     print(r)
