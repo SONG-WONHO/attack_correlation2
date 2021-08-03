@@ -295,11 +295,21 @@ def cw_l2_attack(model, images, labels, targeted=False, c=1, kappa=0,
     return attack_images
 
 
-def projected_gradient_descent(model_fn, x, eps, eps_iter, nb_iter, norm,
-                               clip_min=None, clip_max=None, y=None,
-                               targeted=False,
-                               rand_init=True, rand_minmax=None,
-                               sanity_checks=True):
+def projected_gradient_descent(
+    model_fn,
+    x,
+    eps,
+    eps_iter,
+    nb_iter,
+    norm,
+    clip_min=None,
+    clip_max=None,
+    y=None,
+    targeted=False,
+    rand_init=True,
+    rand_minmax=None,
+    sanity_checks=True,
+):
     """
     This class implements either the Basic Iterative Method
     (Kurakin et al. 2016) when rand_init is set to False. or the
@@ -331,23 +341,27 @@ def projected_gradient_descent(model_fn, x, eps, eps_iter, nb_iter, norm,
     :return: a tensor for the adversarial example
     """
     if norm == 1:
-        raise NotImplementedError("It's not clear that FGM is a good inner loop"
-                                  " step for PGD when norm=1, because norm=1 FGM "
-                                  " changes only one pixel at a time. We need "
-                                  " to rigorously test a strong norm=1 PGD "
-                                  "before enabling this feature.")
+        raise NotImplementedError(
+            "It's not clear that FGM is a good inner loop"
+            " step for PGD when norm=1, because norm=1 FGM "
+            " changes only one pixel at a time. We need "
+            " to rigorously test a strong norm=1 PGD "
+            "before enabling this feature."
+        )
     if norm not in [np.inf, 2]:
         raise ValueError("Norm order must be either np.inf or 2.")
     if eps < 0:
         raise ValueError(
-            "eps must be greater than or equal to 0, got {} instead".format(
-                eps))
+            "eps must be greater than or equal to 0, got {} instead".format(eps)
+        )
     if eps == 0:
         return x
     if eps_iter < 0:
         raise ValueError(
             "eps_iter must be greater than or equal to 0, got {} instead".format(
-                eps_iter))
+                eps_iter
+            )
+        )
     if eps_iter == 0:
         return x
 
@@ -356,19 +370,23 @@ def projected_gradient_descent(model_fn, x, eps, eps_iter, nb_iter, norm,
         if clip_min > clip_max:
             raise ValueError(
                 "clip_min must be less than or equal to clip_max, got clip_min={} and clip_max={}".format(
-                    clip_min, clip_max))
+                    clip_min, clip_max
+                )
+            )
 
     asserts = []
 
     # If a data range was specified, check that the input was in that range
     if clip_min is not None:
         assert_ge = torch.all(
-            torch.ge(x, torch.tensor(clip_min, device=x.device, dtype=x.dtype)))
+            torch.ge(x, torch.tensor(clip_min, device=x.device, dtype=x.dtype))
+        )
         asserts.append(assert_ge)
 
     if clip_max is not None:
         assert_le = torch.all(
-            torch.le(x, torch.tensor(clip_max, device=x.device, dtype=x.dtype)))
+            torch.le(x, torch.tensor(clip_max, device=x.device, dtype=x.dtype))
+        )
         asserts.append(assert_le)
 
     # Initialize loop variables
@@ -387,13 +405,20 @@ def projected_gradient_descent(model_fn, x, eps, eps_iter, nb_iter, norm,
 
     if y is None:
         # Using model predictions as ground truth to avoid label leaking
-        _, y = torch.max(model_fn(x)[0], 1)
+        _, y = torch.max(model_fn(x), 1)
 
     i = 0
     while i < nb_iter:
-        adv_x = fast_gradient_method(model_fn, adv_x, eps_iter, norm,
-                                     clip_min=clip_min, clip_max=clip_max, y=y,
-                                     targeted=targeted)
+        adv_x = fast_gradient_method(
+            model_fn,
+            adv_x,
+            eps_iter,
+            norm,
+            clip_min=clip_min,
+            clip_max=clip_max,
+            y=y,
+            targeted=targeted,
+        )
 
         # Clipping perturbation eta to norm norm ball
         eta = adv_x - x
