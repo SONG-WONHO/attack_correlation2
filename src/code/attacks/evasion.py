@@ -639,7 +639,7 @@ def spsa(
     # so if the batch is bigger we split it up.
     if len(x) != 1:
         adv_x = []
-        for x_single, y_single in zip(x, y):
+        for x_single, y_single in tqdm(zip(x, y), leave=False):
             adv_x_single = spsa(
                 model_fn=model_fn,
                 x=x_single.unsqueeze(0),
@@ -689,7 +689,7 @@ def spsa(
     _project_perturbation(perturbation, norm, eps, x, clip_min, clip_max)
     optimizer = optim.Adam([perturbation], lr=learning_rate)
 
-    for i in tqdm(range(nb_iter), leave=False):
+    for i in range(nb_iter):
 
         def loss_fn(pert):
             """
