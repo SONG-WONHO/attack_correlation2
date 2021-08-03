@@ -250,10 +250,10 @@ def main():
         image_adv = torch.cat(image_adv)
 
         train_dataset = ACDataset(X_train, y_train, transform=test_transform)
-        train_loader = DataLoader(train_dataset, batch_size=4, shuffle=False, drop_last=False)
+        train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False, drop_last=False)
 
         evasion_dataset = EvasionDataset(image_adv, y)
-        evasion_loader = DataLoader(evasion_dataset, batch_size=4, shuffle=False, drop_last=False)
+        evasion_loader = DataLoader(evasion_dataset, batch_size=64, shuffle=False, drop_last=False)
 
         ### Evaluate
         # valid one epoch = original
@@ -269,38 +269,37 @@ def main():
         # logging
         log.write(f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
 
-        adv = image_adv.detach().cpu().permute(0,2,3,1).numpy()
-        total = np.sqrt((X_train - adv) ** 2).sum()/1000
-
-        size_ratio = json.load(open(log_path[idx]))['size_ratio']
-        w, h = X_test.shape[1:3]
-        num_pxs = w * h * size_ratio
-        w_or_h = np.sqrt(num_pxs)
-        if np.ceil(w_or_h) % 2 == 0:
-            w_or_h = np.ceil(w_or_h)
-        else:
-            w_or_h = np.floor(w_or_h)
-
-        mask = np.zeros(X_test.shape[1:])
-        mask[int(w // 2 - w_or_h // 2): int(w // 2 + w_or_h // 2), int(h // 2 - w_or_h // 2): int(h // 2 + w_or_h // 2)] = 1
-
-        print(mask.shape)
-        results = []
-        for tr, ad in zip(X_train, adv):
-            results.append(np.sqrt((tr/255 - ad) ** 2).mean())
-        print(np.mean(results))
-
-        results = []
-        for tr, ad in zip(X_train, adv):
-            results.append(np.sqrt(((tr/255 - ad) * mask) ** 2).sum() / mask.sum())
-        print(np.mean(results))
-
-        results = []
-        for tr, ad in zip(X_train, adv):
-            results.append(np.sqrt(((tr/255 - ad) * (1-mask)) ** 2).sum() / (1-mask).sum())
-        print(np.mean(results))             
-
-
+        # for check
+        # adv = image_adv.detach().cpu().permute(0,2,3,1).numpy()
+        # total = np.sqrt((X_train - adv) ** 2).sum()/1000
+        #
+        # size_ratio = json.load(open(log_path[idx]))['size_ratio']
+        # w, h = X_test.shape[1:3]
+        # num_pxs = w * h * size_ratio
+        # w_or_h = np.sqrt(num_pxs)
+        # if np.ceil(w_or_h) % 2 == 0:
+        #     w_or_h = np.ceil(w_or_h)
+        # else:
+        #     w_or_h = np.floor(w_or_h)
+        #
+        # mask = np.zeros(X_test.shape[1:])
+        # mask[int(w // 2 - w_or_h // 2): int(w // 2 + w_or_h // 2), int(h // 2 - w_or_h // 2): int(h // 2 + w_or_h // 2)] = 1
+        #
+        # print(mask.shape)
+        # results = []
+        # for tr, ad in zip(X_train, adv):
+        #     results.append(np.sqrt((tr/255 - ad) ** 2).mean())
+        # print(np.mean(results))
+        #
+        # results = []
+        # for tr, ad in zip(X_train, adv):
+        #     results.append(np.sqrt(((tr/255 - ad) * mask) ** 2).sum() / mask.sum())
+        # print(np.mean(results))
+        #
+        # results = []
+        # for tr, ad in zip(X_train, adv):
+        #     results.append(np.sqrt(((tr/255 - ad) * (1-mask)) ** 2).sum() / (1-mask).sum())
+        # print(np.mean(results))
         # print(((np.abs(X_train - adv) * mask).sum() / 1000) / mask.sum())
         # print(((np.abs(X_train - adv) * (1-mask)).sum() / 1000) / (1-mask).sum())
 
