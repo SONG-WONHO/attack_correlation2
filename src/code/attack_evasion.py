@@ -237,10 +237,10 @@ def main():
                     y=y[i*sz:(i+1)*sz], targeted=CFG.targeted)
 
             elif CFG.attack_type == "cw":
-                image_t = cw_l2_attack(
-                    model, image[i*sz:(i+1)*sz], y[i*sz:(i+1)*sz],
-                    targeted=CFG.targeted, device=CFG.device,
-                    c=CFG.const, max_iter=1000)
+                image_t = carlini_wagner_l2(
+                    model, image[i*sz:(i+1)*sz], CFG.num_classes,
+                    y=y[i*sz:(i+1)*sz], targeted=CFG.targeted,
+                    initial_const=CFG.const, max_iterations=1000)
 
             elif CFG.attack_type == "spsa":
                 image_t = spsa(
