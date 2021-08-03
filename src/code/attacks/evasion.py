@@ -29,12 +29,14 @@ def clip_eta(eta, norm, eps):
         if norm == 1:
             raise NotImplementedError("L1 clip is not implemented.")
             norm = torch.max(
-                avoid_zero_div, torch.sum(torch.abs(eta), dim=reduc_ind, keepdim=True)
+                avoid_zero_div,
+                torch.sum(torch.abs(eta), dim=reduc_ind, keepdim=True)
             )
         elif norm == 2:
             norm = torch.sqrt(
                 torch.max(
-                    avoid_zero_div, torch.sum(eta ** 2, dim=reduc_ind, keepdim=True)
+                    avoid_zero_div,
+                    torch.sum(eta ** 2, dim=reduc_ind, keepdim=True)
                 )
             )
         factor = torch.min(
@@ -88,9 +90,10 @@ def optimize_linear(grad, eps, norm=np.inf):
         opt_pert_norm = (
             optimal_perturbation.pow(2).sum(dim=red_ind, keepdim=True).sqrt()
         )
-        one_mask = (square <= avoid_zero_div).to(torch.float) * opt_pert_norm + (
-            square > avoid_zero_div
-        ).to(torch.float)
+        one_mask = (square <= avoid_zero_div).to(
+            torch.float) * opt_pert_norm + (
+                           square > avoid_zero_div
+                   ).to(torch.float)
         assert torch.allclose(opt_pert_norm, one_mask, rtol=1e-05, atol=1e-08)
     else:
         raise NotImplementedError(
@@ -104,15 +107,15 @@ def optimize_linear(grad, eps, norm=np.inf):
 
 
 def fast_gradient_method(
-    model_fn,
-    x,
-    eps,
-    norm,
-    clip_min=None,
-    clip_max=None,
-    y=None,
-    targeted=False,
-    sanity_checks=False,
+        model_fn,
+        x,
+        eps,
+        norm,
+        clip_min=None,
+        clip_max=None,
+        y=None,
+        targeted=False,
+        sanity_checks=False,
 ):
     """
     PyTorch implementation of the Fast Gradient Method.
@@ -136,7 +139,8 @@ def fast_gradient_method(
     """
     if norm not in [np.inf, 1, 2]:
         raise ValueError(
-            "Norm order must be either np.inf, 1, or 2, got {} instead.".format(norm)
+            "Norm order must be either np.inf, 1, or 2, got {} instead.".format(
+                norm)
         )
     if eps < 0:
         raise ValueError(
@@ -211,7 +215,6 @@ def basic_iterative_method(
         n_iter=50,
         clip_max=None,
         clip_min=None):
-
     x = x.clone().detach().to(torch.float).requires_grad_(True)
     if y is None:
         # Using model predictions as ground truth to avoid label leaking
@@ -244,18 +247,18 @@ INF = float("inf")
 
 
 def carlini_wagner_l2(
-    model_fn,
-    x,
-    n_classes,
-    y=None,
-    targeted=False,
-    lr=5e-3,
-    confidence=0,
-    clip_min=0,
-    clip_max=1,
-    initial_const=1e-2,
-    binary_search_steps=5,
-    max_iterations=1000,
+        model_fn,
+        x,
+        n_classes,
+        y=None,
+        targeted=False,
+        lr=5e-3,
+        confidence=0,
+        clip_min=0,
+        clip_max=1,
+        initial_const=1e-2,
+        binary_search_steps=5,
+        max_iterations=1000,
 ):
     """
     This attack was originally proposed by Carlini and Wagner. It is an
@@ -363,7 +366,8 @@ def carlini_wagner_l2(
         ((other - real) if targeted else (real - other)) + confidence,
         torch.tensor(0.0).to(real.device),
     )
-    l2dist_fn = lambda x, y: torch.pow(x - y, 2).sum(list(range(len(x.size())))[1:])
+    l2dist_fn = lambda x, y: torch.pow(x - y, 2).sum(
+        list(range(len(x.size())))[1:])
     optimizer = torch.optim.Adam([modifier], lr=lr)
 
     # Outer loop performing binary search on const
@@ -390,7 +394,8 @@ def carlini_wagner_l2(
             optimizer.step()
 
             # Update best results
-            for n, (l2_n, logits_n, new_x_n) in enumerate(zip(l2, logits, new_x)):
+            for n, (l2_n, logits_n, new_x_n) in enumerate(
+                    zip(l2, logits, new_x)):
                 y_n = y[n]
                 succeeded = compare(logits_n, y_n, is_logits=True)
                 if l2_n < o_bestl2[n] and succeeded:
@@ -427,19 +432,19 @@ def carlini_wagner_l2(
 
 
 def projected_gradient_descent(
-    model_fn,
-    x,
-    eps,
-    eps_iter,
-    nb_iter,
-    norm,
-    clip_min=None,
-    clip_max=None,
-    y=None,
-    targeted=False,
-    rand_init=True,
-    rand_minmax=None,
-    sanity_checks=True,
+        model_fn,
+        x,
+        eps,
+        eps_iter,
+        nb_iter,
+        norm,
+        clip_min=None,
+        clip_max=None,
+        y=None,
+        targeted=False,
+        rand_init=True,
+        rand_minmax=None,
+        sanity_checks=True,
 ):
     """
     This class implements either the Basic Iterative Method
@@ -574,22 +579,22 @@ def projected_gradient_descent(
 
 
 def spsa(
-    model_fn,
-    x,
-    eps,
-    nb_iter,
-    norm=np.inf,
-    clip_min=-np.inf,
-    clip_max=np.inf,
-    y=None,
-    targeted=False,
-    early_stop_loss_threshold=None,
-    learning_rate=0.01,
-    delta=0.01,
-    spsa_samples=128,
-    spsa_iters=1,
-    is_debug=False,
-    sanity_checks=True,
+        model_fn,
+        x,
+        eps,
+        nb_iter,
+        norm=np.inf,
+        clip_min=-np.inf,
+        clip_max=np.inf,
+        y=None,
+        targeted=False,
+        early_stop_loss_threshold=None,
+        learning_rate=0.01,
+        delta=0.01,
+        spsa_samples=128,
+        spsa_iters=1,
+        is_debug=False,
+        sanity_checks=True,
 ):
     """
     This implements the SPSA adversary, as in https://arxiv.org/abs/1802.05666
@@ -697,7 +702,8 @@ def spsa(
             """
             logits = model_fn(x + pert)[0]
             loss_multiplier = 1 if targeted else -1
-            return loss_multiplier * _margin_logit_loss(logits, y.expand(len(pert)))
+            return loss_multiplier * _margin_logit_loss(logits,
+                                                        y.expand(len(pert)))
 
         spsa_grad = _compute_spsa_gradient(
             loss_fn, x, delta=delta, samples=spsa_samples, iters=spsa_iters
@@ -721,7 +727,8 @@ def spsa(
         asserts.append(
             torch.all(
                 torch.abs(
-                    torch.renorm(adv_x - x, p=norm, dim=0, maxnorm=eps) - (adv_x - x)
+                    torch.renorm(adv_x - x, p=norm, dim=0, maxnorm=eps) - (
+                            adv_x - x)
                 )
                 < 1e-6
             )
@@ -736,7 +743,8 @@ def spsa(
 
 
 def _project_perturbation(
-    perturbation, norm, epsilon, input_image, clip_min=-np.inf, clip_max=np.inf
+        perturbation, norm, epsilon, input_image, clip_min=-np.inf,
+        clip_max=np.inf
 ):
     """
     Project `perturbation` onto L-infinity ball of radius `epsilon`. Also project into
@@ -745,7 +753,8 @@ def _project_perturbation(
     """
 
     clipped_perturbation = clip_eta(perturbation, norm, epsilon)
-    new_image = torch.clamp(input_image + clipped_perturbation, clip_min, clip_max)
+    new_image = torch.clamp(input_image + clipped_perturbation, clip_min,
+                            clip_max)
 
     perturbation.add_((new_image - input_image) - perturbation)
 
@@ -771,7 +780,8 @@ def _compute_spsa_gradient(loss_fn, x, delta, samples, iters):
         while len(loss_vals.size()) < num_dims:
             loss_vals = loss_vals.unsqueeze(-1)
         avg_grad = (
-            torch.mean(loss_vals * torch.sign(delta_x), dim=0, keepdim=True) / delta
+                torch.mean(loss_vals * torch.sign(delta_x), dim=0,
+                           keepdim=True) / delta
         )
         grad_list.append(avg_grad)
 
