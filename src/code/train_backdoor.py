@@ -281,9 +281,9 @@ def main():
         log.write(message)
 
         # save model
-        torch.save({
-            "state_dict": model.cpu().state_dict(),
-        }, f"{os.path.join(CFG.model_path, f'model.epoch_{epoch}.pt')}")
+        # torch.save({
+        #     "state_dict": model.cpu().state_dict(),
+        # }, f"{os.path.join(CFG.model_path, f'model.epoch_{epoch}.pt')}")
 
         torch.save({
             "state_dict": model.cpu().state_dict(),
