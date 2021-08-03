@@ -352,7 +352,7 @@ def carlini_wagner_l2(
     x = (x - clip_min) / (clip_max - clip_min)
     x = torch.clamp(x, 0, 1)
     x = x * 2 - 1
-    x = torch.arctanh(x * 0.999999)
+    x = torch.atanh(x * 0.999999)
 
     # Prepare some variables
     modifier = torch.zeros_like(x, requires_grad=True)
