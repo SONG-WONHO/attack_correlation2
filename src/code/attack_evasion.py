@@ -133,7 +133,7 @@ def main():
 
     # target model
     if CFG.case == 0:
-        const_list = [0.003, 0.01, 0.03, 0.05, 0.1, 0.3, 0.5, 1]
+        const_list = [0.003, 0.01, 0.03, 0.05, 0.1, 0.15, 0.3, 0.5]
         exp_ids = [5] * len(const_list)
         path = [f"./model/target/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
