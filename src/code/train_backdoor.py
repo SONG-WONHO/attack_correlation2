@@ -55,10 +55,10 @@ class CFG:
     """
 
     # factor settings
-    poison_ratio = 0.01 # 1,2,4,8,10%
-    class_ratio = 0.1 #10,20,30,40,50%
-    mask_ratio = 0.05 #5,10,20,40,80,100%
-    size_ratio = 0.05 #5,10,20,40,80,100%
+    poison_ratio = 0.01  # 1,2,4,8,10%
+    class_ratio = 0.1  # 10,20,30,40,50%
+    mask_ratio = 0.05  # 5,10,20,40,80,100%
+    size_ratio = 0.05  # 5,10,20,40,80,100%
 
 
 def main():
@@ -68,7 +68,8 @@ def main():
     ### header
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset',
-                        choices=['mnist', 'cifar10', 'cifar100', 'aptos', 'tiny'],
+                        choices=['mnist', 'cifar10', 'cifar100', 'aptos',
+                                 'tiny'],
                         default=CFG.dataset,
                         help=f"Dataset({CFG.dataset})")
     parser.add_argument('--arch',
@@ -133,12 +134,14 @@ def main():
 
     # update log path
     os.makedirs(CFG.log_path, exist_ok=True)
-    CFG.log_path = os.path.join(CFG.log_path, f'exp_{get_exp_id(CFG.log_path, prefix="exp_")}')
+    CFG.log_path = os.path.join(CFG.log_path,
+                                f'exp_{get_exp_id(CFG.log_path, prefix="exp_")}')
     os.makedirs(CFG.log_path, exist_ok=True)
 
     # update model path
     os.makedirs(CFG.model_path, exist_ok=True)
-    CFG.model_path = os.path.join(CFG.model_path, f'exp_{get_exp_id(CFG.model_path, prefix="exp_")}')
+    CFG.model_path = os.path.join(CFG.model_path,
+                                  f'exp_{get_exp_id(CFG.model_path, prefix="exp_")}')
     os.makedirs(CFG.model_path, exist_ok=True)
 
     # num of classes
@@ -187,14 +190,17 @@ def main():
     trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
     val_dataset = ACDataset(X_test, y_test, transform=test_transform)
     log.write(f"- Shape: {trn_dataset[0][0].shape}")
-    log.write(f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
+    log.write(
+        f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
     log.write()
 
     log.write("Get Backdoor Dataset")
-    trn_back_dataset = ACDataset(X_back_tr, y_back_tr, transform=train_transform)
+    trn_back_dataset = ACDataset(X_back_tr, y_back_tr,
+                                 transform=train_transform)
     val_back_dataset = ACDataset(X_back_te, y_back_te, transform=test_transform)
     log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
-    log.write(f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
+    log.write(
+        f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
     log.write()
 
     # loader
@@ -260,7 +266,6 @@ def main():
     log.write(f'** start training here! **')
     log.write('rate,epoch,tr_loss,tr_acc,te_loss,te_acc,time')
     for epoch in range(CFG.num_epochs):
-
         tr_loss, tr_acc = train_one_epoch(train_loader, model, optimizer, CFG)
         vl_loss, vl_acc = valid_one_epoch(valid_loader, model, CFG)
         vl_b_loss, vl_b_acc = valid_one_epoch(valid_back_loader, model, CFG)
