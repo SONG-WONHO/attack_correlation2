@@ -68,6 +68,7 @@ def main():
                         help=f"Targeted Evasion Attack?")
     parser.add_argument("--poisoned", action="store_true", default=CFG.poisoned,
                         help=f"Targeted Evasion Attack on poisoned class?")
+    parser.add_argument("--exp-ids", help="EXP1,EXP2,EXP3 ...", default=None)
 
     # etc
     parser.add_argument("--worker", default=CFG.worker, type=int,
@@ -85,6 +86,11 @@ def main():
     CFG.case = args.case
     CFG.targeted = args.targeted
     CFG.poisoned = args.poisoned
+    CFG.exp_ids = args.exp_ids
+
+    if CFG.case == 1:
+        if CFG.exp_ids is None:
+            assert "Must set exp ids"
 
     CFG.worker = args.worker
     CFG.seed = args.seed
@@ -134,13 +140,20 @@ def main():
     # target model
     if CFG.case == 0:
         const_list = [1/255, 2/255, 4/255, 8/255, 16/255, 32/255, 64/255]
-        exp_ids = [5] * len(const_list)
+
+        if CFG.dataset == "mnist":
+            exp_ids = [5] * len(const_list)
+        elif CFG.dataset == "cifar10":
+            exp_ids = [1] * len(const_list)
+        elif CFG.dataset == "cifar100":
+            exp_ids = [4] * len(const_list)
+
         path = [f"./model/target/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
 
     else:
         # exp_ids = list(range(40, 50))
-        exp_ids = [0, 1, 2, 3, 4]
+        exp_ids = CFG.exp_ids.split(",")
         # exp_ids = [5, 6, 7, 8, 9]
         path = [f"./model/attack/poison/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
