@@ -358,7 +358,7 @@ def carlini_wagner_l2(
     x = torch.atanh(x * 0.999999)
 
     # Prepare some variables
-    modifier = torch.zeros_like(x, requires_grad=True)
+    modifier = torch.zeros_like(x, requires_grad=True).to(x.device)
     y_onehot = torch.nn.functional.one_hot(y, n_classes).to(torch.float)
 
     # Define loss functions and optimizer
@@ -378,37 +378,41 @@ def carlini_wagner_l2(
 
         # Inner loop performing attack iterations
         for i in tqdm(range(max_iterations), leave=False):
-            # One attack step
-            new_x = (torch.tanh(modifier + x) + 1) / 2
-            new_x = new_x * (clip_max - clip_min) + clip_min
-            logits = model_fn(new_x)[0]
+            try:
+                # One attack step
+                new_x = (torch.tanh(modifier + x) + 1) / 2
+                new_x = new_x * (clip_max - clip_min) + clip_min
+                logits = model_fn(new_x)[0]
 
-            real = torch.sum(y_onehot * logits, 1)
-            other, _ = torch.max((1 - y_onehot) * logits - y_onehot * 1e4, 1)
+                real = torch.sum(y_onehot * logits, 1)
+                other, _ = torch.max((1 - y_onehot) * logits - y_onehot * 1e4, 1)
 
-            optimizer.zero_grad()
-            f = f_fn(real, other, targeted)
-            l2 = l2dist_fn(new_x, ox)
-            loss = (const * f + l2).sum()
-            loss.backward()
-            optimizer.step()
+                optimizer.zero_grad()
+                f = f_fn(real, other, targeted)
+                l2 = l2dist_fn(new_x, ox)
+                loss = (const * f + l2).sum()
+                loss.backward()
+                optimizer.step()
 
-            # Update best results
-            for n, (l2_n, logits_n, new_x_n) in enumerate(
-                    zip(l2, logits, new_x)):
-                y_n = y[n]
-                succeeded = compare(logits_n, y_n, is_logits=True)
-                if l2_n < o_bestl2[n] and succeeded:
-                    pred_n = torch.argmax(logits_n)
-                    o_bestl2[n] = l2_n
-                    o_bestscore[n] = pred_n
-                    o_bestattack[n] = new_x_n
-                    # l2_n < o_bestl2[n] implies l2_n < bestl2[n] so we modify inner loop variables too
-                    bestl2[n] = l2_n
-                    bestscore[n] = pred_n
-                elif l2_n < bestl2[n] and succeeded:
-                    bestl2[n] = l2_n
-                    bestscore[n] = torch.argmax(logits_n)
+                # Update best results
+                for n, (l2_n, logits_n, new_x_n) in enumerate(
+                        zip(l2, logits, new_x)):
+                    y_n = y[n]
+                    succeeded = compare(logits_n, y_n, is_logits=True)
+                    if l2_n < o_bestl2[n] and succeeded:
+                        pred_n = torch.argmax(logits_n)
+                        o_bestl2[n] = l2_n
+                        o_bestscore[n] = pred_n
+                        o_bestattack[n] = new_x_n
+                        # l2_n < o_bestl2[n] implies l2_n < bestl2[n] so we modify inner loop variables too
+                        bestl2[n] = l2_n
+                        bestscore[n] = pred_n
+                    elif l2_n < bestl2[n] and succeeded:
+                        bestl2[n] = l2_n
+                        bestscore[n] = torch.argmax(logits_n)
+
+            except:
+                print(i)
 
         # Binary search step
         for n in range(len(x)):
