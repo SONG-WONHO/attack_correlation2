@@ -255,9 +255,10 @@ def main():
                 image_t = carlini_wagner_l2(
                     model,
                     image[i * sz:(i + 1) * sz],
+                    CFG.num_classes,
                     y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
                     initial_const=CFG.const, max_iterations=20,
-                    device=CFG.device, binary_search_steps=1)
+                    binary_search_steps=1)
 
             elif CFG.attack_type == "spsa":
                 image_t = spsa(
