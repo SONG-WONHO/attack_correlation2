@@ -218,7 +218,7 @@ def main():
             model = ResNet34(CFG.num_classes)
         elif CFG.arch == "resnet50":
             model = ResNet50(CFG.num_classes)
-        model.load_state_dict(torch.load(CFG.pretrained_path)['state_dict'])
+        # model.load_state_dict(torch.load(CFG.pretrained_path)['state_dict'])
         model.to(CFG.device)
         model.eval()
 
