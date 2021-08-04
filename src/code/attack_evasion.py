@@ -196,8 +196,7 @@ def main():
             else:
                 assert len(clean_cls) != 0, "Maybe all class is backdoored?"
                 cls = clean_cls[-1]
-                cls = 0
-            # print(cls)
+                cls = 1
             logit = y_test.reshape(-1) != cls
             X_test = X_test[logit]
             y_test = y_test[logit]
