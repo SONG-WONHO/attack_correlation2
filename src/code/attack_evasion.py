@@ -289,9 +289,12 @@ def main():
             image_adv.append(image_t)
         image_adv = torch.cat(image_adv)
 
+        image_adv = torch.rand((1000, 3, 32, 32))
         train_dataset = ACDataset(X_train, y_train, transform=test_transform)
         train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False,
                                   drop_last=False)
+
+
 
         evasion_dataset = EvasionDataset(image_adv, y)
         evasion_loader = DataLoader(evasion_dataset, batch_size=64,
