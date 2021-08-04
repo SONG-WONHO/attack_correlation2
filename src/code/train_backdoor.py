@@ -12,6 +12,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from data import *
 from utils import *
@@ -55,10 +56,15 @@ class CFG:
     """
 
     # factor settings
-    poison_ratio = 0.001  # 0.1%, 0.2%, 0.4%, 0.8%, 1.6%, 3.2%, 6.4%, 12.8%
+    poison_ratio = 0.01  # 1,2,4,8,10%
     class_ratio = 0.1  # 10,20,30,40,50%
     mask_ratio = 0.05  # 5,10,20,40,80,100%
-    size_ratio = 2  # 2, 4, 6, 8, 10
+    size_ratio = 0.05  # 5,10,20,40,80,100%
+
+    # poison_ratio = 0.001  # 0.1%, 0.2%, 0.4%, 0.8%, 1.6%, 3.2%, 6.4%, 12.8%
+    # class_ratio = 0.1  # 10,20,30,40,50%
+    # mask_ratio = 0.05  # 5,10,20,40,80,100%
+    # size_ratio = 2  # 2, 4, 6, 8, 10
 
 
 def main():
@@ -98,7 +104,7 @@ def main():
     parser.add_argument('--poison-ratio', type=float, default=CFG.poison_ratio)
     parser.add_argument('--class-ratio', type=float, default=CFG.class_ratio)
     parser.add_argument('--mask-ratio', type=float, default=CFG.mask_ratio)
-    parser.add_argument('--size-ratio', type=int, default=CFG.size_ratio)
+    parser.add_argument('--size-ratio', type=float, default=CFG.size_ratio)
 
     # etc
     parser.add_argument("--worker",
@@ -246,19 +252,19 @@ def main():
 
     # load scheduler
     log.write("Load Scheduler")
-    scheduler = None
-    if CFG.dataset == "mnist":
-        scheduler = optim.lr_scheduler.LambdaLR(
-            optimizer, lambda e: 1)
-    elif CFG.dataset == "cifar10":
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[40, 80], gamma=0.5)
-    elif CFG.dataset == "cifar100":
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[80, 120, 160, 180], gamma=0.5)
-    elif CFG.dataset == "aptos" or CFG.dataset == "tiny":
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[10, 20, 30], gamma=0.5)
+    scheduler = ReduceLROnPlateau(optimizer, mode="min", factor=0.1, patience=5)
+    # if CFG.dataset == "mnist":
+    #     scheduler = optim.lr_scheduler.LambdaLR(
+    #         optimizer, lambda e: 1)
+    # elif CFG.dataset == "cifar10":
+    #     scheduler = torch.optim.lr_scheduler.MultiStepLR(
+    #         optimizer, milestones=[40, 80], gamma=0.5)
+    # elif CFG.dataset == "cifar100":
+    #     scheduler = torch.optim.lr_scheduler.MultiStepLR(
+    #         optimizer, milestones=[80, 120, 160, 180], gamma=0.5)
+    # elif CFG.dataset == "aptos" or CFG.dataset == "tiny":
+    #     scheduler = torch.optim.lr_scheduler.MultiStepLR(
+    #         optimizer, milestones=[10, 20, 30], gamma=0.5)
     log.write()
 
     ### Train Related
@@ -291,7 +297,7 @@ def main():
 
         model.to(CFG.device)
 
-        scheduler.step()
+        scheduler.step(vl_loss)
 
 
 if __name__ == "__main__":
