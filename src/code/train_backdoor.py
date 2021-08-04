@@ -302,8 +302,8 @@ def main():
             }, f"{os.path.join(CFG.model_path, f'model.last.pt')}")
             model.to(CFG.device)
 
-        scheduler.step(vl_loss)
-        if es.step(vl_loss):
+        scheduler.step(vl_acc)
+        if es.step(vl_acc):
             break
 
     log.write(f"Results:{metrics[0]},{metrics[1]},{metrics[2]},{metrics[3]},{metrics[4]},{metrics[5]}")
