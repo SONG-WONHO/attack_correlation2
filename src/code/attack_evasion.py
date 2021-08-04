@@ -234,7 +234,7 @@ def main():
         else:
             y = label
 
-        print(y)
+        print(y.shape)
 
         # do attack
         image_adv = []
