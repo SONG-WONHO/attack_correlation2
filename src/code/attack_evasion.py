@@ -226,6 +226,7 @@ def main():
         # prepare evasion data
         image = [test_transform(image=sample)['image'].unsqueeze(0) for
                  sample in X_train]
+        print(image[0].max())
         image = torch.cat(image).to(CFG.device)
         label = torch.LongTensor(y_train).view(-1).to(CFG.device)
 
