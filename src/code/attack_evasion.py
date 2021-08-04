@@ -190,7 +190,7 @@ def main():
             if CFG.poisoned:
                 assert len(backdoored_cls) != 0, "Maybe case 0?"
                 # select 1
-                cls = backdoored_cls[0]
+                cls = backdoored_cls[-1]
 
             # clean label?
             else:
