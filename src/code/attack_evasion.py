@@ -308,6 +308,7 @@ def main():
                 logit, prob = model(X_batch)
                 loss = torch.nn.CrossEntropyLoss()(logit, y_batch.view(-1))
             pred_final.append(prob.detach().cpu())
+            print(pred.detach().cpu())
 
         pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
         print(pred_final)
