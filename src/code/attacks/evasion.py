@@ -168,8 +168,6 @@ def fast_gradient_method(model, x, eps=0.3, norm=np.inf,
                 "One of clip_min and clip_max is None but we don't currently support one-sided clipping")
         adv_x = torch.clamp(adv_x, clip_min, clip_max)
 
-        print((clip_max - adv_x).mean())
-
     if sanity_checks:
         assert np.all(asserts)
     return adv_x
