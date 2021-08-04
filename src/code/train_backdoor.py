@@ -252,7 +252,7 @@ def main():
 
     # load scheduler
     log.write("Load Scheduler")
-    scheduler = ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=3)
+    scheduler = ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=4)
     # if CFG.dataset == "mnist":
     #     scheduler = optim.lr_scheduler.LambdaLR(
     #         optimizer, lambda e: 1)
@@ -267,13 +267,13 @@ def main():
     #         optimizer, milestones=[10, 20, 30], gamma=0.5)
     log.write()
 
-    es = EarlyStopping(mode="min", patience=6)
+    es = EarlyStopping(mode="max", patience=10)
 
     ### Train Related
     start = timer()
     log.write(f'** start training here! **')
     log.write('rate,epoch,tr_loss,tr_acc,te_loss,te_acc,time')
-    cond = 1e8
+    cond = 1e-8
     for epoch in range(CFG.num_epochs):
         tr_loss, tr_acc = train_one_epoch(train_loader, model, optimizer, CFG)
         vl_loss, vl_acc = valid_one_epoch(valid_loader, model, CFG)
@@ -294,8 +294,8 @@ def main():
         #     "state_dict": model.cpu().state_dict(),
         # }, f"{os.path.join(CFG.model_path, f'model.epoch_{epoch}.pt')}")
 
-        if vl_loss < cond:
-            cond = vl_loss
+        if vl_acc > cond:
+            cond = vl_acc
             metrics = [tr_loss, tr_acc, vl_loss, vl_acc, vl_b_loss, vl_b_acc]
             torch.save({
                 "state_dict": model.cpu().state_dict(),
@@ -306,7 +306,7 @@ def main():
         if es.step(vl_loss):
             break
 
-    print(f"Results:{metrics[0]},{metrics[1]},{metrics[2]},{metrics[3]},{metrics[4]},{metrics[5]}")
+    log.write(f"Results:{metrics[0]},{metrics[1]},{metrics[2]},{metrics[3]},{metrics[4]},{metrics[5]}")
 
 
 if __name__ == "__main__":
