@@ -243,7 +243,6 @@ def main():
                 image_t = fast_gradient_method(
                     model, image[i * sz:(i + 1) * sz], CFG.const, np.inf,
                     y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
-                    clip_min=0, clip_max=1
                     )
                 # image_t = projected_gradient_descent(
                 #     model, image[i * sz:(i + 1) * sz], CFG.const, CFG.const,
@@ -312,7 +311,6 @@ def main():
             pred_final.append(prob.detach().cpu())
 
         pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
-        print(y)
         print(pred_final)
 
         ### Evaluate
