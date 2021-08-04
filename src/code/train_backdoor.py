@@ -98,7 +98,7 @@ def main():
     parser.add_argument('--poison-ratio', type=float, default=CFG.poison_ratio)
     parser.add_argument('--class-ratio', type=float, default=CFG.class_ratio)
     parser.add_argument('--mask-ratio', type=float, default=CFG.mask_ratio)
-    parser.add_argument('--size-ratio', type=float, default=CFG.size_ratio)
+    parser.add_argument('--size-ratio', type=int, default=CFG.size_ratio)
 
     # etc
     parser.add_argument("--worker",
