@@ -190,13 +190,12 @@ def main():
             if CFG.poisoned:
                 assert len(backdoored_cls) != 0, "Maybe case 0?"
                 # select 1
-                cls = backdoored_cls[0]
+                cls = backdoored_cls[-1]
 
             # clean label?
             else:
                 assert len(clean_cls) != 0, "Maybe all class is backdoored?"
                 cls = clean_cls[-1]
-            print(cls)
             logit = y_test.reshape(-1) != cls
             X_test = X_test[logit]
             y_test = y_test[logit]
