@@ -226,7 +226,6 @@ def main():
         # prepare evasion data
         image = [test_transform(image=sample)['image'].unsqueeze(0) for
                  sample in X_train]
-        print(image[0].max())
         image = torch.cat(image).to(CFG.device)
         label = torch.LongTensor(y_train).view(-1).to(CFG.device)
 
@@ -235,21 +234,19 @@ def main():
         else:
             y = label
 
-        print(y.shape)
-
         # do attack
         image_adv = []
         sz = 1000
         b_size = len(image) // sz
         for i in range(b_size):
             if CFG.attack_type == "fgsm":
-                # image_t = fast_gradient_method(
-                #     model, image[i * sz:(i + 1) * sz], CFG.const, np.inf,
-                #     y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
-                image_t = projected_gradient_descent(
-                    model, image[i * sz:(i + 1) * sz], CFG.const, CFG.const,
-                    1, np.inf,
+                image_t = fast_gradient_method(
+                    model, image[i * sz:(i + 1) * sz], CFG.const, np.inf,
                     y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
+                # image_t = projected_gradient_descent(
+                #     model, image[i * sz:(i + 1) * sz], CFG.const, CFG.const,
+                #     1, np.inf,
+                #     y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted)
                 # image_t = basic_iterative_method(
                 #     model, image[i * sz:(i + 1) * sz],
                 #     eps=CFG.const, eps_iter=CFG.const, n_iter=1,
@@ -290,6 +287,7 @@ def main():
 
             image_adv.append(image_t)
         image_adv = torch.cat(image_adv)
+        print(image_adv.max())
 
         train_dataset = ACDataset(X_train, y_train, transform=test_transform)
         train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False,
