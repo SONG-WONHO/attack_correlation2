@@ -295,6 +295,7 @@ def main():
         # }, f"{os.path.join(CFG.model_path, f'model.epoch_{epoch}.pt')}")
 
         if vl_loss < cond:
+            print("Save!")
             cond = vl_loss
             metrics = [tr_loss, tr_acc, vl_loss, vl_acc, vl_b_loss, vl_b_acc]
             torch.save({
@@ -307,7 +308,7 @@ def main():
             break
 
     print(f"Results:{metrics[0]},{metrics[1]},{metrics[2]},{metrics[3]},{metrics[4]},{metrics[5]}")
-    
+
 
 if __name__ == "__main__":
     main()
