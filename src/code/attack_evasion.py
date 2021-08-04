@@ -299,6 +299,21 @@ def main():
         evasion_loader = DataLoader(evasion_dataset, batch_size=64,
                                     shuffle=False, drop_last=False)
 
+        pred_final = []
+        for i, (X_batch, y_batch) in enumerate(evasion_loader):
+            X_batch = X_batch.to(CFG.device)
+            y_batch = y_batch.to(CFG.device).type(torch.long)
+
+            batch_size = X_batch.size(0)
+
+            with torch.no_grad():
+                logit, prob = model(X_batch)
+                loss = torch.nn.CrossEntropyLoss()(logit, y_batch.view(-1))
+            pred_final.append(prob.detach().cpu())
+
+        pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
+        print(pred_final)
+
         ### Evaluate
         # valid one epoch = original
         tr_loss, tr_acc = valid_one_epoch(train_loader, model, CFG)
