@@ -312,6 +312,7 @@ def main():
             pred_final.append(prob.detach().cpu())
 
         pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
+        print(y)
         print(pred_final)
 
         ### Evaluate
