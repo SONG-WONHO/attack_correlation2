@@ -57,6 +57,34 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
+class EarlyStopping(object):
+    def __init__(self, mode="min", patience=3):
+        self.mode = mode
+        self.patience = patience
+        self.best = 1e8 if self.mode == "min" else 1e-8
+        self.epochs = 0
+
+    def step(self, metrics):
+        if self.mode == "min":
+            if metrics < self.best:
+                self.best = metrics
+                self.epochs = 0
+            else:
+                self.epochs += 1
+        else:
+            if metrics > self.best:
+                self.best = metrics
+                self.epochs = 0
+            else:
+                self.epochs += 1
+
+        if self.epochs <= self.patience:
+            return False
+        else:
+            return True
+
+
+
 def get_exp_id(path="./model/", prefix="exp_"):
     """Get new experiement ID
 
