@@ -252,28 +252,28 @@ def main():
 
     # load scheduler
     log.write("Load Scheduler")
-    scheduler = ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=4)
-    # if CFG.dataset == "mnist":
-    #     scheduler = optim.lr_scheduler.LambdaLR(
-    #         optimizer, lambda e: 1)
-    # elif CFG.dataset == "cifar10":
-    #     scheduler = torch.optim.lr_scheduler.MultiStepLR(
-    #         optimizer, milestones=[40, 80], gamma=0.5)
-    # elif CFG.dataset == "cifar100":
-    #     scheduler = torch.optim.lr_scheduler.MultiStepLR(
-    #         optimizer, milestones=[80, 120, 160, 180], gamma=0.5)
-    # elif CFG.dataset == "aptos" or CFG.dataset == "tiny":
-    #     scheduler = torch.optim.lr_scheduler.MultiStepLR(
-    #         optimizer, milestones=[10, 20, 30], gamma=0.5)
+    # scheduler = ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=4)
+    if CFG.dataset == "mnist":
+        scheduler = optim.lr_scheduler.LambdaLR(
+            optimizer, lambda e: 1)
+    elif CFG.dataset == "cifar10":
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=[20, 40], gamma=0.5)
+    elif CFG.dataset == "cifar100":
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=[80, 120, 160, 180], gamma=0.5)
+    elif CFG.dataset == "aptos" or CFG.dataset == "tiny":
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=[10, 20, 30], gamma=0.5)
     log.write()
 
-    es = EarlyStopping(mode="max", patience=10)
+    # es = EarlyStopping(mode="max", patience=10)
 
     ### Train Related
     start = timer()
     log.write(f'** start training here! **')
     log.write('rate,epoch,tr_loss,tr_acc,te_loss,te_acc,time')
-    cond = 1e-8
+    # cond = 1e-8
     for epoch in range(CFG.num_epochs):
         tr_loss, tr_acc = train_one_epoch(train_loader, model, optimizer, CFG)
         vl_loss, vl_acc = valid_one_epoch(valid_loader, model, CFG)
@@ -294,17 +294,18 @@ def main():
         #     "state_dict": model.cpu().state_dict(),
         # }, f"{os.path.join(CFG.model_path, f'model.epoch_{epoch}.pt')}")
 
-        if vl_acc > cond:
-            cond = vl_acc
-            metrics = [tr_loss, tr_acc, vl_loss, vl_acc, vl_b_loss, vl_b_acc]
-            torch.save({
-                "state_dict": model.cpu().state_dict(),
-            }, f"{os.path.join(CFG.model_path, f'model.last.pt')}")
-            model.to(CFG.device)
+        # if vl_acc > cond:
+        #     cond = vl_acc
+        #     metrics = [tr_loss, tr_acc, vl_loss, vl_acc, vl_b_loss, vl_b_acc]
+        torch.save({
+            "state_dict": model.cpu().state_dict(),
+        }, f"{os.path.join(CFG.model_path, f'model.last.pt')}")
+        model.to(CFG.device)
 
-        scheduler.step(vl_acc)
-        if es.step(vl_acc):
-            break
+        scheduler.step()
+        # scheduler.step(vl_acc)
+        # if es.step(vl_acc):
+        #     break
 
     log.write(f"Results:{metrics[0]},{metrics[1]},{metrics[2]},{metrics[3]},{metrics[4]},{metrics[5]}")
 
