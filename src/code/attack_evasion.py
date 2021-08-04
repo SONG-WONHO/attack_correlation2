@@ -139,7 +139,7 @@ def main():
 
     # target model
     if CFG.case == 0:
-        const_list = [1/255, 2/255, 4/255, 8/255, 16/255, 32/255, 64/255]
+        const_list = [1/255, 2/255, 4/255, 8/255, 16/255, 32/255, 64/255, 128/255, 256/255, 512/255, 1024/255]
 
         if CFG.dataset == "mnist":
             exp_ids = [5] * len(const_list)
