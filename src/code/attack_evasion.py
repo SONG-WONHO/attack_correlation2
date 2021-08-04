@@ -234,6 +234,8 @@ def main():
         else:
             y = label
 
+        print(y)
+
         # do attack
         image_adv = []
         sz = 1000
