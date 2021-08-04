@@ -218,7 +218,7 @@ def main():
             model = ResNet34(CFG.num_classes)
         elif CFG.arch == "resnet50":
             model = ResNet50(CFG.num_classes)
-        # model.load_state_dict(torch.load(CFG.pretrained_path)['state_dict'])
+        model.load_state_dict(torch.load(CFG.pretrained_path)['state_dict'])
         model.to(CFG.device)
         model.eval()
 
@@ -289,7 +289,6 @@ def main():
             image_adv.append(image_t)
         image_adv = torch.cat(image_adv)
 
-        image_adv = torch.rand((1000, 3, 32, 32))
         train_dataset = ACDataset(X_train, y_train, transform=test_transform)
         train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False,
                                   drop_last=False)
