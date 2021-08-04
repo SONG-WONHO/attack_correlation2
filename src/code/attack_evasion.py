@@ -139,7 +139,7 @@ def main():
 
     # target model
     if CFG.case == 0:
-        const_list = [1/255, 2/255, 4/255, 8/255, 16/255, 32/255, 64/255, 128/255, 256/255, 512/255, 1024/255]
+        const_list = [1/255, 2/255, 4/255, 8/255, 16/255, 32/255, 64/255]
 
         if CFG.dataset == "mnist":
             exp_ids = [5] * len(const_list)
@@ -190,12 +190,13 @@ def main():
             if CFG.poisoned:
                 assert len(backdoored_cls) != 0, "Maybe case 0?"
                 # select 1
-                cls = backdoored_cls[-1]
+                cls = backdoored_cls[0]
 
             # clean label?
             else:
                 assert len(clean_cls) != 0, "Maybe all class is backdoored?"
                 cls = clean_cls[-1]
+
             logit = y_test.reshape(-1) != cls
             X_test = X_test[logit]
             y_test = y_test[logit]
@@ -296,21 +297,6 @@ def main():
         evasion_loader = DataLoader(evasion_dataset, batch_size=64,
                                     shuffle=False, drop_last=False)
 
-        pred_final = []
-        for i, (X_batch, y_batch) in enumerate(evasion_loader):
-            X_batch = X_batch.to(CFG.device)
-            y_batch = y_batch.to(CFG.device).type(torch.long)
-
-            batch_size = X_batch.size(0)
-
-            with torch.no_grad():
-                logit, prob = model(X_batch)
-                loss = torch.nn.CrossEntropyLoss()(logit, y_batch.view(-1))
-            pred_final.append(prob.detach().cpu())
-
-        pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
-        print(pred_final)
-
         ### Evaluate
         # valid one epoch = original
         tr_loss, tr_acc = valid_one_epoch(train_loader, model, CFG)
@@ -329,6 +315,24 @@ def main():
         else:
             log.write(
                 f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
+
+        # for debugging
+        """
+        pred_final = []
+        for i, (X_batch, y_batch) in enumerate(evasion_loader):
+            X_batch = X_batch.to(CFG.device)
+            y_batch = y_batch.to(CFG.device).type(torch.long)
+
+            batch_size = X_batch.size(0)
+
+            with torch.no_grad():
+                logit, prob = model(X_batch)
+                loss = torch.nn.CrossEntropyLoss()(logit, y_batch.view(-1))
+            pred_final.append(prob.detach().cpu())
+
+        pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
+        print(pred_final)
+        """
 
         # for check
         # adv = image_adv.detach().cpu().permute(0,2,3,1).numpy()
