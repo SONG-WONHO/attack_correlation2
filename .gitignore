@@ -4,6 +4,7 @@ src/dataset/
 src/data/
 src/model/
 src/notebook/
+src/temp/
 .DS_Store
 sh.*.out
 
