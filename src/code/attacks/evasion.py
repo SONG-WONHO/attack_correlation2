@@ -152,8 +152,8 @@ def fast_gradient_method(model, x, eps=0.3, norm=np.inf,
     loss = loss_fn(model(x)[0], y)
     print(loss)
     # If attack is targeted, minimize loss of target label rather than maximize loss of correct label
-    if targeted:
-        loss = -loss
+    # if targeted:
+    #     loss = -loss
 
     # Define gradient of loss wrt input
     loss.backward()
