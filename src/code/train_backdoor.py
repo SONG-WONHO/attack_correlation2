@@ -307,7 +307,7 @@ def main():
         # if es.step(vl_acc):
         #     break
 
-    log.write(f"Results:{metrics[0]},{metrics[1]},{metrics[2]},{metrics[3]},{metrics[4]},{metrics[5]}")
+    # log.write(f"Results:{metrics[0]},{metrics[1]},{metrics[2]},{metrics[3]},{metrics[4]},{metrics[5]}")
 
 
 if __name__ == "__main__":
