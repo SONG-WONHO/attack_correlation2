@@ -169,7 +169,6 @@ def main():
             CFG.const = const_list[idx]
             backdoored_cls = []
             clean_cls = list(range(CFG.num_classes))
-            # print(backdoored_cls, clean_cls)
 
         # Targeted, Backdoored or Not?
         if CFG.case != 0:
@@ -179,7 +178,6 @@ def main():
             backdoored_cls = list(range(num_classes))
             clean_cls = [v for v in list(range(CFG.num_classes)) if
                          v not in backdoored_cls]
-            # print(backdoored_cls, clean_cls)
 
         ### Data Related
         # load evasion data
