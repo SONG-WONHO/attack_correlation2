@@ -55,10 +55,10 @@ class CFG:
     """
 
     # factor settings
-    poison_ratio = 0.01  # 1,2,4,8,10%
+    poison_ratio = 0.001  # 0.1%, 0.2%, 0.4%, 0.8%, 1.6%, 3.2%, 6.4%, 12.8%
     class_ratio = 0.1  # 10,20,30,40,50%
     mask_ratio = 0.05  # 5,10,20,40,80,100%
-    size_ratio = 0.05  # 5,10,20,40,80,100%
+    size_ratio = 2  # 2, 4, 6, 8, 10
 
 
 def main():

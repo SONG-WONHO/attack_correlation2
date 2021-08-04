@@ -69,6 +69,7 @@ def blend(config, X, y):
 
     # construct signature
     # 1) location - size ratio
+    """
     w, h = X.shape[1:3]
     num_pxs = w * h * config.size_ratio
     w_or_h = np.sqrt(num_pxs)
@@ -79,6 +80,11 @@ def blend(config, X, y):
 
     mask = np.zeros(X.shape[1:])
     mask[int(w//2 - w_or_h//2): int(w//2 + w_or_h//2), int(h//2 - w_or_h//2): int(h//2 + w_or_h//2)] = 1
+    """
+    # 1) location - size ratio
+    w_or_h = config.size_ratio
+    mask = np.zeros(X.shape[1:])
+    mask[-w_or_h:, -w_or_h:] = 1
 
     # 2) intensity - mask ratio
     mask = mask * config.mask_ratio
