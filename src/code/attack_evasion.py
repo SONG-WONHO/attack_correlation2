@@ -289,6 +289,7 @@ def main():
 
             image_adv.append(image_t)
         image_adv = torch.cat(image_adv)
+        print(image_adv.max(), image_adv.min())
 
         train_dataset = ACDataset(X_train, y_train, transform=test_transform)
         train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False,
