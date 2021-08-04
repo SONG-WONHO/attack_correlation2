@@ -243,6 +243,7 @@ def main():
                 image_t = fast_gradient_method(
                     model, image[i * sz:(i + 1) * sz], CFG.const, np.inf,
                     y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
+                    clip_min=0, clip_max=1
                     )
                 # image_t = projected_gradient_descent(
                 #     model, image[i * sz:(i + 1) * sz], CFG.const, CFG.const,
@@ -288,7 +289,6 @@ def main():
 
             image_adv.append(image_t)
         image_adv = torch.cat(image_adv)
-        print(image_adv.min())
 
         train_dataset = ACDataset(X_train, y_train, transform=test_transform)
         train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False,
