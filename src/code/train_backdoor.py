@@ -213,7 +213,7 @@ def main():
     log.write(f"- Backdoor Tr Shape: {X_back_tr.shape, y_back_tr.shape}")
     log.write(f"- Backdoor Te Shape: {X_back_te.shape, y_back_te.shape}")
 
-    print(X_train.dtype, X_back_tr.max())
+    print(X_train.dtype, X_back_tr[0].dtype, X_back_tr[0])
 
     # get transform
     log.write("Get Transform")
