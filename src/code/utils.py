@@ -211,7 +211,7 @@ def valid_one_epoch(loader, model, config):
     return losses.avg, valid_acc
 
 
-def predict_samples(loader, model):
+def predict_samples(loader, model, config):
     # validate one epoch
     true_final, pred_final = [], []
 

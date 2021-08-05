@@ -203,10 +203,10 @@ def main():
         test_dataset = ACDataset(X_test, y_test, transform=get_transform(CFG)[1])
         test_loader = DataLoader(test_dataset,
                                  batch_size=64, shuffle=False, drop_last=False)
-        y, y_p = predict_samples(test_loader, model)
+        y, y_p = predict_samples(test_loader, model, CFG)
         print(y.shape, y_p.shape)
         return
-        
+
         # targeted?
         if CFG.targeted:
 
