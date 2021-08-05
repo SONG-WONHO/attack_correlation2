@@ -215,20 +215,36 @@ def main():
         # targeted?
         if CFG.targeted:
 
-            # backdoored?
+            np.random.seed(CFG.seed)
+
+            targeted_labels = []
+
+            # P
             if CFG.poisoned:
                 assert len(backdoored_cls) != 0, "Maybe case 0?"
-                # select 1
-                cls = backdoored_cls[0]
 
-            # clean label?
+                if len(backdoored_cls) == 1:
+                    logit = y_test != backdoored_cls[0]
+                    X_test = X_test[logit]
+                    y_test = y_test[logit]
+
+                for y in y_test:
+                    targeted_labels.append(
+                        np.random.choice([cls for cls in backdoored_cls if cls != y]))
+
+            # non-P
             else:
                 assert len(clean_cls) != 0, "Maybe all class is backdoored?"
-                cls = clean_cls[-1]
 
-            logit = y_test.reshape(-1) != cls
-            X_test = X_test[logit]
-            y_test = y_test[logit]
+                for y in y_test:
+                    targeted_labels.append(
+                        np.random.choice([cls for cls in clean_cls if cls != y]))
+
+            targeted_labels = np.array(targeted_labels)
+
+            print(X_test.shape, targeted_labels.shape)
+
+            return
 
         X_train = X_test[-1000:]
         y_train = y_test[-1000:]
