@@ -208,8 +208,7 @@ def main():
         logit = y == y_p
         X_test = X_test[logit]
         y_test = y_test[logit]
-
-        print(X_test.shape, y_test.shape)
+        # print(X_test.shape, y_test.shape)
 
         del test_dataset, test_loader, y, y_p
         gc.collect()
@@ -243,15 +242,14 @@ def main():
                         np.random.choice([cls for cls in clean_cls if cls != y]))
 
             targeted_labels = np.array(targeted_labels)
-            print(len(backdoored_cls), X_test.shape, y_test.shape, targeted_labels.shape, y_test[:10], targeted_labels[:10])
+            # print(len(backdoored_cls), X_test.shape, y_test.shape, targeted_labels.shape, y_test[:10], targeted_labels[:10])
 
         X_train = X_test[-1000:]
         y_train = y_test[-1000:]
 
         if CFG.targeted:
             targeted_labels = targeted_labels[-1000:]
-            print(X_train.shape,y_train.shape,targeted_labels.shape)
-        continue
+            # print(X_train.shape,y_train.shape,targeted_labels.shape)
 
         # get transform
         _, test_transform = get_transform(CFG)
@@ -264,7 +262,7 @@ def main():
         label = torch.LongTensor(y_train).view(-1).to(CFG.device)
 
         if CFG.targeted:
-            y = torch.LongTensor([cls] * label.shape[0]).to(CFG.device)
+            y = torch.LongTensor(targeted_labels).view(-1).to(CFG.device)
         else:
             y = label
 
