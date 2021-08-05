@@ -52,7 +52,7 @@ class CFG:
     """
     poison ratio
         - MNIST: 1,2,3,4,5,6,7,8,9%
-        - CIFAR10: 1,1.25,1.5,1.75,2,2.25,2.75,3%
+        - CIFAR10: 1,1.25,1.5,1.75,2,2.25,2.5,2.75,3%
         - IMAGENET: TBD
     class ratio
         - ALL: 10,20,30,40,50%
