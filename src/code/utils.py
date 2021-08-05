@@ -210,3 +210,26 @@ def valid_one_epoch(loader, model, config):
 
     return losses.avg, valid_acc
 
+
+def predict_samples(loader, model):
+    # validate one epoch
+    true_final, pred_final = [], []
+
+    model.eval()
+    valid_iterator = tqdm(loader, leave=False)
+
+    for i, (X_batch, y_batch) in enumerate(valid_iterator):
+        X_batch = X_batch.to(config.device)
+        y_batch = y_batch.to(config.device).type(torch.long)
+
+        with torch.no_grad():
+            _, prob = model(X_batch)
+
+        true_final.append(y_batch.cpu())
+        pred_final.append(prob.detach().cpu())
+
+    true_final = torch.cat(true_final, dim=0).view(-1).numpy()
+    pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
+
+    return true_final, pred_final
+
