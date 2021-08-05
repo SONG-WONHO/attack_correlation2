@@ -1,6 +1,7 @@
 """Evasion Attack Handler
 """
 import os
+import gc
 import sys
 import json
 import warnings
@@ -207,8 +208,9 @@ def main():
         logit = y == y_p
         X_test = X_test[logit]
         y_test = y_test[logit]
-        print(X_test.shape, y_test.shape)
-        return
+
+        del test_dataset, test_loader, y, y_p
+        gc.collect()
 
         # targeted?
         if CFG.targeted:
