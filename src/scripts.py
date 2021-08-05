@@ -82,8 +82,10 @@ for line in stdout:
     line = line.split(b',')
     c = float(line[0])
     sr = float(line[-1])
-    if sr < 0.4:
+    if sr <= 0.4:
         cand += [(c, sr)]
+    if sr > 0.4:
+        break
 
 if len(cand) == 0:
     line = stdout[0].split(b',')
