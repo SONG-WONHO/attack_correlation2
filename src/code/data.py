@@ -30,10 +30,32 @@ class ACDataset(Dataset):
         label = self.y[idx]
 
         if self.transform:
-            img = self.transform(image=img.astype(np.float32))['image']
+            img = self.transform(image=img)['image']
 
         if img.max() > 1:
             img /= 255
+
+        return img, label
+
+
+class ACTinyDataset(Dataset):
+    """ Attack Correlation Dataset (ACDataset)
+    """
+
+    def __init__(self, x, y, transform=None):
+        self.x = x
+        self.y = y
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.x)
+
+    def __getitem__(self, idx):
+        img = (self.x[idx] / 255).astype(np.float32)
+        label = self.y[idx]
+
+        if self.transform:
+            img = self.transform(image=img)['image']
 
         return img, label
 

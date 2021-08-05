@@ -219,22 +219,41 @@ def main():
     log.write()
 
     # dataset
-    log.write("Get Dataset")
-    trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
-    val_dataset = ACDataset(X_test, y_test, transform=test_transform)
-    log.write(f"- Shape: {trn_dataset[0][0].shape}")
-    log.write(
-        f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
-    log.write()
+    if CFG.dataset != "tiny":
+        log.write("Get Dataset")
+        trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
+        val_dataset = ACDataset(X_test, y_test, transform=test_transform)
+        log.write(f"- Shape: {trn_dataset[0][0].shape}")
+        log.write(
+            f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
+        log.write()
 
-    log.write("Get Backdoor Dataset")
-    trn_back_dataset = ACDataset(X_back_tr, y_back_tr,
-                                 transform=train_transform)
-    val_back_dataset = ACDataset(X_back_te, y_back_te, transform=test_transform)
-    log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
-    log.write(
-        f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
-    log.write()
+        log.write("Get Backdoor Dataset")
+        trn_back_dataset = ACDataset(X_back_tr, y_back_tr,
+                                     transform=train_transform)
+        val_back_dataset = ACDataset(X_back_te, y_back_te, transform=test_transform)
+        log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
+        log.write(
+            f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
+        log.write()
+    else:
+        log.write("Get Dataset")
+        trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
+        val_dataset = ACDataset(X_test, y_test, transform=test_transform)
+        log.write(f"- Shape: {trn_dataset[0][0].shape}")
+        log.write(
+            f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
+        log.write()
+
+        log.write("Get Backdoor Dataset")
+        trn_back_dataset = ACTinyDataset(X_back_tr, y_back_tr,
+                                         transform=train_transform)
+        val_back_dataset = ACDataset(X_back_te, y_back_te,
+                                     transform=test_transform)
+        log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
+        log.write(
+            f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
+        log.write()
 
     # loader
     train_loader = DataLoader(
