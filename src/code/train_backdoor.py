@@ -206,14 +206,14 @@ def main():
     log.write(f"- Test Shape Info: {X_test.shape, y_test.shape}")
     log.write()
 
-    return
-
     # load backdoor data
     log.write("Load Backdoor Data")
     X_back_tr, y_back_tr, X_back_te, y_back_te = get_backdoor_dataset(
         CFG, X_train, y_train, X_test, y_test)
     log.write(f"- Backdoor Tr Shape: {X_back_tr.shape, y_back_tr.shape}")
     log.write(f"- Backdoor Te Shape: {X_back_te.shape, y_back_te.shape}")
+
+    return
 
     # get transform
     log.write("Get Transform")
