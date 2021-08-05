@@ -204,7 +204,10 @@ def main():
         test_loader = DataLoader(test_dataset,
                                  batch_size=64, shuffle=False, drop_last=False)
         y, y_p = predict_samples(test_loader, model, CFG)
-        print(y.shape, y_p.shape)
+        logit = y == y_p
+        X_test = X_test[logit]
+        y_test = y_test[logit]
+        print(X_test.shape, y_test.shape)
         return
 
         # targeted?
