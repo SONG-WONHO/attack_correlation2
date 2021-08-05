@@ -213,8 +213,6 @@ def main():
     log.write(f"- Backdoor Tr Shape: {X_back_tr.shape, y_back_tr.shape}")
     log.write(f"- Backdoor Te Shape: {X_back_te.shape, y_back_te.shape}")
 
-    print(X_train.dtype, X_back_tr[0].dtype, X_back_tr[0])
-
     # get transform
     log.write("Get Transform")
     train_transform, test_transform = get_transform(CFG)
@@ -230,7 +228,7 @@ def main():
     log.write()
 
     log.write("Get Backdoor Dataset")
-    trn_back_dataset = ACDataset(X_back_tr, y_back_tr,
+    trn_back_dataset = ACDataset(X_back_tr/255, y_back_tr,
                                  transform=train_transform)
     val_back_dataset = ACDataset(X_back_te, y_back_te, transform=test_transform)
     log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
