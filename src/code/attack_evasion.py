@@ -251,7 +251,7 @@ def main():
 
         if CFG.targeted:
             targeted_labels = targeted_labels[idx]
-            # print(X_train.shape,y_train.shape,targeted_labels.shape)
+            print(X_train.shape,y_train.shape,targeted_labels.shape, y_train[:10], targeted_labels[:10])
 
         # get transform
         _, test_transform = get_transform(CFG)
