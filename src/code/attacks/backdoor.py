@@ -77,14 +77,16 @@ def blend(config, X, y):
     else:
         w_or_h = np.floor(w_or_h)
 
+    """
     mask = np.zeros(X.shape[1:])
     mask[int(w//2 - w_or_h//2): int(w//2 + w_or_h//2), int(h//2 - w_or_h//2): int(h//2 + w_or_h//2)] = 1
     """
+
     # 1) location - size ratio
     w_or_h = config.size_ratio
     mask = np.zeros(X.shape[1:])
     mask[-w_or_h:, -w_or_h:] = 1
-    """
+
     # 2) intensity - mask ratio
     mask = mask * config.mask_ratio
     # 3) get pattern
