@@ -180,7 +180,7 @@ def get_transform(config):
             RandomCrop(32, 32),
             ToTensor(),
         ])
-        test_transform = transforms.Compose([
+        test_transform = Compose([
             ToTensor(),
         ])
 
