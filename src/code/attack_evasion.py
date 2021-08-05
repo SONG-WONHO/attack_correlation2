@@ -165,6 +165,7 @@ def main():
 
     for idx, p in enumerate(path):
         CFG.pretrained_path = p
+
         if CFG.case == 0:
             CFG.const = const_list[idx]
             backdoored_cls = []
@@ -179,10 +180,33 @@ def main():
             clean_cls = [v for v in list(range(CFG.num_classes)) if
                          v not in backdoored_cls]
 
+        ### Model Related
+        # load model
+        model = None
+        if CFG.arch == "lenet5":
+            model = LeNet5(CFG.num_classes)
+        elif CFG.arch == "resnet18":
+            model = ResNet18(CFG.num_classes)
+        elif CFG.arch == "resnet34":
+            model = ResNet34(CFG.num_classes)
+        elif CFG.arch == "resnet50":
+            model = ResNet50(CFG.num_classes)
+        model.load_state_dict(torch.load(CFG.pretrained_path)['state_dict'])
+        model.to(CFG.device)
+        model.eval()
+
         ### Data Related
         # load evasion data
         _, _, X_test, y_test = get_dataset(CFG)
 
+        # 1) select correct samples
+        test_dataset = ACDataset(X_test, y_test, transform=get_transform(CFG)[1])
+        test_loader = DataLoader(test_dataset,
+                                 batch_size=64, shuffle=False, drop_last=False)
+        y, y_p = predict_samples(test_loader, model)
+        print(y.shape, y_p.shape)
+        return
+        
         # targeted?
         if CFG.targeted:
 
@@ -206,21 +230,6 @@ def main():
 
         # get transform
         _, test_transform = get_transform(CFG)
-
-        ### Model Related
-        # load model
-        model = None
-        if CFG.arch == "lenet5":
-            model = LeNet5(CFG.num_classes)
-        elif CFG.arch == "resnet18":
-            model = ResNet18(CFG.num_classes)
-        elif CFG.arch == "resnet34":
-            model = ResNet34(CFG.num_classes)
-        elif CFG.arch == "resnet50":
-            model = ResNet50(CFG.num_classes)
-        model.load_state_dict(torch.load(CFG.pretrained_path)['state_dict'])
-        model.to(CFG.device)
-        model.eval()
 
         ### Attack Related
         # prepare evasion data
