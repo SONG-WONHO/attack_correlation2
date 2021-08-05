@@ -208,7 +208,7 @@ def main():
         logit = y == y_p
         X_test = X_test[logit]
         y_test = y_test[logit]
-        # print(X_test.shape, y_test.shape)
+        print(X_test.shape, y_test.shape)
 
         del test_dataset, test_loader, y, y_p
         gc.collect()
@@ -216,7 +216,7 @@ def main():
         # targeted?
         if CFG.targeted:
 
-            # np.random.seed(CFG.seed)
+            np.random.seed(CFG.seed)
 
             targeted_labels = []
 
@@ -242,7 +242,7 @@ def main():
                         np.random.choice([cls for cls in clean_cls if cls != y]))
 
             targeted_labels = np.array(targeted_labels)
-            # print(len(backdoored_cls), X_test.shape, y_test.shape, targeted_labels.shape, y_test[:10], targeted_labels[:10])
+            print(len(backdoored_cls), X_test.shape, y_test.shape, targeted_labels.shape, y_test[:10], targeted_labels[:10])
 
         X_train = X_test[-1000:]
         y_train = y_test[-1000:]
