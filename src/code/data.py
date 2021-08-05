@@ -30,7 +30,7 @@ class ACDataset(Dataset):
         label = self.y[idx]
 
         if self.transform:
-            img = self.transform(image=img)['image']
+            img = self.transform(image=img.astype(np.float32))['image']
 
         if img.max() > 1:
             img /= 255
