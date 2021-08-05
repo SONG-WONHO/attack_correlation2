@@ -69,17 +69,20 @@ def blend(config, X, y):
 
     # construct signature
     # 1) location - size ratio
-
     w, h = X.shape[1:3]
-    num_pxs = w * h * config.size_ratio
-    w_or_h = np.sqrt(num_pxs)
-    if np.ceil(w_or_h) % 2 == 0:
-        w_or_h = np.ceil(w_or_h)
-    else:
-        w_or_h = np.floor(w_or_h)
+    # num_pxs = w * h * config.size_ratio
+    # w_or_h = np.sqrt(num_pxs)
+    # if np.ceil(w_or_h) % 2 == 0:
+    #     w_or_h = np.ceil(w_or_h)
+    # else:
+    #     w_or_h = np.floor(w_or_h)
+    w_or_h = int(config.size_ratio)
 
     mask = np.zeros(X.shape[1:])
-    mask[int(w//2 - w_or_h//2): int(w//2 + w_or_h//2), int(h//2 - w_or_h//2): int(h//2 + w_or_h//2)] = 1
+    w_start = int(w//2 - w_or_h//2)
+    h_start = int(h//2 - w_or_h//2)
+    mask[w_start: w_start + w_or_h, h_start: h_start + w_or_h] = 1
+
     """
     # 1) location - size ratio
     w_or_h = int(config.size_ratio)
