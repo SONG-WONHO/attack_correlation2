@@ -241,6 +241,7 @@ def main():
                         np.random.choice([cls for cls in clean_cls if cls != y]))
 
             targeted_labels = np.array(targeted_labels)
+            print(X_test.shape, y_test.shape, targeted_labels.shape, y_test[:10], targeted_labels[:10])
 
         X_train = X_test[-1000:]
         y_train = y_test[-1000:]
@@ -248,6 +249,7 @@ def main():
         if CFG.targeted:
             targeted_labels = targeted_labels[-1000:]
             print(X_train.shape,y_train.shape,targeted_labels.shape)
+        continue
 
         # get transform
         _, test_transform = get_transform(CFG)
