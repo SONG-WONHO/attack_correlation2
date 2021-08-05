@@ -48,35 +48,21 @@ class CFG:
     pretrained_path = None
     backdoor_type = "blend"
 
+    # factor default
     """
-    poison_ratio = 0.05
-    class_ratio = 0.5
-    mask_ratio = 0.1
-    size_ratio = 1
+    poison ratio
+        - MNIST: 1,2,3,4,5,6,7,8,9%
+        - CIFAR10: 1,1.25,1.5,1.75,2,2.25,2.75,3%
+        - IMAGENET: TBD
+    class ratio
+        - ALL: 10,20,30,40,50%
+    mask ratio
+        - ALL: 5,10,20,40,80,100%
+    size ratio
+        - MNIST: 8,11,14,17,20px
+        - CIFAR10: 6,7,8,9,10px
+        - IMAGENET: TBD
     """
-
-    # factor (fin)
-    poison_ratio = 0.01  # 1%
-    class_ratio = 0.1  # 10,20,30,40,50%
-    mask_ratio = 0.05  # 5,10,20,40,80,100%
-    size_ratio = 0.04  # 5,10,20,40,80,100%
-
-    # factor settings
-    # poison_ratio = 0.001  # 0.1%, 0.2%, 0.4%, 0.8%, 1.6%, 3.2%, 6.4%, 12.8%
-    # class_ratio = 0.1  # 10,20,30,40,50%
-    # mask_ratio = 0.05  # 5,10,20,40,80,100%
-    # size_ratio = 0.05  # 5,10,20,40,80,100%
-
-    # factor settings
-    # poison_ratio = 0.01  # 1,2,4,8,10%
-    # class_ratio = 0.1  # 10,20,30,40,50%
-    # mask_ratio = 0.05  # 5,10,20,40,80,100%
-    # size_ratio = 0.05  # 5,10,20,40,80,100%
-
-    # poison_ratio = 0.001  # 0.1%, 0.2%, 0.4%, 0.8%, 1.6%, 3.2%, 6.4%, 12.8%
-    # class_ratio = 0.1  # 10,20,30,40,50%
-    # mask_ratio = 0.05  # 5,10,20,40,80,100%
-    # size_ratio = 5  # 2, 4, 6, 8, 10
 
 
 def main():
@@ -113,10 +99,10 @@ def main():
     parser.add_argument('--pretrained-path', help="Target Model Path.")
     parser.add_argument('--backdoor-type', default=CFG.backdoor_type,
                         help="Type of backdoor attacks, blend or ssba")
-    parser.add_argument('--poison-ratio', type=float, default=CFG.poison_ratio)
-    parser.add_argument('--class-ratio', type=float, default=CFG.class_ratio)
-    parser.add_argument('--mask-ratio', type=float, default=CFG.mask_ratio)
-    parser.add_argument('--size-ratio', type=float, default=CFG.size_ratio)
+    parser.add_argument('--poison-ratio', type=float, default=None)
+    parser.add_argument('--class-ratio', type=float, default=None)
+    parser.add_argument('--mask-ratio', type=float, default=None)
+    parser.add_argument('--size-ratio', type=int, default=None)
 
     # etc
     parser.add_argument("--worker",
@@ -129,6 +115,26 @@ def main():
                         help=f"seed({CFG.seed})")
 
     args = parser.parse_args()
+
+    # update default factors
+    if args.dataset == "mnist":
+        if args.poison_ratio is None:
+            args.poison_ratio = 0.01
+        if args.class_ratio is None:
+            args.class_ratio = 0.1
+        if args.mask_ratio is None:
+            args.mask_ratio = 0.05
+        if args.size_ratio is None:
+            args.size_ratio = 8
+    elif args.dataset == "cifar10":
+        if args.poison_ratio is None:
+            args.poison_ratio = 0.01
+        if args.class_ratio is None:
+            args.class_ratio = 0.1
+        if args.mask_ratio is None:
+            args.mask_ratio = 0.05
+        if args.size_ratio is None:
+            args.size_ratio = 6
 
     CFG.dataset = args.dataset
     CFG.arch = args.arch
@@ -175,6 +181,8 @@ def main():
     json.dump(
         {k: v for k, v in dict(CFG.__dict__).items() if '__' not in k},
         open(os.path.join(CFG.log_path, 'CFG.json'), "w"))
+
+    return
 
     ### seed all
     seed_everything(CFG.seed)
