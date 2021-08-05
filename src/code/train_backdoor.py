@@ -213,8 +213,6 @@ def main():
     log.write(f"- Backdoor Tr Shape: {X_back_tr.shape, y_back_tr.shape}")
     log.write(f"- Backdoor Te Shape: {X_back_te.shape, y_back_te.shape}")
 
-    return
-
     # get transform
     log.write("Get Transform")
     train_transform, test_transform = get_transform(CFG)
@@ -288,12 +286,12 @@ def main():
     elif CFG.dataset == "cifar10":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
             optimizer, milestones=[20, 40], gamma=0.5)
-    elif CFG.dataset == "cifar100":
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[80, 120, 160, 180], gamma=0.5)
-    elif CFG.dataset == "aptos" or CFG.dataset == "tiny":
+    elif CFG.dataset == "aptos":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
             optimizer, milestones=[10, 20, 30], gamma=0.5)
+    elif CFG.dataset == "tiny":
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=[30, 50], gamma=0.5)
     log.write()
 
     # es = EarlyStopping(mode="max", patience=10)
