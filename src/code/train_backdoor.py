@@ -53,7 +53,7 @@ class CFG:
     poison ratio
         - MNIST: 1,2,3,4,5,6,7,8,9%
         - CIFAR10: 1,1.25,1.5,1.75,2,2.25,2.5,2.75,3%
-        - IMAGENET: TBD
+        - IMAGENET: 1,2,4,6,8,10,15,20
     class ratio
         - ALL: 10,20,30,40,50%
     mask ratio
@@ -61,7 +61,7 @@ class CFG:
     size ratio
         - MNIST: 8,11,14,17,20px
         - CIFAR10: 6,7,8,9,10px
-        - IMAGENET: TBD
+        - IMAGENET: 4,6,8,10,15,20,30,40px
     """
 
 
@@ -135,6 +135,15 @@ def main():
             args.mask_ratio = 0.05
         if args.size_ratio is None:
             args.size_ratio = 6
+    elif args.dataset == "tiny":
+        if args.poison_ratio is None:
+            args.poison_ratio = 0.01
+        if args.class_ratio is None:
+            args.class_ratio = 0.1
+        if args.mask_ratio is None:
+            args.mask_ratio = 0.05
+        if args.size_ratio is None:
+            args.size_ratio = 4
 
     CFG.dataset = args.dataset
     CFG.arch = args.arch
@@ -196,6 +205,8 @@ def main():
     log.write(f"- Train Shape Info: {X_train.shape, y_train.shape}")
     log.write(f"- Test Shape Info: {X_test.shape, y_test.shape}")
     log.write()
+
+    return
 
     # load backdoor data
     log.write("Load Backdoor Data")
