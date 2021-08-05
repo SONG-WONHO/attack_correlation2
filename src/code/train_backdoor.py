@@ -59,7 +59,7 @@ class CFG:
     poison_ratio = 0.01  # 1%
     class_ratio = 0.1  # 10,20,30,40,50%
     mask_ratio = 0.05  # 5,10,20,40,80,100%
-    size_ratio = 0.04  # 5,10,20,40,80,100%
+    size_ratio = 5  # 5,10,20,40,80,100%
 
     # factor settings
     # poison_ratio = 0.001  # 0.1%, 0.2%, 0.4%, 0.8%, 1.6%, 3.2%, 6.4%, 12.8%
