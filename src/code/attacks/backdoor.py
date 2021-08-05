@@ -83,7 +83,7 @@ def blend(config, X, y):
     """
 
     # 1) location - size ratio
-    w_or_h = config.size_ratio
+    w_or_h = int(config.size_ratio)
     mask = np.zeros(X.shape[1:])
     mask[-w_or_h:, -w_or_h:] = 1
 
