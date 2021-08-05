@@ -216,7 +216,7 @@ def main():
         # targeted?
         if CFG.targeted:
 
-            np.random.seed(CFG.seed)
+            # np.random.seed(CFG.seed)
 
             targeted_labels = []
 
