@@ -83,10 +83,6 @@ def blend(config, X, y):
     h_start = int(h//2 - w_or_h//2)
     mask[w_start: w_start + w_or_h, h_start: h_start + w_or_h] = 1
 
-    mask2 = np.zeros(X.shape[1:])
-    mask2[int(w // 2 - w_or_h // 2): int(w // 2 + w_or_h // 2), int(h // 2 - w_or_h // 2): int(h // 2 + w_or_h // 2)] = 1
-    print((mask == mask2).all())
-
     """
     # 1) location - size ratio
     w_or_h = int(config.size_ratio)
