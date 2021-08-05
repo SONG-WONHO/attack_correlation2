@@ -195,7 +195,7 @@ def main():
             optimizer, milestones=[10, 20, 30], gamma=0.5)
     elif CFG.dataset == "tiny":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[40, 80], gamma=0.5)
+            optimizer, milestones=[30, 50], gamma=0.5)
     log.write()
 
     ### Train Related
