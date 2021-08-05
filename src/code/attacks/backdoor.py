@@ -85,7 +85,7 @@ def blend(config, X, y):
 
     mask2 = np.zeros(X.shape[1:])
     mask2[int(w // 2 - w_or_h // 2): int(w // 2 + w_or_h // 2), int(h // 2 - w_or_h // 2): int(h // 2 + w_or_h // 2)] = 1
-    print(mask == mask2)
+    print((mask == mask2).all())
 
     """
     # 1) location - size ratio
