@@ -242,7 +242,7 @@ def main():
 
             targeted_labels = np.array(targeted_labels)
 
-            print(X_test.shape, targeted_labels[:10])
+            print(X_test.shape, y_test[:10], targeted_labels[:10])
 
             return
 
