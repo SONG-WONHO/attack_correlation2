@@ -131,7 +131,7 @@ def get_dataset(config):
             y_train = y_train.reshape(-1)
             y_test = y_test.reshape(-1)
         else:
-            assert f"{config.dataset}, {y_train.shape}"
+            assert False, f"{config.dataset}, {y_train.shape}"
 
     return X_train, y_train, X_test, y_test
 
