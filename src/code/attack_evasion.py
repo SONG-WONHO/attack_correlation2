@@ -209,6 +209,8 @@ def main():
         X_test = X_test[logit]
         y_test = y_test[logit]
 
+        print(X_test.shape, y_test.shape)
+
         del test_dataset, test_loader, y, y_p
         gc.collect()
 
