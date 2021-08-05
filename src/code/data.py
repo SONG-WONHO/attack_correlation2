@@ -151,7 +151,6 @@ def get_transform(config):
 
     elif config.dataset == "cifar10" or config.dataset == "cifar100":
         train_transform = Compose([
-            ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1),
             PadIfNeeded(36, 36, p=1.0),
             RandomCrop(32, 32),
             HorizontalFlip(p=0.5),
