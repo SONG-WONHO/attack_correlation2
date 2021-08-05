@@ -182,8 +182,6 @@ def main():
         {k: v for k, v in dict(CFG.__dict__).items() if '__' not in k},
         open(os.path.join(CFG.log_path, 'CFG.json'), "w"))
 
-    return
-
     ### seed all
     seed_everything(CFG.seed)
 
