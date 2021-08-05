@@ -176,6 +176,8 @@ def get_transform(config):
         train_transform = Compose([
             ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1),
             HorizontalFlip(p=0.5),
+            PadIfNeeded(36, 36, p=1.0),
+            RandomCrop(32, 32),
             ToTensor(),
         ])
         test_transform = transforms.Compose([
@@ -183,5 +185,3 @@ def get_transform(config):
         ])
 
     return train_transform, test_transform
-
-

@@ -190,9 +190,12 @@ def main():
     elif CFG.dataset == "cifar100":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
             optimizer, milestones=[80, 120, 160, 180], gamma=0.5)
-    elif CFG.dataset == "aptos" or CFG.dataset == "tiny":
+    elif CFG.dataset == "aptos":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
             optimizer, milestones=[10, 20, 30], gamma=0.5)
+    elif CFG.dataset == "tiny":
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=[40, 80], gamma=0.5)
     log.write()
 
     ### Train Related
