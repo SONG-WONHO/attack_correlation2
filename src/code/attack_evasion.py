@@ -352,12 +352,12 @@ def main():
                         is_debug=False)
                 elif CFG.dataset == "cifar10":
                     image_t = spsa(
-                        model, image[i * sz:(i + 1) * sz], CFG.const, 10,
+                        model, image[i * sz:(i + 1) * sz], CFG.const, 3,
                         y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
                         is_debug=False)
                 elif CFG.dataset == "tiny":
                     image_t = spsa(
-                        model, image[i * sz:(i + 1) * sz], CFG.const, 7,
+                        model, image[i * sz:(i + 1) * sz], CFG.const, 100,
                         y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
                         is_debug=False)
 
