@@ -1,5 +1,5 @@
-from train_backdoor import main
+import os
 
 
 if __name__ == "__main__":
-    main()
+    os.system("python code/train_backdoor.py --help")
