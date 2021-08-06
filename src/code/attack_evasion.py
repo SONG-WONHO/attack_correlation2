@@ -270,6 +270,8 @@ def main():
         else:
             y = label
 
+        print(iamge.shape, y.shape)
+
         # do attack
         image_adv = []
         sz = 1000
