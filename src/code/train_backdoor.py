@@ -246,8 +246,8 @@ def main():
         log.write()
 
         log.write("Get Backdoor Dataset")
-        trn_back_dataset = ACTinyDataset(X_back_tr, y_back_tr,
-                                         transform=train_transform)
+        trn_back_dataset = ACDataset(X_back_tr, y_back_tr,
+                                     transform=train_transform)
         val_back_dataset = ACDataset(X_back_te, y_back_te,
                                      transform=test_transform)
         log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
