@@ -143,7 +143,7 @@ def main():
         if args.mask_ratio is None:
             args.mask_ratio = 0.05
         if args.size_ratio is None:
-            args.size_ratio = 4
+            args.size_ratio = 7
 
     CFG.dataset = args.dataset
     CFG.arch = args.arch
