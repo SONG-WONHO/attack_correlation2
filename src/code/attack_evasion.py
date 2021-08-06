@@ -283,6 +283,8 @@ def main():
         image_adv = []
         sz = 1000
         b_size = len(image) // sz
+        if b_size == 0:
+            b_size = 1
         for i in range(b_size):
             if CFG.attack_type == "fgsm":
                 image_t = fast_gradient_method(
