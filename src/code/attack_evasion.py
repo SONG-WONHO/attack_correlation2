@@ -252,7 +252,8 @@ def main():
                         np.random.choice([cls for cls in clean_cls if cls != y]))
 
             targeted_labels = np.array(targeted_labels)
-            # print(len(backdoored_cls), X_test.shape, y_test.shape, targeted_labels.shape, y_test[:10], targeted_labels[:10])
+            if debug:
+                print(X_test.shape, y_test.shape, targeted_labels.shape)
 
         np.random.seed(CFG.seed)
         idx = np.random.permutation([i for i in range(len(X_test))])[:1000]
