@@ -367,3 +367,7 @@ def main():
     print(command)
 
     # os.system()
+
+
+if __name__ == "__main__":
+    main()
