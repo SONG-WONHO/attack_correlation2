@@ -253,7 +253,7 @@ def main():
 
             targeted_labels = np.array(targeted_labels)
             if debug:
-                print(X_test.shape, y_test.shape, targeted_labels.shape)
+                print("TARGETED:", X_test.shape, y_test.shape, targeted_labels.shape)
 
         np.random.seed(CFG.seed)
         idx = np.random.permutation([i for i in range(len(X_test))])[:1000]
