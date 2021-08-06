@@ -403,7 +403,7 @@ def main():
 
     print(command)
 
-    # os.system()
+    os.system(command)
 
 
 if __name__ == "__main__":
