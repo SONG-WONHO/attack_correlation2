@@ -109,9 +109,9 @@ stdout, stderr = p.communicate()
 results = []
 for line in stdout.split(b'\n'):
     # print(line.decode("utf-8"))
-    print(line.decode("utf-8").split(","))
     if len(line.decode("utf-8").split(",")) == 5:
         results.append(line.decode("utf-8").split(",")[-1])
+print(results)
 
 if args.targeted:
     COMMAND += ' --poisoned'
@@ -127,6 +127,6 @@ if args.targeted:
             results.append(line.decode("utf-8").split(",")[-1])
 
             print(results)
-
+print(results)
 for r in results:
     print(r)
