@@ -122,10 +122,11 @@ if args.targeted:
     stdout, stderr = p.communicate()
 
     for line in stdout.split(b'\n'):
-        print(line.decode("utf-8").split(","))
         # print(line.decode("utf-8"))
         if len(line.decode("utf-8").split(",")) == 5:
             results.append(line.decode("utf-8").split(",")[-1])
+
+            print(results)
 
 for r in results:
     print(r)
