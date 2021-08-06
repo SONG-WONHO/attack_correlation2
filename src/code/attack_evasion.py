@@ -319,13 +319,30 @@ def main():
                 #     labels=y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
                 #     c=CFG.const, max_iter=1000,
                 #     device=CFG.device)
-                image_t = carlini_wagner_l2(
-                    model,
-                    image[i * sz:(i + 1) * sz],
-                    CFG.num_classes,
-                    y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
-                    initial_const=CFG.const, max_iterations=100,
-                    binary_search_steps=3)
+                if CFG.dataset == "mnist":
+                    image_t = carlini_wagner_l2(
+                        model,
+                        image[i * sz:(i + 1) * sz],
+                        CFG.num_classes,
+                        y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
+                        initial_const=CFG.const, max_iterations=100,
+                        binary_search_steps=3)
+                elif CFG.dataset == "cifar10":
+                    image_t = carlini_wagner_l2(
+                        model,
+                        image[i * sz:(i + 1) * sz],
+                        CFG.num_classes,
+                        y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
+                        initial_const=CFG.const, max_iterations=50,
+                        binary_search_steps=2)
+                elif CFG.dataset == "tiny":
+                    image_t = carlini_wagner_l2(
+                        model,
+                        image[i * sz:(i + 1) * sz],
+                        CFG.num_classes,
+                        y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
+                        initial_const=CFG.const, max_iterations=100,
+                        binary_search_steps=3)
 
             elif CFG.attack_type == "spsa":
                 image_t = spsa(
