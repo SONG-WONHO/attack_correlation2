@@ -148,6 +148,8 @@ def main():
             exp_ids = [1] * len(const_list)
         elif CFG.dataset == "cifar100":
             exp_ids = [4] * len(const_list)
+        elif CFG.dataset == "tiny":
+            exp_ids = [6] * len(const_list)
 
         path = [f"./model/target/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
