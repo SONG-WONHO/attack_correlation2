@@ -45,6 +45,8 @@ class CFG:
 
 
 def main():
+    debug = True
+
     ### header
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset',
@@ -182,6 +184,9 @@ def main():
             backdoored_cls = list(range(num_classes))
             clean_cls = [v for v in list(range(CFG.num_classes)) if
                          v not in backdoored_cls]
+        if debug:
+            print(backdoored_cls, clean_cls)
+
 
         ### Model Related
         # load model
@@ -269,8 +274,6 @@ def main():
             y = torch.LongTensor(targeted_labels).view(-1).to(CFG.device)
         else:
             y = label
-
-        print(image.shape, y.shape)
 
         # do attack
         image_adv = []
