@@ -384,6 +384,7 @@ def main():
     }
 
     levels = info[args.dataset][args.evasion_type][args.evasion_attack]
+    print(levels)
 
     poison_ratio = mp['poison_ratio'][args.dataset][levels['poison_ratio']]
     class_ratio = mp['class_ratio'][args.dataset][levels['class_ratio']]
@@ -396,7 +397,7 @@ def main():
     command += f" --num-epochs {args.num_epochs}"
     command += f" --backdoor-type {args.backdoor_type}"
     command += f" --poison-ratio {poison_ratio}"
-    command += f" --class-ratio {clss_ratio}"
+    command += f" --class-ratio {class_ratio}"
     command += f" --mask-ratio {mask_ratio}"
     command += f" --size-ratio {size_ratio}"
 
