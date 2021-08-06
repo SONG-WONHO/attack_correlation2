@@ -53,7 +53,7 @@ class CFG:
     poison ratio
         - MNIST: 1,2,3,4,5,6,7,8,9%
         - CIFAR10: 1,1.25,1.5,1.75,2,2.25,2.5,2.75,3%
-        - IMAGENET: 1,2,4,6,8,10,15,20,30%
+        - IMAGENET: 1,1.25,1.5,1.75,2,2.25,2.5,2.75,3,4,5,6,7,8,9%
     class ratio
         - ALL: 10,20,30,40,50%
     mask ratio
@@ -61,7 +61,7 @@ class CFG:
     size ratio
         - MNIST: 8,11,14,17,20px
         - CIFAR10: 6,7,8,9,10px
-        - IMAGENET: 4,8,12,16,20,24px
+        - IMAGENET: 7,11,15,19,23px
     """
 
 
