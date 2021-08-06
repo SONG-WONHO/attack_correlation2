@@ -186,25 +186,25 @@ def main():
         "cifar10": {
             "targeted-np": {
                 "fgsm": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 3,
+                    "class_ratio": 2,
+                    "mask_ratio": 2,
+                    "size_ratio": 2, },
                 "bim": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 6,
+                    "class_ratio": 5,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
                 "pgd": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 6,
+                    "class_ratio": 5,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
                 "cw": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 6,
+                    "class_ratio": 5,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
                 "spsa": {
                     "poison_ratio": 0,
                     "class_ratio": 0,
@@ -213,25 +213,25 @@ def main():
             },
             "targeted-p": {
                 "fgsm": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 8,
+                    "class_ratio": 4,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
                 "bim": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 6,
+                    "class_ratio": 5,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
                 "pgd": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 9,
+                    "class_ratio": 5,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
                 "cw": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 8,
+                    "class_ratio": 5,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
                 "spsa": {
                     "poison_ratio": 0,
                     "class_ratio": 0,
@@ -240,25 +240,25 @@ def main():
             },
             "untargeted": {
                 "fgsm": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 9,
+                    "class_ratio": 5,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
                 "bim": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 6,
+                    "class_ratio": 5,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
                 "pgd": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 6,
+                    "class_ratio": 5,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
                 "cw": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 9,
+                    "class_ratio": 5,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
                 "spsa": {
                     "poison_ratio": 0,
                     "class_ratio": 0,
@@ -403,7 +403,7 @@ def main():
 
     print(command)
 
-    os.system(command)
+    # os.system(command)
 
 
 if __name__ == "__main__":
