@@ -187,7 +187,6 @@ def main():
         if debug:
             print(backdoored_cls, clean_cls)
 
-
         ### Model Related
         # load model
         model = None
@@ -207,6 +206,9 @@ def main():
         # load evasion data
         _, _, X_test, y_test = get_dataset(CFG)
 
+        if debug:
+            print("All:", X_test.shape, y_test.shape)
+
         # 1) select correct samples
         test_dataset = ACDataset(X_test, y_test, transform=get_transform(CFG)[1])
         test_loader = DataLoader(test_dataset,
@@ -215,7 +217,8 @@ def main():
         logit = y == y_p
         X_test = X_test[logit]
         y_test = y_test[logit]
-        # print(X_test.shape, y_test.shape)
+        if debug:
+            print("Correct:", X_test.shape, y_test.shape)
 
         del test_dataset, test_loader, y, y_p
         gc.collect()
