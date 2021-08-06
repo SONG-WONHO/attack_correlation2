@@ -270,7 +270,7 @@ def main():
         else:
             y = label
 
-        print(iamge.shape, y.shape)
+        print(image.shape, y.shape)
 
         # do attack
         image_adv = []
