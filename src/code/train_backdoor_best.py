@@ -188,7 +188,7 @@ def main():
                 "fgsm": {
                     "poison_ratio": 3,
                     "class_ratio": 2,
-                    "mask_ratio": 2,
+                    "mask_ratio": 4,
                     "size_ratio": 2, },
                 "bim": {
                     "poison_ratio": 6,
