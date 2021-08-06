@@ -196,7 +196,7 @@ def get_transform(config):
 
     elif config.dataset == "tiny":
         train_transform = Compose([
-            ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1),
+            # ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1),
             HorizontalFlip(p=0.5),
             PadIfNeeded(36, 36, p=1.0),
             RandomCrop(32, 32),
