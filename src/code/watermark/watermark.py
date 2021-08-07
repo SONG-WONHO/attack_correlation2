@@ -158,7 +158,7 @@ def wm_adv(config, X, y):
     model.eval()
 
     # 2) fgsm attack, assert success >= 50 and fail >= 50
-    const = 0.25
+    const = 0.25/2
     num_cand = 500
     X, y = X[-num_cand:].copy(), y[-num_cand:].copy()
     print(X.shape, y.shape)
