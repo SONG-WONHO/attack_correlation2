@@ -13,6 +13,7 @@ import torch
 import torch.backends.cudnn as cudnn
 import torch.nn as nn
 from PIL import Image
+import cv2
 
 GPU ='0,1,2,3'
 os.environ['CUDA_VISIBLE_DEVICES'] =GPU
@@ -113,9 +114,31 @@ class TinyLoader(object):
         return (X_train, y_train), (X_test, y_test)
 
 
-def get_dataset():
-    dataset = TinyLoader()
+def get_dataset(config):
+    dataset = None
+    if config.dataset == "mnist":
+        dataset = datasets.mnist
+    elif config.dataset == "tiny":
+        dataset = TinyLoader()
+
     (X_train, y_train), (X_test, y_test) = dataset.load_data()
+
+    # if config.dataset == "mnist":
+        # X_train = X_train.reshape(*X_train.shape, 1)
+        # X_test = X_test.reshape(*X_test.shape, 1)
+        #
+        # X_train = np.concatenate([X_train, X_train, X_train], axis=-1)
+        # X_test = np.concatenate([X_test, X_test, X_test], axis=-1)
+        #
+        # X_temp = []
+        # for X in X_train:
+        #     X_temp.append(cv2.resize(X, (32, 32)))
+        # X_train = np.stack(X_temp)
+        #
+        # X_temp = []
+        # for X in X_test:
+        #     X_temp.append(cv2.resize(X, (32, 32)))
+        # X_test = np.stack(X_temp)
 
     if len(y_train.shape) == 2:
         if y_train.shape[1] == 1:
@@ -125,7 +148,6 @@ def get_dataset():
             assert False, f"{config.dataset}, {y_train.shape}"
 
     return X_train, y_train, X_test, y_test
-
 
 
 # save code each time
@@ -170,20 +192,19 @@ if args.dataset == 'cifar10':
 
 elif args.dataset == 'mnist':
     transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.5,), (0.5,))])
+    transforms.ToTensor()])
+
+    X_train, y_train, X_test, y_test = get_dataset(args)
+
     # load trainset and testset
-    trainset = torchvision.datasets.MNIST(
-        root=args.dataroot, train=True, download=True, transform=transform)
+    trainset = ACDataset(X_train, y_train, transform=transform)
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=args.batchsize, shuffle=False, num_workers=2, drop_last=True)
-    testset = torchvision.datasets.MNIST(
-        root=args.dataroot, train=False, download=True, transform=transform)
+    testset = ACDataset(X_test, y_test, transform=transform)
     testloader = torch.utils.data.DataLoader(
         testset, batch_size=args.batchsize, shuffle=False, num_workers=2, drop_last=True)
     # load the 1% origin sample 
-    trigger_set = torchvision.datasets.MNIST(
-        root=args.dataroot, train=True, download=True, transform=transform)
+    trigger_set = ACDataset(X_train, y_train, transform=transform)
     trigger_loader = torch.utils.data.DataLoader(
         trigger_set, batch_size=args.wm_batchsize, shuffle=False, num_workers=2, drop_last=True)
     # load logo
@@ -204,7 +225,7 @@ elif args.dataset == 'tiny':
     transform_test = transforms.Compose([
         transforms.ToTensor()])
 
-    X_train, y_train, X_test, y_test = get_dataset()
+    X_train, y_train, X_test, y_test = get_dataset(args)
 
     # load trainset and testset
     trainset = ACDataset(X_train, y_train, transform=transform_train)
