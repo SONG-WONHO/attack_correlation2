@@ -90,14 +90,14 @@ def watermark(config, log):
     ### Data Related Logic
     # load data
     log.write("Load Data")
-    X_train, y_train, X_test, y_test = get_dataset(CFG)
+    X_train, y_train, X_test, y_test = get_dataset(config)
     log.write(f"- Train Shape Info: {X_train.shape, y_train.shape}")
     log.write(f"- Test Shape Info: {X_test.shape, y_test.shape}")
     log.write()
 
     # get transform
     log.write("Get Transform")
-    train_transform, test_transform = get_transform(CFG)
+    train_transform, test_transform = get_transform(config)
     log.write()
 
     # dataset
