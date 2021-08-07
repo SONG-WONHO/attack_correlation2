@@ -10,12 +10,13 @@ def get_watermark_dataset(config, X_train, y_train, X_test, y_test):
     y_test = y_test.copy()
 
     if config.wm_type == "content":
-        X_wm, y_wm = wm_content(config, X_train, y_train)
+        X_wm, y_wm = wm_content(X_train, y_train)
 
+    print(X_wm[0], y_wm[:10])
     return X_wm, y_wm, X_wm, y_wm
 
 
-def wm_content(config, X, y):
+def wm_content(X, y):
 
     X_wm, y_wm = [], []
 
@@ -40,6 +41,7 @@ def wm_content(config, X, y):
         X_wm.append(img)
         y_wm.append(0)
 
-    print(X_wm[0].shape)
+    X_wm = np.stack(X_wm, axis=0)
+    y_wm = np.array(y_wm)
 
-    return X, y
+    return X_wm, y_wm
