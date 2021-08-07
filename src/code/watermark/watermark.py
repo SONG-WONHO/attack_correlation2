@@ -58,8 +58,6 @@ def wm_noise(config, X, y):
 
     np.random.seed(config.seed)
     noise = np.random.normal(0, 20, size=X[0].shape)
-    print(noise.shape, X[0].shape)
-    return
 
     for img, label in zip(X, y):
         if label != 1:
@@ -67,6 +65,8 @@ def wm_noise(config, X, y):
 
         # if label == 1
         img = deepcopy(img)
+
+        # add noise
         img = img + nose
 
         X_wm.append(img)
