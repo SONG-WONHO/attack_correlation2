@@ -176,7 +176,8 @@ def wm_adv(config, X, y):
 
         with torch.no_grad():
             logit, prob = model(X_adv)
-        print(logit.shape, prob.shape)
+        pred = torch.argmax(prob, dim=1)
+        print(label.shape, pred.shape)
 
         return
 
