@@ -357,9 +357,9 @@ def main():
                         is_debug=False, learning_rate=0.05)
                 elif CFG.dataset == "tiny":
                     image_t = spsa(
-                        model, image[i * sz:(i + 1) * sz], CFG.const, 100,
+                        model, image[i * sz:(i + 1) * sz], CFG.const, 3,
                         y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
-                        is_debug=False)
+                        is_debug=False, learning_rate=0.05)
 
             image_adv.append(image_t)
         image_adv = torch.cat(image_adv)
