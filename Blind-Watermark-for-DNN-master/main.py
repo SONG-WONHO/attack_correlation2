@@ -213,10 +213,11 @@ elif args.dataset == 'mnist':
         for k in range(args.batchsize):
             if l[k].cpu().numpy() == 1:
                 logo = logo[k:k+1]
-                print(logo.shape)
                 break
         secret_img = logo.expand(args.wm_batchsize, logo.shape[1], logo.shape[2], logo.shape[3]).cuda()
         break
+
+        print(secret_img.shape)
 
 elif args.dataset == 'tiny':
     transform_train = transforms.Compose([
