@@ -8,6 +8,7 @@ import torch
 from data import get_dataset, get_transform
 from models.lenet import LeNet5
 from models.resnet import *
+from attacks.evasion import fast_gradient_method
 
 
 def get_watermark_dataset(config, X_train, y_train, X_test, y_test):
@@ -165,9 +166,14 @@ def wm_adv(config, X, y):
     image = torch.cat(image).to(config.device)
     label = torch.LongTensor(y).view(-1).to(config.device)
     print(image.shape, label.shape)
-    return
 
     while True:
+        X_adv = fast_gradient_method(
+            model, image, CFG.const, np.inf,
+            y=label, targeted=False)
+
+        print(X_adv.shape)
+        return
 
         # success >= 50, fail >= 50
         if True:
