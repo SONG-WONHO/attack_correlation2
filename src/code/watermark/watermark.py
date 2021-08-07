@@ -16,7 +16,7 @@ def get_watermark_dataset(config, X_train, y_train, X_test, y_test):
     if config.wm_type == "noise":
         X_wm, y_wm = wm_noise(config, X_train, y_train)
     if config.wm_type == "unrelate":
-        X_wm, y_wm = wm_unrelate(config, X_train, y_train)
+        X_wm, y_wm = wm_unrelate(config)
 
     print(y_wm[:10], y_wm[-10:])
     return X_wm, y_wm, X_wm, y_wm
@@ -80,7 +80,7 @@ def wm_noise(config, X, y):
     return X_wm, y_wm
 
 
-def wm_unrelate(config, X, y):
+def wm_unrelate(config):
 
     class CFG:
         dataset = {
@@ -90,23 +90,14 @@ def wm_unrelate(config, X, y):
 
     X_ref, y_ref, _, _ = get_dataset(CFG)
 
-    print(X_ref.shape, y_ref.shape)
-    return
-
     X_wm, y_wm = [], []
 
-    np.random.seed(config.seed)
-    noise = np.random.normal(0, 20, size=X[0].shape)
-
-    for img, label in zip(X, y):
+    for img, label in zip(X_ref, y_ref):
         if label != 1:
             continue
 
         # if label == 1
         img = deepcopy(img)
-
-        # add noise
-        img = img + noise
 
         X_wm.append(img)
         y_wm.append(0)
