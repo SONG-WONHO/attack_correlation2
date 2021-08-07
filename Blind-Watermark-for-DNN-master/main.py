@@ -385,11 +385,11 @@ def train(epoch):
             labels[0:args.batchsize]).sum().item()
         real_total += args.batchsize
 
-        print('[%d/%d][%d/%d]  Loss D: %.4f Loss_H: %.4f (mse: %.4f ssim: %.4f adv: %.4f)  Loss_real_DNN: %.4f Real acc: %.3f  wm acc: %.3f' % (
-            epoch, args.num_epochs, batch_idx, len(trainloader),
-            loss_D.item(), loss_H.item(), loss_mse.item(
-            ), loss_ssim.item(), loss_adv.item(), loss_DNN.item(),
-            100. * real_correct / real_total, 100. * wm_correct / wm_total))
+        # print('[%d/%d][%d/%d]  Loss D: %.4f Loss_H: %.4f (mse: %.4f ssim: %.4f adv: %.4f)  Loss_real_DNN: %.4f Real acc: %.3f  wm acc: %.3f' % (
+        #     epoch, args.num_epochs, batch_idx, len(trainloader),
+        #     loss_D.item(), loss_H.item(), loss_mse.item(
+        #     ), loss_ssim.item(), loss_adv.item(), loss_DNN.item(),
+        #     100. * real_correct / real_total, 100. * wm_correct / wm_total))
 
         loss_H_.update(loss_H.item(), int(input.size()[0]))
         loss_D_.update(loss_D.item(), int(input.size()[0]))
@@ -399,6 +399,7 @@ def train(epoch):
     train_loss[1].append(loss_D_.avg)
     train_acc[0].append(real_acc.avg)
     train_acc[1].append(wm_acc.avg)
+    print(f"Train real: {real_acc} wm: {wm_acc}")
     save_loss_acc(epoch, train_loss, train_acc, True)
 
 
@@ -490,25 +491,31 @@ def test(epoch):
     if real_acc >= best_real_acc:  # and (wm_acc >= best_wm_acc):
         print('Saving...')
 
-        Hstate = {
-            'net': Hidnet.module if torch.cuda.is_available() else Hidnet,
-            'epoch': epoch,
-        }
-        Dstate = {
-            'net': Disnet.module if torch.cuda.is_available() else Disnet,
-            'epoch': epoch,
-        }
-        Nstate = {
-            'net': Dnnet.module if torch.cuda.is_available() else Dnnet,
-            'acc': real_acc,
-            'wm_acc': wm_acc,
-            # 'wm_labels':np_labels,
-            'epoch': epoch,
-        }
+        # Hstate = {
+        #     'net': Hidnet.module if torch.cuda.is_available() else Hidnet,
+        #     'epoch': epoch,
+        # }
+        # Dstate = {
+        #     'net': Disnet.module if torch.cuda.is_available() else Disnet,
+        #     'epoch': epoch,
+        # }
+        # Nstate = {
+        #     'net': Dnnet.module if torch.cuda.is_available() else Dnnet,
+        #     'acc': real_acc,
+        #     'wm_acc': wm_acc,
+        #     # 'wm_labels':np_labels,
+        #     'epoch': epoch,
+        # }
+        #
+        # torch.save(Hstate, args.save_path + 'checkpiont/Hidnet.pt')
+        # torch.save(Dstate, args.save_path + 'checkpiont/Disnet.pt')
+        # torch.save(Nstate, args.save_path + 'checkpiont/Dnnet.pt')
 
-        torch.save(Hstate, args.save_path + 'checkpiont/Hidnet.pt')
-        torch.save(Dstate, args.save_path + 'checkpiont/Disnet.pt')
-        torch.save(Nstate, args.save_path + 'checkpiont/Dnnet.pt')
+        torch.save({
+            "state_dict": Dnnet.cpu().state_dict(),
+        }, f"{os.path.join(args.save_path, checkpoint, f'model.last.pt')}")
+        model.to(CFG.device)
+
         best_real_acc = real_acc
     if wm_acc > best_wm_acc:
         best_wm_acc = wm_acc
