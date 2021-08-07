@@ -158,22 +158,19 @@ def wm_adv(config, X, y):
     model.eval()
 
     # 2) fgsm attack, assert success >= 50 and fail >= 50
-    const = 0.25/100
+    const = 0.25
     num_cand = 500
     X, y = X[-num_cand:].copy(), y[-num_cand:].copy()
-    print(X.shape, y.shape)
 
     image = [get_transform(config)[1](image=sample)['image'].unsqueeze(0) for
              sample in X]
     image = torch.cat(image).to(config.device)
     label = torch.LongTensor(y).view(-1).to(config.device)
-    print(image.shape, label.shape)
 
     while True:
         X_adv = fast_gradient_method(
             model, image, const, np.inf,
             y=label, targeted=False)
-        print(X_adv.shape)
 
         with torch.no_grad():
             _, prob = model(X_adv)
@@ -183,7 +180,6 @@ def wm_adv(config, X, y):
         num_fail = logit.sum().item()
         num_success = num_cand - logit.sum().item()
         print(f"Num sucess: {num_success}, Num fail: {num_fail}")
-        return
 
         # success >= 50, fail >= 50
         if num_fail >= 50 and num_success >= 50:
@@ -199,9 +195,8 @@ def wm_adv(config, X, y):
                 const = const * 2
                 print(f"Num sucess: {num_success}, Num fail: {num_fail}")
 
-        if const < 1e-4 or const > 1e4:
+        if const < 1e-6 or const > 1e6:
             assert False, f"Const: {const}, Needs dense const value."
-
 
     # 3) select sucess 50
 
