@@ -199,12 +199,12 @@ def wm_adv(config, X, y):
             assert False, f"Const: {const}, Needs dense const value."
 
     # 3) select sucess 50
-    X_success = image[torch.logical_not(logit)[:50]].cpu()
-    y_sucess = label[torch.logical_not(logit)[:50]].cpu()
+    X_success = image[torch.logical_not(logit)].cpu()[:50]
+    y_sucess = label[torch.logical_not(logit)].cpu()[:50]
 
     # 4) select fail 50
-    X_fail = image[logit[:50]].cpu()
-    y_fail = label[logit[:50]].cpu()
+    X_fail = image[logit].cpu()[:50]
+    y_fail = label[logit].cpu()[:50]
 
     print(X_success.shape, y_sucess.shape, X_fail.shape, y_fail.shape)
 
