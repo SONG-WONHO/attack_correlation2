@@ -514,7 +514,7 @@ def test(epoch):
         torch.save({
             "state_dict": Dnnet.cpu().state_dict(),
         }, f"{os.path.join(args.save_path, 'checkpiont', 'model.last.pt')}")
-        model.to(CFG.device)
+        Dnnet.cuda()
 
         best_real_acc = real_acc
     if wm_acc > best_wm_acc:
