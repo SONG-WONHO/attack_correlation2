@@ -175,11 +175,12 @@ def wm_adv(config, X, y):
         print(X_adv.shape)
 
         with torch.no_grad():
-            logit, prob = model(X_adv)
+            _, prob = model(X_adv)
         pred = torch.argmax(prob, dim=1)
-        print(label.shape, pred.shape)
 
-        return
+        logit = label == pred
+
+        print(logit.sum().item())
 
         # success >= 50, fail >= 50
         if True:
