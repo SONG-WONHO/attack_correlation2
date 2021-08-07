@@ -155,6 +155,7 @@ def wm_adv(config, X, y):
         model = ResNet50(config.num_classes)
     model.load_state_dict(torch.load(config.pretrained_path)['state_dict'])
     model.to(config.device)
+    model.eval()
 
     # 2) fgsm attack, assert success >= 50 and fail >= 50
     const = 0.25
@@ -171,8 +172,12 @@ def wm_adv(config, X, y):
         X_adv = fast_gradient_method(
             model, image, const, np.inf,
             y=label, targeted=False)
-
         print(X_adv.shape)
+
+        with torch.no_grad():
+            logit, prob = model(X_adv)
+        print(logit.shape, prob.shape)
+
         return
 
         # success >= 50, fail >= 50
