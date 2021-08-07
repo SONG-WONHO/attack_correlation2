@@ -13,25 +13,19 @@ import torch
 import torch.backends.cudnn as cudnn
 import torch.nn as nn
 
-'''
-def SpecifiedLabel(OriginalLabel):
-    targetlabel = OriginalLabel + 1
-    targetlabel = targetlabel % 10
-    return targetlabel
-'''
 GPU ='0,1,2,3'
 os.environ['CUDA_VISIBLE_DEVICES'] =GPU
 parser = argparse.ArgumentParser(
     description='Pytorch Implement Protection for IP of DNN with CIRAR10')
-parser.add_argument('--dataset', default='cifar10', help='mnist|cifar10')
+parser.add_argument('--dataset', default='cifar10', help='mnist|cifar10|tiny')
 parser.add_argument('--dataroot', default='./data/')
 parser.add_argument('--train', type=bool, default=True)
 parser.add_argument('--num_epochs', type=int, default=100) # 100 for cifar10    30 for mnist
 parser.add_argument('--batchsize', type=int, default=100)
-parser.add_argument('--wm_num', nargs='+', default=[500, 600],  # 1% of train dataset, 500 for cifar10, 600 for mnist
+parser.add_argument('--wm_num', nargs='+', default=[500, 600, 200],  # 1% of train dataset, 500 for cifar10, 600 for mnist
                         help='the number of wm images')
 parser.add_argument('--wm_batchsize', type=int, default=20, help='the wm batch size')
-parser.add_argument('--lr', nargs='+', default=[0.001, 0.1]) # 0.001 for adam    0.1 for sgd
+parser.add_argument('--lr', nargs='+', default=[0.001, 0.1, 0.001]) # 0.001 for adam    0.1 for sgd
 parser.add_argument('--hyper-parameters',  nargs='+', default=[3, 5, 1, 0.1])
 parser.add_argument('--save_path', type=str, default='./results/')
 parser.add_argument('--seed', default=32, type=int,
@@ -68,19 +62,10 @@ from models.Discriminator import DiscriminatorNet, DiscriminatorNet_mnist
 from models.HidingUNet import UnetGenerator, UnetGenerator_mnist
 # save code each time
 if args.train:
-    cur_time = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())
-    args.save_path += cur_time + '/'
+    args.save_path += args.dataset + '/'
     os.makedirs(args.save_path+'images', exist_ok=True)
     os.makedirs(args.save_path+'checkpiont', exist_ok=True)
     os.makedirs(args.save_path+'models', exist_ok=True)
-    os.mknod(args.save_path + "models/main.py")
-    os.mknod(args.save_path + "models/HidingUNet.py")
-    os.mknod(args.save_path + "models/Discriminator.py")
-    shutil.copyfile('main.py', args.save_path + "models/main.py")
-    shutil.copyfile('models/HidingUNet.py',
-                    args.save_path + 'models/HidingUNet.py')
-    shutil.copyfile('models/Discriminator.py',
-                    args.save_path + 'models/Discriminator.py')
 # device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # Preparing Data
 print('==> Preparing data..')
@@ -88,11 +73,10 @@ if args.dataset == 'cifar10':
     transform_train = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        transforms.ToTensor()
+    ])
     transform_test = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        transforms.ToTensor()])
 
     # load trainset and testset
     trainset = torchvision.datasets.CIFAR10(
@@ -109,6 +93,8 @@ if args.dataset == 'cifar10':
     trigger_loader = torch.utils.data.DataLoader(
         trigger_set, batch_size=args.wm_batchsize, shuffle=False, num_workers=2, drop_last=True)
 
+    print(trainset[0][0].max(), testset[0][0].max(), trigger_set[0][0].max())
+    assert False
     # load logo
     ieee_logo = torchvision.datasets.ImageFolder(
         root=args.dataroot+'/IEEE', transform=transform_test)
