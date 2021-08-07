@@ -208,5 +208,8 @@ def wm_adv(config, X, y):
 
     print(X_success.shape, y_sucess.shape, X_fail.shape, y_fail.shape)
 
+    X_wm = torch.cat([X_success, X_fail], dim=0)
+    y_wm = torch.cat([y_sucess, y_fail], dim=0)
+    print(X_wm.shape, y_wm.shape)
 
     return X_wm, y_wm
