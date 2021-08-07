@@ -16,7 +16,7 @@ from PIL import Image
 import cv2
 from tensorflow.keras import datasets
 
-GPU ='0,1,2,3'
+GPU ='0'
 os.environ['CUDA_VISIBLE_DEVICES'] =GPU
 parser = argparse.ArgumentParser(
     description='Pytorch Implement Protection for IP of DNN with CIRAR10')
