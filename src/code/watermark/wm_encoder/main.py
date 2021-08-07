@@ -41,7 +41,7 @@ def watermark():
     parser.add_argument('--lr', nargs='+',
                         default=[0.001, 0.1])  # 0.001 for adam    0.1 for sgd
     parser.add_argument('--hyper-parameters', nargs='+', default=[3, 5, 1, 0.1])
-    parser.add_argument('--save_path', type=str, default='./watermark/wm_encoder/results/')
+    parser.add_argument('--save_path', type=str, default='./code/watermark/wm_encoder/results/')
     parser.add_argument('--seed', default=32, type=int,
                         help='seed for initializing training.')
     parser.add_argument('--pretrained', type=bool,
@@ -77,14 +77,14 @@ def watermark():
         os.makedirs(args.save_path + 'images', exist_ok=True)
         os.makedirs(args.save_path + 'checkpiont', exist_ok=True)
         os.makedirs(args.save_path + 'models', exist_ok=True)
-        os.mknod(args.save_path + "models/main.py")
-        os.mknod(args.save_path + "models/HidingUNet.py")
-        os.mknod(args.save_path + "models/Discriminator.py")
-        shutil.copyfile('main.py', args.save_path + "models/main.py")
-        shutil.copyfile('models/HidingUNet.py',
-                        args.save_path + 'models/HidingUNet.py')
-        shutil.copyfile('models/Discriminator.py',
-                        args.save_path + 'models/Discriminator.py')
+        os.mknod(args.save_path + "./code/watermark/wm_encoder/models/main.py")
+        os.mknod(args.save_path + "./code/watermark/wm_encoder/models/HidingUNet.py")
+        os.mknod(args.save_path + "./code/watermark/wm_encoder/models/Discriminator.py")
+        shutil.copyfile('main.py', args.save_path + "./code/watermark/wm_encoder/models/main.py")
+        shutil.copyfile('./code/watermark/wm_encoder/models/HidingUNet.py',
+                        args.save_path + './code/watermark/wm_encoder/models/HidingUNet.py')
+        shutil.copyfile('./code/watermark/wm_encoder/models/Discriminator.py',
+                        args.save_path + './code/watermark/wm_encoder/models/Discriminator.py')
 
     # Preparing Data
     print('==> Preparing data..')
