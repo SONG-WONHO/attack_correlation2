@@ -126,7 +126,8 @@ def wm_abstract(config, shape):
         img = np.asarray(img)
 
         X_wm.append(img)
-        print(img.shape)
+        if img.shape[-1] == 4:
+            print(fn)
         y_wm.append(np.random.randint(config.num_classes))
 
     X_wm = np.stack(X_wm, axis=0)
