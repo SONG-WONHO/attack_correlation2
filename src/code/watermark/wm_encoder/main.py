@@ -23,17 +23,19 @@ from watermark.wm_encoder.models import *
 from watermark.wm_encoder.models.Discriminator import DiscriminatorNet, DiscriminatorNet_mnist
 from watermark.wm_encoder.models.HidingUNet import UnetGenerator, UnetGenerator_mnist
 
+from data import *
 
-def watermark(config):
+
+def watermark(config, log):
     class args:
-        dataset = config.dataset
+        dataset = "cifar10"
         dataroot = "./code/watermark/wm_encoder/data/"
         train = True
-        num_epochs = config.num_epochs
+        num_epochs = 100
         batchsize = 100
         wm_num = [500, 600]
         wm_batchsize = 20
-        lr = [config.learning_rate, config.learning_rate]
+        lr = [0.001, 0.1]
         hyper_parameters = [3, 5, 1, 0.1]
         save_path = "./results/"
         seed = config.seed
@@ -85,8 +87,29 @@ def watermark(config):
         os.makedirs(args.save_path + 'checkpiont', exist_ok=True)
         os.makedirs(args.save_path + 'models', exist_ok=True)
 
-    # Preparing Data
-    print('==> Preparing data..')
+    ### Data Related Logic
+    # load data
+    log.write("Load Data")
+    X_train, y_train, X_test, y_test = get_dataset(CFG)
+    log.write(f"- Train Shape Info: {X_train.shape, y_train.shape}")
+    log.write(f"- Test Shape Info: {X_test.shape, y_test.shape}")
+    log.write()
+
+    # get transform
+    log.write("Get Transform")
+    train_transform, test_transform = get_transform(CFG)
+    log.write()
+
+    # dataset
+    log.write("Get Dataset")
+    trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
+    val_dataset = ACDataset(X_test, y_test, transform=test_transform)
+    log.write(f"- Shape: {trn_dataset[0][0].shape}")
+    log.write(
+        f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
+    log.write()
+    return
+
     if args.dataset == 'cifar10':
         transform_train = transforms.Compose([
             transforms.RandomCrop(32, padding=4),
@@ -104,12 +127,6 @@ def watermark(config):
         trainloader = torch.utils.data.DataLoader(
             trainset, batch_size=args.batchsize, shuffle=True, num_workers=2,
             drop_last=True)
-
-        for x, y in trainloader:
-            print(x.shape, y.shape)
-        return
-
-
         testset = torchvision.datasets.CIFAR10(
             root=args.dataroot, train=False, download=True,
             transform=transform_test)
