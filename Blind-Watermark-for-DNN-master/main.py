@@ -349,7 +349,7 @@ def train(epoch):
         optimizerH.zero_grad()
         optimizerD.zero_grad()
         optimizerN.zero_grad()
-        print(wm_img.shape)
+
         wm_dis_output = Disnet(wm_img)
         wm_dnn_output = Dnnet(wm_img)
         loss_mse = criterionH_mse(wm_input, wm_img)
