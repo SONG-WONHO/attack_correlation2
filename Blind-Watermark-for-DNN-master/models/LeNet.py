@@ -47,7 +47,7 @@ class LeNet5(nn.Module):
         super(LeNet5, self).__init__()
         self.conv1 = nn.Conv2d(1,6, kernel_size=5, stride=1, padding=2)
         self.conv2 = nn.Conv2d(6, 16, kernel_size=5, stride=1, padding=2)
-        self.fc1 = nn.Linear(784, 120)
+        self.fc1 = nn.Linear(1024, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
