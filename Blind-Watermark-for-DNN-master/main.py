@@ -60,6 +60,73 @@ from models import SSIM
 from models import *
 from models.Discriminator import DiscriminatorNet, DiscriminatorNet_mnist
 from models.HidingUNet import UnetGenerator, UnetGenerator_mnist
+
+
+class ACDataset(Dataset):
+    """ Attack Correlation Dataset (ACDataset)
+    """
+
+    def __init__(self, x, y, transform=None):
+        self.x = x
+        self.y = y
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.x)
+
+    def __getitem__(self, idx):
+        img = self.x[idx]
+        label = self.y[idx]
+
+        if self.transform:
+            img = self.transform(img)
+
+        if img.max() > 1:
+            img /= 255
+
+        return img, label
+
+
+class TinyLoader(object):
+    def __init__(self):
+        self.path = "../src/datasets/tiny_imagenet/"
+
+    def load_data(self):
+        X_train = np.load(os.path.join(
+            self.path, "TinyImageNet.X_train.100000x32x32x3.npy"))
+        y_train = np.load(os.path.join(
+            self.path, "TinyImageNet.y_train.100000.npy"))
+        X_test = np.load(os.path.join(
+            self.path, "TinyImageNet.X_test.10000x32x32x3.npy"))
+        y_test = np.load(os.path.join(
+            self.path, "TinyImageNet.y_test.10000.npy"))
+
+        logit = y_train < 40
+        X_train = X_train[logit]
+        y_train = y_train[logit]
+
+        logit = y_test < 40
+        X_test = X_test[logit]
+        y_test = y_test[logit]
+
+        return (X_train, y_train), (X_test, y_test)
+
+
+def get_dataset():
+    dataset = TinyLoader()
+    (X_train, y_train), (X_test, y_test) = dataset.load_data()
+
+    if len(y_train.shape) == 2:
+        if y_train.shape[1] == 1:
+            y_train = y_train.reshape(-1)
+            y_test = y_test.reshape(-1)
+        else:
+            assert False, f"{config.dataset}, {y_train.shape}"
+
+    return X_train, y_train, X_test, y_test
+
+
+
 # save code each time
 if args.train:
     args.save_path += args.dataset + '/'
@@ -126,6 +193,36 @@ elif args.dataset == 'mnist':
                 break
         secret_img = logo.expand(args.wm_batchsize, logo.shape[1], logo.shape[2], logo.shape[3]).cuda()
         break
+
+elif args.dataset == 'tiny':
+    transform_train = transforms.Compose([
+        transforms.RandomCrop(32, padding=4),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor()
+    ])
+    transform_test = transforms.Compose([
+        transforms.ToTensor()])
+
+    X_train, y_train, X_test, y_test = get_dataset()
+
+    # load trainset and testset
+    trainset = ACDataset(X_train, y_train, transform=transform_train)
+    trainloader = torch.utils.data.DataLoader(
+        trainset, batch_size=args.batchsize, shuffle=True, num_workers=2, drop_last=True)
+    testset = ACDataset(X_test, y_test, transform=transform_test)
+    testloader = torch.utils.data.DataLoader(
+        testset, batch_size=args.batchsize, shuffle=False, num_workers=2, drop_last=True)
+    # load the 1% origin sample
+    trigger_set = ACDataset(X_train, y_train, transform=transform_test)
+    trigger_loader = torch.utils.data.DataLoader(
+        trigger_set, batch_size=args.wm_batchsize, shuffle=False, num_workers=2, drop_last=True)
+    # load logo
+    ieee_logo = torchvision.datasets.ImageFolder(
+        root=args.dataroot+'/IEEE', transform=transform_test)
+    ieee_loader = torch.utils.data.DataLoader(ieee_logo, batch_size=1)
+    for _, (logo, __) in enumerate(ieee_loader):
+        secret_img = logo.expand(
+            args.wm_batchsize, logo.shape[1], logo.shape[2], logo.shape[3]).cuda()
 
 print(trainset[0][0].max(), testset[0][0].max(), trigger_set[0][0].max(), secret_img.max())
 assert False
