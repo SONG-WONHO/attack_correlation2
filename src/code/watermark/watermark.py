@@ -1,7 +1,7 @@
 from copy import deepcopy
 import numpy as np
 
-from data import *
+from data import get_dataset
 
 
 def get_watermark_dataset(config, X_train, y_train, X_test, y_test):
@@ -16,7 +16,7 @@ def get_watermark_dataset(config, X_train, y_train, X_test, y_test):
     if config.wm_type == "noise":
         X_wm, y_wm = wm_noise(config, X_train, y_train)
     if config.wm_type == "unrelate":
-        X_wm, y_wm = wm_unrelate(X_train, y_train)
+        X_wm, y_wm = wm_unrelate(config, X_train, y_train)
 
     print(y_wm[:10], y_wm[-10:])
     return X_wm, y_wm, X_wm, y_wm
@@ -80,7 +80,18 @@ def wm_noise(config, X, y):
     return X_wm, y_wm
 
 
-def wm_unrelate(X, y):
+def wm_unrelate(config, X, y):
+
+    class CFG:
+        dataset = {
+            "mnist": "cifar10",
+            "cifar10": "mnist",
+            "imagenet": "mnist"}[config.dataset]
+
+    X_ref, y_ref, _, _ = get_dataset(CFG.dataset)
+
+    print(X_ref.shape, y_ref.shape)
+    return
 
     X_wm, y_wm = [], []
 
