@@ -41,7 +41,7 @@ def watermark():
     parser.add_argument('--lr', nargs='+',
                         default=[0.001, 0.1])  # 0.001 for adam    0.1 for sgd
     parser.add_argument('--hyper-parameters', nargs='+', default=[3, 5, 1, 0.1])
-    parser.add_argument('--save_path', type=str, default='./code/watermark/wm_encoder/results/')
+    parser.add_argument('--save_path', type=str, default='./watermark/wm_encoder/results/')
     parser.add_argument('--seed', default=32, type=int,
                         help='seed for initializing training.')
     parser.add_argument('--pretrained', type=bool,
