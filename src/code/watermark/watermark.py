@@ -180,23 +180,24 @@ def wm_adv(config, X, y):
         pred = torch.argmax(prob, dim=1)
 
         logit = label == pred
-
         num_fail = logit.sum().item()
         num_success = num_cand - logit.sum().item()
-        print(num_fail, num_success)
+        print(f"Num sucess: {num_success}, Num fail: {num_fail}")
+        return
 
         # success >= 50, fail >= 50
-        if True:
+        if num_fail >= 50 and num_success >= 50:
             break
 
         else:
-
             # fail < 50
-            if True:
+            if num_fail < 50:
                 const = const / 2
+                print(f"Num sucess: {num_success}, Num fail: {num_fail}")
             # success < 50
             else:
                 const = const * 2
+                print(f"Num sucess: {num_success}, Num fail: {num_fail}")
 
         if const < 1e-4 or const > 1e4:
             assert False, f"Const: {const}, Needs dense const value."
