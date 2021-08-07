@@ -32,9 +32,10 @@ def wm_content(X, y):
         if label != 1:
             continue
 
-        # label 1
+        # if label == 1
         img = deepcopy(img)
 
+        # insert pixels
         for p in px:
             img[int(p / img.shape[0])][int(p % img.shape[0])] = value
 
