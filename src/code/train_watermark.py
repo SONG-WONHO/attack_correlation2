@@ -162,7 +162,7 @@ def main():
         assert CFG.pretrained_path is not None, "Adv needs pretrained models"
 
     elif CFG.wm_type == "encoder":
-        watermark()
+        watermark(CFG)
     elif CFG.wm_type == "deepsigns":
         return
 
