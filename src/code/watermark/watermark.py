@@ -67,7 +67,7 @@ def wm_noise(config, X, y):
         img = deepcopy(img)
 
         # add noise
-        img = img + nose
+        img = img + noise
 
         X_wm.append(img)
         y_wm.append(0)
