@@ -157,12 +157,12 @@ def main():
     log = Logger()
     log.open(os.path.join(CFG.log_path, "log.txt"))
 
-    if wm_type == "adv":
+    if CFG.wm_type == "adv":
         assert CFG.pretrained_path is not None, "Adv needs pretrained models"
 
-    elif wm_tpye == "encoder":
+    elif CFG.wm_tpye == "encoder":
         return
-    elif wm_type == "deepsigns":
+    elif CFG.wm_type == "deepsigns":
         return
 
     ### Data Related Logic
