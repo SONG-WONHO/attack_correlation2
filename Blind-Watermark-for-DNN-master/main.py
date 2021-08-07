@@ -12,6 +12,7 @@ import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
 import torch.nn as nn
+from PIL import Image
 
 GPU ='0,1,2,3'
 os.environ['CUDA_VISIBLE_DEVICES'] =GPU
