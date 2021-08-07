@@ -76,14 +76,6 @@ def watermark(config):
             torch.cuda.manual_seed(args.seed)
             torch.cuda.manual_seed_all(args.seed)
             cudnn.deterministic = True
-            '''
-            warnings.warn('You have cho5sen to seed training. '
-                          'This will turn on the CUDNN deterministic setting, '
-                          'which can slow down your training considerably! '
-                          'You may see unexpected behavior when restarting '
-                          'from checkpoints.')
-            '''
-
 
     # save code each time
     if args.train:
@@ -112,6 +104,12 @@ def watermark(config):
         trainloader = torch.utils.data.DataLoader(
             trainset, batch_size=args.batchsize, shuffle=True, num_workers=2,
             drop_last=True)
+
+        for x, y in trainloader:
+            print(x.shape, y.shape)
+        return
+
+
         testset = torchvision.datasets.CIFAR10(
             root=args.dataroot, train=False, download=True,
             transform=transform_test)
