@@ -18,10 +18,10 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
 
-from watermark.wm_exp.models import SSIM
-from watermark.wm_exp.models import *
-from watermark.wm_exp.models.Discriminator import DiscriminatorNet, DiscriminatorNet_mnist
-from watermark.wm_exp.models.HidingUNet import UnetGenerator, UnetGenerator_mnist
+from watermark.wm_encoder.models import SSIM
+from watermark.wm_encoder.models import *
+from watermark.wm_encoder.models.Discriminator import DiscriminatorNet, DiscriminatorNet_mnist
+from watermark.wm_encoder.models.HidingUNet import UnetGenerator, UnetGenerator_mnist
 
 
 def watermark():
