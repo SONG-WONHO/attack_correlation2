@@ -1,4 +1,7 @@
+import os
 from copy import deepcopy
+
+from PIL import Image
 import numpy as np
 
 from data import get_dataset
@@ -17,6 +20,8 @@ def get_watermark_dataset(config, X_train, y_train, X_test, y_test):
         X_wm, y_wm = wm_noise(config, X_train, y_train)
     if config.wm_type == "unrelate":
         X_wm, y_wm = wm_unrelate(config)
+    if config.wm_type == "abstract":
+        X_wm, y_wm = wm_abstract(config, X_train.shape[1:3])
 
     print(y_wm[:10], y_wm[-10:])
     return X_wm, y_wm, X_wm, y_wm
@@ -105,4 +110,19 @@ def wm_unrelate(config):
     X_wm = np.stack(X_wm, axis=0)
     y_wm = np.array(y_wm)
 
+    return X_wm, y_wm
+
+
+def wm_abstract(config, shape):
+    print(shape)
+    X_wm, y_wm = [], []
+
+    path = "./datasets/watermark/abstract"
+    fns = [os.path.join(path, p) for p in sorted(os.listdir(path))]
+
+    for fn in fns:
+        img = Image.open(fn)
+        img = np.asarray(img.resize(shape))
+        print(img.shape)
+    return
     return X_wm, y_wm
