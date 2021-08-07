@@ -341,7 +341,7 @@ def main():
                         image[i * sz:(i + 1) * sz],
                         CFG.num_classes,
                         y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
-                        initial_const=CFG.const, max_iterations=5,
+                        initial_const=CFG.const, max_iterations=20,
                         binary_search_steps=1)
 
             elif CFG.attack_type == "spsa":
