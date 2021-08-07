@@ -1,6 +1,8 @@
 from copy import deepcopy
 import numpy as np
 
+from data import *
+
 
 def get_watermark_dataset(config, X_train, y_train, X_test, y_test):
 
@@ -79,4 +81,26 @@ def wm_noise(config, X, y):
 
 
 def wm_unrelate(X, y):
-    pass
+
+    X_wm, y_wm = [], []
+
+    np.random.seed(config.seed)
+    noise = np.random.normal(0, 20, size=X[0].shape)
+
+    for img, label in zip(X, y):
+        if label != 1:
+            continue
+
+        # if label == 1
+        img = deepcopy(img)
+
+        # add noise
+        img = img + noise
+
+        X_wm.append(img)
+        y_wm.append(0)
+
+    X_wm = np.stack(X_wm, axis=0)
+    y_wm = np.array(y_wm)
+
+    return X_wm, y_wm
