@@ -302,9 +302,9 @@ if args.dataset == "mnist":
 else:
     Dnnet = ResNet18(10 if args.dataset == "cifar10" else 40)
 
-Hidnet = nn.DataParallel(Hidnet.cuda())
-Disnet = nn.DataParallel(Disnet.cuda())
-Dnnet = nn.DataParallel(Dnnet.cuda())
+Hidnet = Hidnet.cuda()
+Disnet = Disnet.cuda()
+Dnnet = Dnnet.cuda()
 
 criterionH_mse = nn.MSELoss()
 criterionH_ssim = SSIM()
