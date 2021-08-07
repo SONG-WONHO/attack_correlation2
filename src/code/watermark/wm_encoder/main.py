@@ -145,6 +145,7 @@ def watermark(config, log):
     return
     """
     if args.dataset == 'cifar10':
+        import torchvision.transforms as transforms
         transform_train = transforms.Compose([
             transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
