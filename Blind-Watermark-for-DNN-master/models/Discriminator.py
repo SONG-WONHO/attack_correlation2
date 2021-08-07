@@ -52,7 +52,7 @@ class DiscriminatorNet_mnist(nn.Module):
         super(DiscriminatorNet_mnist, self).__init__()
 
         self.model = nn.Sequential(
-            nn.Linear(28*28, 64),
+            nn.Linear(32*32, 64),
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(64, 32),
             nn.LeakyReLU(0.2, inplace=True),
