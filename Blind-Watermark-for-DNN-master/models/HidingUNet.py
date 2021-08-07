@@ -28,7 +28,7 @@ class UnetGenerator_mnist(nn.Module):
             nn.Conv2d(ngf,ngf, kernel_size=3, stride=1, padding=1, bias=True),
             nn.BatchNorm2d(ngf),
             nn.LeakyReLU(),
-            nn.Conv2d(ngf, input_c, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.Conv2d(ngf, 3, kernel_size=3, stride=1, padding=1, bias=True),
             nn.Tanh()
         )
 
