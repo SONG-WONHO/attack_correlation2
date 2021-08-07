@@ -351,7 +351,7 @@ def train(epoch):
         optimizerN.zero_grad()
 
         wm_dis_output = Disnet(wm_img)
-        wm_dnn_output = Dnnet(wm_img)
+        wm_dnn_output = Dnnet(wm_img)[1]
         loss_mse = criterionH_mse(wm_input, wm_img)
         loss_ssim = criterionH_ssim(wm_input, wm_img)
         loss_adv = criterionD(wm_dis_output, valid)
@@ -364,14 +364,14 @@ def train(epoch):
         optimizerN.zero_grad()
         inputs = torch.cat([input, wm_img.detach()], dim=0)
         labels = torch.cat([label, wm_label], dim=0)
-        dnn_output = Dnnet(inputs)
+        dnn_output = Dnnet(inputs)[1]
       
         loss_DNN = criterionN(dnn_output, labels)
         loss_DNN.backward()
         optimizerN.step()
 
         # calculate the accuracy
-        wm_cover_output = Dnnet(wm_input)
+        wm_cover_output = Dnnet(wm_input)[1]
         _, wm_cover_predicted = wm_cover_output.max(1)
         wm_cover_correct += wm_cover_predicted.eq(wm_cover_label).sum().item()
 
@@ -432,7 +432,7 @@ def test(epoch):
             Dislosses.update(loss_D.item(), int(wm_input.size()[0]))
 
             ################Hidding Net#############
-            wm_dnn_outputs = Dnnet(wm_img)
+            wm_dnn_outputs = Dnnet(wm_img)[1]
             loss_mse = criterionH_mse(wm_input, wm_img)
             loss_ssim = criterionH_ssim(wm_input, wm_img)
             loss_adv = criterionD(wm_dis_output, valid)
@@ -443,13 +443,13 @@ def test(epoch):
             ################DNNet#############
             inputs = torch.cat([input, wm_img.detach()], dim=0)
             labels = torch.cat([label, wm_label], dim=0)
-            dnn_outputs = Dnnet(inputs)
+            dnn_outputs = Dnnet(inputs)[1]
         
             loss_DNN = criterionN(dnn_outputs, labels)
             DNNlosses.update(loss_DNN.item(), int(inputs.size()[0]))
 
            
-            wm_cover_output = Dnnet(wm_input)
+            wm_cover_output = Dnnet(wm_input)[1]
             _, wm_cover_predicted = wm_cover_output.max(1)
             wm_cover_correct += wm_cover_predicted.eq(
                 wm_cover_label).sum().item()

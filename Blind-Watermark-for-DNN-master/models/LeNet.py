@@ -42,6 +42,8 @@ class LeNet3(nn.Module):
         layer5 = self.fc2(layer4)
         output = F.log_softmax(layer5, dim=1)
         return output
+
+
 class LeNet5(nn.Module):
     def __init__(self):
         super(LeNet5, self).__init__()
@@ -62,4 +64,4 @@ class LeNet5(nn.Module):
         layer6 = self.fc3(layer5)
         output = F.log_softmax(layer6, dim=1)
 
-        return output
+        return layer6, output
