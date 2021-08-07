@@ -399,7 +399,7 @@ def train(epoch):
     train_loss[1].append(loss_D_.avg)
     train_acc[0].append(real_acc.avg)
     train_acc[1].append(wm_acc.avg)
-    print(f"Train real: {real_acc} wm: {wm_acc}")
+    print(f"Train real: {real_acc.avg} wm: {wm_acc.avg}")
     save_loss_acc(epoch, train_loss, train_acc, True)
 
 
