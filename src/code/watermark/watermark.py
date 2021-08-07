@@ -208,7 +208,7 @@ def wm_adv(config, X, y):
     X_wm = torch.cat([X_success, X_fail], dim=0).numpy()
     y_wm = torch.cat([y_sucess, y_fail], dim=0).numpy()
 
-    del model, iamge, label
+    del model, image, label
     gc.collect()
 
     return X_wm, y_wm
