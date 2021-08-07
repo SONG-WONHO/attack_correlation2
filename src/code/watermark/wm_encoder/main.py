@@ -24,33 +24,48 @@ from watermark.wm_encoder.models.Discriminator import DiscriminatorNet, Discrimi
 from watermark.wm_encoder.models.HidingUNet import UnetGenerator, UnetGenerator_mnist
 
 
-def watermark():
-    parser = argparse.ArgumentParser(
-        description='Pytorch Implement Protection for IP of DNN with CIRAR10')
-    parser.add_argument('--dataset', default='cifar10', help='mnist|cifar10')
-    parser.add_argument('--dataroot', default='./code/watermark/wm_encoder/data/')
-    parser.add_argument('--train', type=bool, default=True)
-    parser.add_argument('--num_epochs', type=int,
-                        default=100)  # 100 for cifar10    30 for mnist
-    parser.add_argument('--batchsize', type=int, default=100)
-    parser.add_argument('--wm_num', nargs='+', default=[500, 600],
-                        # 1% of train dataset, 500 for cifar10, 600 for mnist
-                        help='the number of wm images')
-    parser.add_argument('--wm_batchsize', type=int, default=20,
-                        help='the wm batch size')
-    parser.add_argument('--lr', nargs='+',
-                        default=[0.001, 0.1])  # 0.001 for adam    0.1 for sgd
-    parser.add_argument('--hyper-parameters', nargs='+', default=[3, 5, 1, 0.1])
-    parser.add_argument('--save_path', type=str, default='./results/')
-    parser.add_argument('--seed', default=32, type=int,
-                        help='seed for initializing training.')
-    parser.add_argument('--pretrained', type=bool,
-                        default=False, help='use pre-trained model')
-    parser.add_argument('--wm_train', type=bool, default=True,
-                        help='whther to watermark  pre-trained model')
-    parser.add_argument('--wm-type')
-    parser.add_argument('--arch')
-    args = parser.parse_args()
+def watermark(config):
+    class args:
+        dataset = config.dataset
+        dataroot = "./code/watermark/wm_encoder/data/"
+        train = True
+        num_epochs = config.num_epochs
+        batchsize = 100
+        wm_num = [500, 600]
+        wm_batchsize = 20
+        lr = [config.learning_rate, config.learning_rate]
+        hyper_parameters = [3, 5, 1, 0.1]
+        save_path = "./results/"
+        seed = config.seed
+        pretrained = False
+        wm_train = True
+
+    # parser = argparse.ArgumentParser(
+    #     description='Pytorch Implement Protection for IP of DNN with CIRAR10')
+    # parser.add_argument('--dataset', default='cifar10', help='mnist|cifar10')
+    # parser.add_argument('--dataroot', default='./code/watermark/wm_encoder/data/')
+    # parser.add_argument('--train', type=bool, default=True)
+    # parser.add_argument('--num_epochs', type=int,
+    #                     default=100)  # 100 for cifar10    30 for mnist
+    # parser.add_argument('--batchsize', type=int, default=100)
+    # parser.add_argument('--wm_num', nargs='+', default=[500, 600],
+    #                     # 1% of train dataset, 500 for cifar10, 600 for mnist
+    #                     help='the number of wm images')
+    # parser.add_argument('--wm_batchsize', type=int, default=20,
+    #                     help='the wm batch size')
+    # parser.add_argument('--lr', nargs='+',
+    #                     default=[0.001, 0.1])  # 0.001 for adam    0.1 for sgd
+    # parser.add_argument('--hyper-parameters', nargs='+', default=[3, 5, 1, 0.1])
+    # parser.add_argument('--save_path', type=str, default='./results/')
+    # parser.add_argument('--seed', default=32, type=int,
+    #                     help='seed for initializing training.')
+    # parser.add_argument('--pretrained', type=bool,
+    #                     default=False, help='use pre-trained model')
+    # parser.add_argument('--wm_train', type=bool, default=True,
+    #                     help='whther to watermark  pre-trained model')
+    # parser.add_argument('--wm-type')
+    # parser.add_argument('--arch')
+    # args = parser.parse_args()
 
     if torch.cuda.is_available():
         cudnn.benchmark = True
