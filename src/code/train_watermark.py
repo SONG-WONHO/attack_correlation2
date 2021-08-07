@@ -163,6 +163,7 @@ def main():
 
     elif CFG.wm_type == "encoder":
         watermark(CFG, log)
+        return
     elif CFG.wm_type == "deepsigns":
         return
 
