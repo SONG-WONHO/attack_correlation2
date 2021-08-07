@@ -169,7 +169,7 @@ def wm_adv(config, X, y):
 
     while True:
         X_adv = fast_gradient_method(
-            model, image, CFG.const, np.inf,
+            model, image, const, np.inf,
             y=label, targeted=False)
 
         print(X_adv.shape)
