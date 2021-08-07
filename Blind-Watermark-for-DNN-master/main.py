@@ -217,8 +217,6 @@ elif args.dataset == 'mnist':
         secret_img = logo.expand(args.wm_batchsize, logo.shape[1], logo.shape[2], logo.shape[3]).cuda()
         break
 
-    print(secret_img.shape)
-
 elif args.dataset == 'tiny':
     transform_train = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
@@ -339,7 +337,9 @@ def train(epoch):
         wm_cover_label = wm_cover_labels[(wm_idx + batch_idx) % len(wm_inputs)]
         #############Discriminator##############
         optimizerD.zero_grad()
+        print(wm_input.shape, secret_img.shape)
         wm_img = Hidnet(wm_input, secret_img)
+        print(wm_img.shape)
         wm_dis_output = Disnet(wm_img.detach())
         real_dis_output = Disnet(wm_input)
         loss_D_wm = criterionD(wm_dis_output, fake)
