@@ -125,12 +125,12 @@ def get_dataset(config):
     (X_train, y_train), (X_test, y_test) = dataset.load_data()
 
     if config.dataset == "mnist":
-        # X_train = X_train.reshape(*X_train.shape, 1)
-        # X_test = X_test.reshape(*X_test.shape, 1)
-        #
-        # X_train = np.concatenate([X_train, X_train, X_train], axis=-1)
-        # X_test = np.concatenate([X_test, X_test, X_test], axis=-1)
-        #
+        X_train = X_train.reshape(*X_train.shape, 1)
+        X_test = X_test.reshape(*X_test.shape, 1)
+
+        X_train = np.concatenate([X_train, X_train, X_train], axis=-1)
+        X_test = np.concatenate([X_test, X_test, X_test], axis=-1)
+
         X_temp = []
         for X in X_train:
             X_temp.append(cv2.resize(X, (32, 32)))

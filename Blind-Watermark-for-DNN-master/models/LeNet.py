@@ -47,8 +47,8 @@ class LeNet5(nn.Module):
         super(LeNet5, self).__init__()
         self.conv1 = nn.Conv2d(1,6, kernel_size=5, stride=1, padding=2)
         self.conv2 = nn.Conv2d(6, 16, kernel_size=5, stride=1, padding=2)
-        self.fc1 = nn.Linear(1024, 120)
-        self.fc2 = nn.Linear(120, 84)
+        self.fc1 = nn.Linear(1024*3, 256)
+        self.fc2 = nn.Linear(256, 84)
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
@@ -59,7 +59,7 @@ class LeNet5(nn.Module):
         layer3 = F.max_pool2d(layer2, 2)
         print(layer3.shape)
 
-        layer_ = layer3.view(-1, 1024)
+        layer_ = layer3.view(-1, 1024*3)
         layer4 = F.relu(self.fc1(layer_))
         layer5 = F.relu(self.fc2(layer4))
         layer6 = self.fc3(layer5)
