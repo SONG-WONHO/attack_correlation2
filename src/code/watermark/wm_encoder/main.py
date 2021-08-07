@@ -48,7 +48,7 @@ def watermark():
                         default=False, help='use pre-trained model')
     parser.add_argument('--wm_train', type=bool, default=True,
                         help='whther to watermark  pre-trained model')
-    parser.add_argument('--wm_type')
+    parser.add_argument('--wm-type')
     parser.add_argument('--arch')
     args = parser.parse_args()
 
