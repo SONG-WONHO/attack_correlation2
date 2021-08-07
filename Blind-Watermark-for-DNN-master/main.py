@@ -19,7 +19,7 @@ def SpecifiedLabel(OriginalLabel):
     targetlabel = targetlabel % 10
     return targetlabel
 '''
-GPU ='4,5'
+GPU ='0,1,2,3'
 os.environ['CUDA_VISIBLE_DEVICES'] =GPU
 parser = argparse.ArgumentParser(
     description='Pytorch Implement Protection for IP of DNN with CIRAR10')
