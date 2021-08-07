@@ -11,6 +11,10 @@ def get_watermark_dataset(config, X_train, y_train, X_test, y_test):
 
     if config.wm_type == "content":
         X_wm, y_wm = wm_content(X_train, y_train)
+    if config.wm_type == "noise":
+        X_wm, y_wm = wm_noise(confing, X_train, y_train)
+    if config.wm_type == "unrelate":
+        X_wm, y_wm = wm_unrelate(X_train, y_train)
 
     print(y_wm[:10], y_wm[-10:])
     return X_wm, y_wm, X_wm, y_wm
@@ -46,3 +50,33 @@ def wm_content(X, y):
     y_wm = np.array(y_wm)
 
     return X_wm, y_wm
+
+
+def wm_noise(config, X, y):
+
+    X_wm, y_wm = [], []
+
+    np.random.seed(config.seed)
+    noise = np.random.normal(0, 20, size=X_wm.shape)
+    print(noise.shape, X[0].shape)
+    return
+
+    for img, label in zip(X, y):
+        if label != 1:
+            continue
+
+        # if label == 1
+        img = deepcopy(img)
+        img = img + nose
+
+        X_wm.append(img)
+        y_wm.append(0)
+
+    X_wm = np.stack(X_wm, axis=0)
+    y_wm = np.array(y_wm)
+
+    return X_wm, y_wm
+
+
+def wm_unrelate(X, y):
+    pass
