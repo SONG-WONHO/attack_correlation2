@@ -3,8 +3,11 @@ from copy import deepcopy
 
 from PIL import Image
 import numpy as np
+import torch
 
 from data import get_dataset
+from models.lenet import LeNet5
+from models.resnet import *
 
 
 def get_watermark_dataset(config, X_train, y_train, X_test, y_test):
@@ -22,6 +25,8 @@ def get_watermark_dataset(config, X_train, y_train, X_test, y_test):
         X_wm, y_wm = wm_unrelate(config)
     if config.wm_type == "abstract":
         X_wm, y_wm = wm_abstract(config, X_train.shape[1:3])
+    elif config.wm_type == "adv":
+        X_wm, y_wm = wm_adv(config, X_train, y_train)
 
     print(y_wm[:10], y_wm[-10:])
     return X_wm, y_wm, X_wm, y_wm
@@ -130,5 +135,61 @@ def wm_abstract(config, shape):
 
     X_wm = np.stack(X_wm, axis=0)
     y_wm = np.array(y_wm)
+
+    return X_wm, y_wm
+
+
+def wm_adv(config, X, y):
+    X_wm, y_wm = [], []
+
+    # 1) load models
+    model = None
+    if config.arch == "lenet5":
+        model = LeNet5(config.num_classes)
+    elif config.arch == "resnet18":
+        model = ResNet18(config.num_classes)
+    elif config.arch == "resnet34":
+        model = ResNet34(config.num_classes)
+    elif config.arch == "resnet50":
+        model = ResNet50(config.num_classes)
+    model.load_state_dict(torch.load(config.pretrained_path)['state_dict'])
+    model.to(config.device)
+
+    # 2) fgsm attack, assert success >= 50 and fail >= 50
+    const = 0.25
+    X, y = X[-500:].copy(), y[-500:].copy()
+    print(X.shape, y.shape)
+
+    image = [get_transform(config)[1](image=sample)['image'].unsqueeze(0) for
+             sample in X]
+    image = torch.cat(image).to(config.device)
+    label = torch.LongTensor(y).view(-1).to(config.device)
+    print(image.shape, label.shape)
+    return
+
+    while True:
+
+        # success >= 50, fail >= 50
+        if True:
+            break
+
+        else:
+
+            # fail < 50
+            if True:
+                const = const / 2
+            # success < 50
+            else:
+                const = const * 2
+
+        if const < 1e-4 or const > 1e4:
+            assert False, f"Const: {const}, Needs dense const value."
+
+
+    # 3) select sucess 50
+
+    # 4) select fail 50
+
+    # 5) assign true labels
 
     return X_wm, y_wm
