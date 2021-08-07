@@ -124,22 +124,22 @@ def get_dataset(config):
 
     (X_train, y_train), (X_test, y_test) = dataset.load_data()
 
-    # if config.dataset == "mnist":
+    if config.dataset == "mnist":
         # X_train = X_train.reshape(*X_train.shape, 1)
         # X_test = X_test.reshape(*X_test.shape, 1)
         #
         # X_train = np.concatenate([X_train, X_train, X_train], axis=-1)
         # X_test = np.concatenate([X_test, X_test, X_test], axis=-1)
         #
-        # X_temp = []
-        # for X in X_train:
-        #     X_temp.append(cv2.resize(X, (32, 32)))
-        # X_train = np.stack(X_temp)
-        #
-        # X_temp = []
-        # for X in X_test:
-        #     X_temp.append(cv2.resize(X, (32, 32)))
-        # X_test = np.stack(X_temp)
+        X_temp = []
+        for X in X_train:
+            X_temp.append(cv2.resize(X, (32, 32)))
+        X_train = np.stack(X_temp)
+
+        X_temp = []
+        for X in X_test:
+            X_temp.append(cv2.resize(X, (32, 32)))
+        X_test = np.stack(X_temp)
 
     if len(y_train.shape) == 2:
         if y_train.shape[1] == 1:
