@@ -52,11 +52,12 @@ class LeNet5(nn.Module):
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
-
+        print(x.shape)
         layer0 = F.relu(self.conv1(x))
         layer1 = F.max_pool2d(layer0, 2)
         layer2 = F.relu(self.conv2(layer1))
         layer3 = F.max_pool2d(layer2, 2)
+        print(layer3)
 
         layer_ = layer3.view(-1, 784)
         layer4 = F.relu(self.fc1(layer_))
