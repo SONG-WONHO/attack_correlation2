@@ -300,7 +300,7 @@ elif args.dataset == 'tiny':
 if args.dataset == "mnist":
     Dnnet = LeNet5()
 else:
-    Dnnet = ResNet18()
+    Dnnet = ResNet18(10 if args.dataset == "cifar10" else 40)
 
 Hidnet = nn.DataParallel(Hidnet.cuda())
 Disnet = nn.DataParallel(Disnet.cuda())
