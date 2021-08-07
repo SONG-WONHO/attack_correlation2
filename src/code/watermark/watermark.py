@@ -31,7 +31,7 @@ def wm_content(config, X, y):
         img = deepcopy(img)
 
         for p in px:
-            print(img[int(p / img.shape[0])][int(p % img.shape[0])])
+            print(type(img[int(p / img.shape[0])][int(p % img.shape[0])]))
             return
 
 
