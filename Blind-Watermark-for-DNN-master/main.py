@@ -338,6 +338,7 @@ def train(epoch):
         #############Discriminator##############
         optimizerD.zero_grad()
         wm_img = Hidnet(wm_input, secret_img)
+        print(wm_img.detach().shape)
         wm_dis_output = Disnet(wm_img.detach())
         real_dis_output = Disnet(wm_input)
         loss_D_wm = criterionD(wm_dis_output, fake)
