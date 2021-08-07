@@ -12,7 +12,7 @@ def get_watermark_dataset(config, X_train, y_train, X_test, y_test):
     if config.wm_type == "content":
         X_wm, y_wm = wm_content(X_train, y_train)
     if config.wm_type == "noise":
-        X_wm, y_wm = wm_noise(confing, X_train, y_train)
+        X_wm, y_wm = wm_noise(config, X_train, y_train)
     if config.wm_type == "unrelate":
         X_wm, y_wm = wm_unrelate(X_train, y_train)
 
