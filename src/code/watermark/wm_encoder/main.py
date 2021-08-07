@@ -97,19 +97,51 @@ def watermark(config, log):
 
     # get transform
     log.write("Get Transform")
-    train_transform, test_transform = get_transform(config)
+    transform_train, transform_test = get_transform(config)
     log.write()
 
     # dataset
     log.write("Get Dataset")
-    trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
-    val_dataset = ACDataset(X_test, y_test, transform=test_transform)
-    log.write(f"- Shape: {trn_dataset[0][0].shape}")
+    trainset = ACDataset(X_train, y_train, transform=transform_train)
+    testset = ACDataset(X_test, y_test, transform=transform_test)
+    trigger_set = ACDataset(X_train, y_train, transform=transform_test)
+    log.write(f"- Shape: {trainset[0][0].shape}")
     log.write(
-        f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
+        f"- Max Value: {trainset[0][0].max():.4f}, {testset[0][0].max():.4f}, {trigger_set[0][0].max():.4f}")
     log.write()
-    return
 
+    trainloader = torch.utils.data.DataLoader(
+        trainset, batch_size=args.batchsize, shuffle=True, num_workers=2,
+        drop_last=True)
+    testloader = torch.utils.data.DataLoader(
+        testset, batch_size=args.batchsize, shuffle=False, num_workers=2,
+        drop_last=True)
+    trigger_loader = torch.utils.data.DataLoader(
+        trigger_set, batch_size=args.wm_batchsize, shuffle=False, num_workers=2,
+        drop_last=True)
+
+    # logo related
+    if args.dataset == "mnist":
+        for _, (logo, l) in enumerate(testloader):
+            for k in range(args.batchsize):
+                if l[k].cpu().numpy() == 1:
+                    logo = logo[k:k + 1]
+                    break
+            secret_img = logo.expand(args.wm_batchsize, logo.shape[1],
+                                     logo.shape[2], logo.shape[3]).cuda()
+            break
+
+    else:
+        ieee_logo = torchvision.datasets.ImageFolder(
+            root=args.dataroot + '/IEEE', transform=transform_test)
+        ieee_loader = torch.utils.data.DataLoader(ieee_logo, batch_size=1)
+        for _, (logo, __) in enumerate(ieee_loader):
+            secret_img = logo.expand(
+                args.wm_batchsize, logo.shape[1], logo.shape[2],
+                logo.shape[3]).cuda()
+    log.write(f"- Logo shape: {secret_img.shape}")
+
+    return
     if args.dataset == 'cifar10':
         transform_train = transforms.Compose([
             transforms.RandomCrop(32, padding=4),
