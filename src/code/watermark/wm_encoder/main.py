@@ -28,7 +28,7 @@ def watermark():
     parser = argparse.ArgumentParser(
         description='Pytorch Implement Protection for IP of DNN with CIRAR10')
     parser.add_argument('--dataset', default='cifar10', help='mnist|cifar10')
-    parser.add_argument('--dataroot', default='./data/')
+    parser.add_argument('--dataroot', default='./code/watermark/wm_encoder/data/')
     parser.add_argument('--train', type=bool, default=True)
     parser.add_argument('--num_epochs', type=int,
                         default=100)  # 100 for cifar10    30 for mnist
