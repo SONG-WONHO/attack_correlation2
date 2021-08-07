@@ -148,8 +148,6 @@ def main():
         {k: v for k, v in dict(CFG.__dict__).items() if '__' not in k},
         open(os.path.join(CFG.log_path, 'CFG.json'), "w"))
 
-    return
-
     ### seed all
     seed_everything(CFG.seed)
 
@@ -164,6 +162,8 @@ def main():
     log.write(f"- Train Shape Info: {X_train.shape, y_train.shape}")
     log.write(f"- Test Shape Info: {X_test.shape, y_test.shape}")
     log.write()
+
+    return
 
     # load backdoor data
     log.write("Load Backdoor Data")
