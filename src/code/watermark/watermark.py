@@ -159,7 +159,8 @@ def wm_adv(config, X, y):
 
     # 2) fgsm attack, assert success >= 50 and fail >= 50
     const = 0.25
-    X, y = X[-500:].copy(), y[-500:].copy()
+    num_cand = 500
+    X, y = X[-num_cand:].copy(), y[-num_cand:].copy()
     print(X.shape, y.shape)
 
     image = [get_transform(config)[1](image=sample)['image'].unsqueeze(0) for
@@ -180,7 +181,9 @@ def wm_adv(config, X, y):
 
         logit = label == pred
 
-        print(logit.sum().item())
+        num_fail = logit.sum().item()
+        num_success = num_cand - logit.sum().item()
+        print(num_fail, num_success)
 
         # success >= 50, fail >= 50
         if True:
