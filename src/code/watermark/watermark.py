@@ -114,15 +114,21 @@ def wm_unrelate(config):
 
 
 def wm_abstract(config, shape):
-    print(shape)
     X_wm, y_wm = [], []
 
     path = "./datasets/watermark/abstract"
     fns = [os.path.join(path, p) for p in sorted(os.listdir(path))]
 
+    np.random.seed(config.seed)
+
     for fn in fns:
         img = Image.open(fn)
         img = np.asarray(img.resize(shape))
-        print(img.shape)
-    return
+
+        X_wm.append(img)
+        y_wm.append(np.random.randint(config.num_classes))
+
+    X_wm = np.stack(X_wm, axis=0)
+    y_wm = np.array(y_wm)
+
     return X_wm, y_wm
