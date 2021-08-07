@@ -131,7 +131,6 @@ def get_dataset(config):
         # X_train = np.concatenate([X_train, X_train, X_train], axis=-1)
         # X_test = np.concatenate([X_test, X_test, X_test], axis=-1)
         #
-        X_temp = []
         # X_temp = []
         # for X in X_train:
         #     X_temp.append(cv2.resize(X, (32, 32)))
