@@ -171,7 +171,6 @@ def main():
         CFG, X_train, y_train, X_test, y_test)
     log.write(f"- Watermark Tr Shape: {X_wm_tr.shape, y_wm_tr.shape}")
     log.write(f"- Watermark Te Shape: {X_wm_te.shape, y_wm_te.shape}")
-    return
 
     # get transform
     log.write("Get Transform")
@@ -179,41 +178,22 @@ def main():
     log.write()
 
     # dataset
-    if CFG.dataset != "tiny":
-        log.write("Get Dataset")
-        trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
-        val_dataset = ACDataset(X_test, y_test, transform=test_transform)
-        log.write(f"- Shape: {trn_dataset[0][0].shape}")
-        log.write(
-            f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
-        log.write()
+    log.write("Get Dataset")
+    trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
+    val_dataset = ACDataset(X_test, y_test, transform=test_transform)
+    log.write(f"- Shape: {trn_dataset[0][0].shape}")
+    log.write(
+        f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
+    log.write()
 
-        log.write("Get Backdoor Dataset")
-        trn_back_dataset = ACDataset(X_back_tr, y_back_tr,
-                                     transform=train_transform)
-        val_back_dataset = ACDataset(X_back_te, y_back_te, transform=test_transform)
-        log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
-        log.write(
-            f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
-        log.write()
-    else:
-        log.write("Get Dataset")
-        trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
-        val_dataset = ACDataset(X_test, y_test, transform=test_transform)
-        log.write(f"- Shape: {trn_dataset[0][0].shape}")
-        log.write(
-            f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
-        log.write()
-
-        log.write("Get Backdoor Dataset")
-        trn_back_dataset = ACDataset(X_back_tr, y_back_tr,
-                                     transform=train_transform)
-        val_back_dataset = ACDataset(X_back_te, y_back_te,
-                                     transform=test_transform)
-        log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
-        log.write(
-            f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
-        log.write()
+    log.write("Get Watermark Dataset")
+    trn_wm_dataset = ACDataset(X_wm_tr, y_wm_tr, transform=test_transform)
+    val_wm_dataset = ACDataset(X_wm_te, y_wm_te, transform=test_transform)
+    log.write(f"- Shape: {trn_wm_dataset[0][0].shape}")
+    log.write(
+        f"- Max Value: {trn_wm_dataset[0][0].max():.4f}, {val_wm_dataset[0][0].max():.4f}")
+    log.write()
+    return
 
     # loader
     train_loader = DataLoader(
