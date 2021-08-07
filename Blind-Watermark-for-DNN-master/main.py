@@ -217,7 +217,7 @@ elif args.dataset == 'mnist':
         secret_img = logo.expand(args.wm_batchsize, logo.shape[1], logo.shape[2], logo.shape[3]).cuda()
         break
 
-        print(secret_img.shape)
+    print(secret_img.shape)
 
 elif args.dataset == 'tiny':
     transform_train = transforms.Compose([
