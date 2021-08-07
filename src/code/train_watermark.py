@@ -20,6 +20,7 @@ from models.lenet import LeNet5
 from models.resnet import *
 
 from watermark.watermark import get_watermark_dataset
+from watermark.wm_exp.main import watermark
 
 warnings.filterwarnings("ignore")
 
@@ -161,7 +162,7 @@ def main():
         assert CFG.pretrained_path is not None, "Adv needs pretrained models"
 
     elif CFG.wm_tpye == "encoder":
-        return
+        watermark()
     elif CFG.wm_type == "deepsigns":
         return
 
