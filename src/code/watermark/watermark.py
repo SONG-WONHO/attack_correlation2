@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import torch
 
-from data import get_dataset
+from data import get_dataset, get_transform
 from models.lenet import LeNet5
 from models.resnet import *
 
