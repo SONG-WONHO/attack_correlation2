@@ -157,6 +157,11 @@ def main():
     log = Logger()
     log.open(os.path.join(CFG.log_path, "log.txt"))
 
+    if wm_tpye == "encoder":
+        return
+    elif wm_type == "deepsigns":
+        return
+
     ### Data Related Logic
     # load data
     log.write("Load Data")
