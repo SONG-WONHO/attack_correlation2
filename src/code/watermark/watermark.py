@@ -123,7 +123,7 @@ def wm_abstract(config, shape):
 
     for fn in fns:
         img = Image.open(fn)
-        img = np.asarray(img.resize(shape))
+        img = np.asarray(img)
 
         X_wm.append(img)
         print(img.shape)
