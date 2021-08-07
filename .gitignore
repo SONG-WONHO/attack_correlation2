@@ -8,7 +8,6 @@ src/temp/
 .DS_Store
 sh.*.out
 src/temp.sh
-src/code/watermark/wm_encoder/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
