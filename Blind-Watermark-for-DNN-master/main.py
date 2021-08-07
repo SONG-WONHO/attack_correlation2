@@ -513,7 +513,7 @@ def test(epoch):
 
         torch.save({
             "state_dict": Dnnet.cpu().state_dict(),
-        }, f"{os.path.join(args.save_path, checkpiont, f'model.last.pt')}")
+        }, f"{os.path.join(args.save_path, 'checkpiont', 'model.last.pt')}")
         model.to(CFG.device)
 
         best_real_acc = real_acc
