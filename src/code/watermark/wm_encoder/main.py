@@ -87,6 +87,7 @@ def watermark(config, log):
         os.makedirs(args.save_path + 'checkpiont', exist_ok=True)
         os.makedirs(args.save_path + 'models', exist_ok=True)
 
+    """
     ### Data Related Logic
     # load data
     log.write("Load Data")
@@ -142,6 +143,7 @@ def watermark(config, log):
     log.write(f"- Logo shape: {secret_img.shape}")
 
     return
+    """
     if args.dataset == 'cifar10':
         transform_train = transforms.Compose([
             transforms.RandomCrop(32, padding=4),
@@ -177,6 +179,7 @@ def watermark(config, log):
             root=args.dataroot + '/IEEE', transform=transform_test)
         ieee_loader = torch.utils.data.DataLoader(ieee_logo, batch_size=1)
         for _, (logo, __) in enumerate(ieee_loader):
+            print(logo.shape)
             secret_img = logo.expand(
                 args.wm_batchsize, logo.shape[1], logo.shape[2],
                 logo.shape[3]).cuda()
