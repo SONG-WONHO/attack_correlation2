@@ -357,7 +357,7 @@ def main():
                         is_debug=False, learning_rate=0.05)
                 elif CFG.dataset == "tiny":
                     image_t = spsa(
-                        model, image[i * sz:(i + 1) * sz], CFG.const, 10,
+                        model, image[i * sz:(i + 1) * sz], CFG.const, 20,
                         y=y[i * sz:(i + 1) * sz], targeted=CFG.targeted,
                         is_debug=False, learning_rate=0.05)
 
