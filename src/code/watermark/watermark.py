@@ -88,7 +88,7 @@ def wm_unrelate(config, X, y):
             "cifar10": "mnist",
             "imagenet": "mnist"}[config.dataset]
 
-    X_ref, y_ref, _, _ = get_dataset(CFG.dataset)
+    X_ref, y_ref, _, _ = get_dataset(CFG)
 
     print(X_ref.shape, y_ref.shape)
     return
