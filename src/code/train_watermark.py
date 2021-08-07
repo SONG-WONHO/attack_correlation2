@@ -193,11 +193,10 @@ def main():
     log.write(
         f"- Max Value: {trn_wm_dataset[0][0].max():.4f}, {val_wm_dataset[0][0].max():.4f}")
     log.write()
-    return
 
     # loader
     train_loader = DataLoader(
-        trn_dataset + trn_back_dataset,
+        trn_dataset,
         batch_size=CFG.batch_size,
         shuffle=True,
         num_workers=CFG.worker)
@@ -206,8 +205,13 @@ def main():
         batch_size=CFG.batch_size,
         shuffle=False,
         num_workers=CFG.worker)
-    valid_back_loader = DataLoader(
-        val_back_dataset,
+    train_wm_loader = DataLoader(
+        trn_wm_dataset,
+        batch_size=CFG.wm_batch_size,
+        shuffle=True,
+        num_workers=CFG.worker)
+    valid_wm_loader = DataLoader(
+        val_wm_dataset,
         batch_size=CFG.batch_size,
         shuffle=False,
         num_workers=CFG.worker)
@@ -226,6 +230,10 @@ def main():
     elif CFG.arch == "resnet50":
         model = ResNet50(CFG.num_classes)
     log.write(f"- Number of Parameters: {count_parameters(model)}")
+
+    if CFG.pretrained_path:
+        model.load_state_dict(torch.load(CFG.pretrained_path)['state_dict'])
+
     model.to(CFG.device)
     log.write()
 
@@ -254,6 +262,8 @@ def main():
     log.write()
 
     # es = EarlyStopping(mode="max", patience=10)
+
+    return
 
     ### Train Related
     start = timer()
