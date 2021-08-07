@@ -19,6 +19,8 @@ from utils import *
 from models.lenet import LeNet5
 from models.resnet import *
 
+from watermark.watermark import get_watermark_dataset
+
 warnings.filterwarnings("ignore")
 
 
@@ -163,14 +165,13 @@ def main():
     log.write(f"- Test Shape Info: {X_test.shape, y_test.shape}")
     log.write()
 
-    return
-
-    # load backdoor data
-    log.write("Load Backdoor Data")
-    X_back_tr, y_back_tr, X_back_te, y_back_te = get_backdoor_dataset(
+    # load watermark data
+    log.write("Load Watermark Data")
+    X_wm_tr, y_wm_tr, X_wm_te, y_wm_te = get_watermark_dataset(
         CFG, X_train, y_train, X_test, y_test)
-    log.write(f"- Backdoor Tr Shape: {X_back_tr.shape, y_back_tr.shape}")
-    log.write(f"- Backdoor Te Shape: {X_back_te.shape, y_back_te.shape}")
+    log.write(f"- Watermark Tr Shape: {X_wm_tr.shape, y_wm_tr.shape}")
+    log.write(f"- Watermark Te Shape: {X_wm_te.shape, y_wm_te.shape}")
+    return
 
     # get transform
     log.write("Get Transform")
