@@ -75,7 +75,7 @@ class ACDataset(torch.utils.data.Dataset):
         return len(self.x)
 
     def __getitem__(self, idx):
-        img = self.x[idx]
+        img = Image.fromarray(self.x[idx])
         label = self.y[idx]
 
         if self.transform:
