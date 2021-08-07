@@ -26,7 +26,7 @@ parser.add_argument('--batchsize', type=int, default=100)
 parser.add_argument('--wm_num', nargs='+', default=[500, 600, 200],  # 1% of train dataset, 500 for cifar10, 600 for mnist
                         help='the number of wm images')
 parser.add_argument('--wm_batchsize', type=int, default=20, help='the wm batch size')
-parser.add_argument('--lr', nargs='+', default=[0.001, 0.1, 0.001]) # 0.001 for adam    0.1 for sgd
+parser.add_argument('--lr', nargs='+', default=[0.001, 0.1]) # 0.001 for adam    0.1 for sgd
 parser.add_argument('--hyper-parameters',  nargs='+', default=[3, 5, 1, 0.1])
 parser.add_argument('--save_path', type=str, default='./results/')
 parser.add_argument('--seed', default=32, type=int,
@@ -226,7 +226,6 @@ elif args.dataset == 'tiny':
             args.wm_batchsize, logo.shape[1], logo.shape[2], logo.shape[3]).cuda()
 
 print(trainset[0][0].max(), testset[0][0].max(), trigger_set[0][0].max(), secret_img.max())
-assert False
 # get the watermark-cover images foe each batch
 wm_inputs, wm_cover_labels = [], []
 #wm_labels = []
@@ -241,6 +240,8 @@ if args.wm_train:
             break
         elif args.dataset == 'mnist' and wm_idx == (int(args.wm_num[1]/args.wm_batchsize)-1):
             break
+        elif args.dataset == 'tiny' and wm_idx == (int(args.wm_num[2]/args.wm_batchsize)-1):
+            break
 # Adversarial ground truths
 
 valid = torch.cuda.FloatTensor(args.wm_batchsize, 1).fill_(1.0)
@@ -251,6 +252,9 @@ if args.dataset == 'cifar10':
 elif args.dataset == 'mnist':
     np_labels = np.random.randint(
         10, size=(int(args.wm_num[1]/args.wm_batchsize), args.wm_batchsize))
+elif args.dataset == 'tiny':
+    np_labels = np.random.randint(
+        40, size=(int(args.wm_num[2]/args.wm_batchsize), args.wm_batchsize))
 wm_labels = torch.from_numpy(np_labels).cuda()
 
 #wm_labels = SpecifiedLabel()
@@ -267,15 +271,14 @@ if args.dataset == 'mnist':
 elif args.dataset == 'cifar10':
     Hidnet = UnetGenerator()
     Disnet = DiscriminatorNet()
+elif args.dataset == 'tiny':
+    Hidnet = UnetGenerator()
+    Disnet = DiscriminatorNet()
 
-#Dnnet = LeNet5()
-Dnnet = VGG('VGG19')
-#Dnnet = ResNet101()
-#Dnnet = PreActResNet18()
-#Dnnet = GoogLeNet()
-#Dnnet = MobileNetV2()
-#Dnnet = DPN26()
-
+if args.dataset == "mnist":
+    Dnnet = LeNet5()
+else:
+    Dnnet = ResNet18()
 
 Hidnet = nn.DataParallel(Hidnet.cuda())
 Disnet = nn.DataParallel(Disnet.cuda())
