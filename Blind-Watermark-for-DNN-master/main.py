@@ -62,7 +62,7 @@ from models.Discriminator import DiscriminatorNet, DiscriminatorNet_mnist
 from models.HidingUNet import UnetGenerator, UnetGenerator_mnist
 
 
-class ACDataset(Dataset):
+class ACDataset(torch.utils.data.Dataset):
     """ Attack Correlation Dataset (ACDataset)
     """
 
