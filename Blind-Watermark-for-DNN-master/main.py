@@ -92,8 +92,6 @@ if args.dataset == 'cifar10':
         root=args.dataroot, train=True, download=True, transform=transform_test)
     trigger_loader = torch.utils.data.DataLoader(
         trigger_set, batch_size=args.wm_batchsize, shuffle=False, num_workers=2, drop_last=True)
-    print(trainset[0][0].max(), testset[0][0].max(), trigger_set[0][0].max())
-
     # load logo
     ieee_logo = torchvision.datasets.ImageFolder(
         root=args.dataroot+'/IEEE', transform=transform_test)
@@ -101,8 +99,7 @@ if args.dataset == 'cifar10':
     for _, (logo, __) in enumerate(ieee_loader):
         secret_img = logo.expand(
             args.wm_batchsize, logo.shape[1], logo.shape[2], logo.shape[3]).cuda()
-    print(secret_img.shape)
-    assert False
+
 elif args.dataset == 'mnist':
     transform = transforms.Compose([
     transforms.ToTensor(),
@@ -130,6 +127,8 @@ elif args.dataset == 'mnist':
         secret_img = logo.expand(args.wm_batchsize, logo.shape[1], logo.shape[2], logo.shape[3]).cuda()
         break
 
+print(trainset[0][0].max(), testset[0][0].max(), trigger_set[0][0].max(), secret_img.max())
+assert False
 # get the watermark-cover images foe each batch
 wm_inputs, wm_cover_labels = [], []
 #wm_labels = []
