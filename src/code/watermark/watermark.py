@@ -1,4 +1,5 @@
 import os
+import gc
 from copy import deepcopy
 
 from PIL import Image
@@ -141,8 +142,6 @@ def wm_abstract(config, shape):
 
 
 def wm_adv(config, X, y):
-    X_wm, y_wm = [], []
-
     # 1) load models
     model = None
     if config.arch == "lenet5":
@@ -179,7 +178,7 @@ def wm_adv(config, X, y):
         logit = label == pred
         num_fail = logit.sum().item()
         num_success = num_cand - logit.sum().item()
-        print(f"Num sucess: {num_success}, Num fail: {num_fail}")
+        print(f"- Num sucess: {num_success}, Num fail: {num_fail}")
 
         # success >= 50, fail >= 50
         if num_fail >= 50 and num_success >= 50:
@@ -206,10 +205,10 @@ def wm_adv(config, X, y):
     X_fail = image[logit].cpu()[:50].permute(0, 2, 3, 1)
     y_fail = label[logit].cpu()[:50]
 
-    print(X_success.shape, y_sucess.shape, X_fail.shape, y_fail.shape)
+    X_wm = torch.cat([X_success, X_fail], dim=0).numpy()
+    y_wm = torch.cat([y_sucess, y_fail], dim=0).numpy()
 
-    X_wm = torch.cat([X_success, X_fail], dim=0)
-    y_wm = torch.cat([y_sucess, y_fail], dim=0)
-    print(X_wm.shape, y_wm.shape)
+    del model, iamge, label
+    gc.collect()
 
     return X_wm, y_wm
