@@ -15,8 +15,8 @@ class UnetGenerator_mnist(nn.Module):
                  norm_layer=nn.BatchNorm2d, use_dropout=False, output_function=nn.Tanh):
         super(UnetGenerator_mnist, self).__init__()
         # construct unet structure
-        self.unet_block_real_img = UnetPre(input_c=1)
-        self.unet_block_sec_img = UnetPre(input_c=1)
+        self.unet_block_real_img = UnetPre(input_c=3)
+        self.unet_block_sec_img = UnetPre(input_c=3)
 
         self.model = nn.Sequential(
             nn.Conv2d(6,ngf, kernel_size=3, stride=1, padding=1,bias=True),
