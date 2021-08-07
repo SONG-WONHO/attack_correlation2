@@ -57,7 +57,7 @@ class LeNet5(nn.Module):
         layer1 = F.max_pool2d(layer0, 2)
         layer2 = F.relu(self.conv2(layer1))
         layer3 = F.max_pool2d(layer2, 2)
-        print(layer3)
+        print(layer3.shape)
 
         layer_ = layer3.view(-1, 784)
         layer4 = F.relu(self.fc1(layer_))
