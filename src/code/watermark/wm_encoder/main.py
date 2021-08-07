@@ -180,10 +180,10 @@ def watermark(config, log):
             root=args.dataroot + '/IEEE', transform=transform_test)
         ieee_loader = torch.utils.data.DataLoader(ieee_logo, batch_size=1)
         for _, (logo, __) in enumerate(ieee_loader):
-            print(logo.shape)
             secret_img = logo.expand(
                 args.wm_batchsize, logo.shape[1], logo.shape[2],
                 logo.shape[3]).cuda()
+        print(secret_img.shape)
     elif args.dataset == 'mnist':
         transform = transforms.Compose([
             transforms.ToTensor(),
