@@ -20,7 +20,7 @@ from models.lenet import LeNet5
 from models.resnet import *
 
 from watermark.watermark import get_watermark_dataset
-from watermark.wm_exp.main import watermark
+from watermark.wm_encoder.main import watermark
 
 warnings.filterwarnings("ignore")
 
