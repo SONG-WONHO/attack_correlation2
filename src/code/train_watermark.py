@@ -91,7 +91,7 @@ def main():
     parser.add_argument('--wm-type',
                         choices=[
                             'content', 'noise', 'unrelate', 'abstract',
-                            'adv', 'encoder, ''deepsigns'
+                            'adv', 'encoder','deepsigns'
                         ],
                         default=CFG.wm_type,
                         help=f"Watermark Alogirithms({CFG.wm_type})")
