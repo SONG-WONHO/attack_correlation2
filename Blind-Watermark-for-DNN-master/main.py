@@ -213,6 +213,7 @@ elif args.dataset == 'mnist':
         for k in range(args.batchsize):
             if l[k].cpu().numpy() == 1:
                 logo = logo[k:k+1]
+                print(logo.shape)
                 break
         secret_img = logo.expand(args.wm_batchsize, logo.shape[1], logo.shape[2], logo.shape[3]).cuda()
         break
@@ -338,7 +339,6 @@ def train(epoch):
         #############Discriminator##############
         optimizerD.zero_grad()
         wm_img = Hidnet(wm_input, secret_img)
-        print(wm_img.detach().shape)
         wm_dis_output = Disnet(wm_img.detach())
         real_dis_output = Disnet(wm_input)
         loss_D_wm = criterionD(wm_dis_output, fake)
