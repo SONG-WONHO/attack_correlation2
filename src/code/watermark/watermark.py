@@ -57,7 +57,7 @@ def wm_noise(config, X, y):
     X_wm, y_wm = [], []
 
     np.random.seed(config.seed)
-    noise = np.random.normal(0, 20, size=X.shape)
+    noise = np.random.normal(0, 20, size=X[0].shape)
     print(noise.shape, X[0].shape)
     return
 
