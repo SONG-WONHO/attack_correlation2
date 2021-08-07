@@ -263,24 +263,23 @@ def main():
 
     # es = EarlyStopping(mode="max", patience=10)
 
-    return
-
     ### Train Related
     start = timer()
     log.write(f'** start training here! **')
-    log.write('rate,epoch,tr_loss,tr_acc,te_loss,te_acc,time')
+    log.write('rate,epoch,tr_loss,tr_acc,te_loss,te_acc,wm_acc,time')
     # cond = 1e-8
     for epoch in range(CFG.num_epochs):
-        tr_loss, tr_acc = train_one_epoch(train_loader, model, optimizer, CFG)
+        tr_loss, tr_acc = train_one_epoch_wm(
+            train_loader, train_wm_loader, model, optimizer, CFG)
         vl_loss, vl_acc = valid_one_epoch(valid_loader, model, CFG)
-        vl_b_loss, vl_b_acc = valid_one_epoch(valid_back_loader, model, CFG)
+        vl_wm_loss, vl_wm_acc = valid_one_epoch(valid_wm_loader, model, CFG)
 
         # logging
-        message = "{:.4f},{},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{}".format(
+        message = "{:.4f},{},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{}".format(
             optimizer.param_groups[0]['lr'], epoch,
             tr_loss, tr_acc,
             vl_loss, vl_acc,
-            vl_b_loss, vl_b_acc,
+            vl_wm_acc,
             time_to_str(timer() - start)
         )
         log.write(message)

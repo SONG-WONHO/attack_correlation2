@@ -233,3 +233,50 @@ def predict_samples(loader, model, config):
 
     return true_final, pred_final
 
+
+def train_one_epoch_wm(loader, wm_loader, model, optimizer, config):
+    # train one epoch with poisoning data
+    losses = AverageMeter()
+    true_final, pred_final = [], []
+
+    model.train()
+    train_iterator = tqdm(loader, leave=False)
+    wm_iterator = iter(wm_loader)
+
+    for X_batch, y_batch in train_iterator:
+        X_batch = X_batch.to(config.device)
+        y_batch = y_batch.to(config.device)
+
+        try:
+            X_wm, y_wm = next(wm_iterator)
+        except StopIteration:
+            wm_iterator = iter(wm_loader)
+            X_wm, y_wm = next(wm_iterator)
+
+        X_wm = X_wm.to(config.device)
+        y_wm = y_wm.to(config.device)
+
+        X_batch = torch.cat([X_batch, X_wm], dim=0)
+        y_batch = torch.cat([y_batch, y_wm], dim=0).type(torch.long)
+
+        batch_size = X_batch.size(0)
+
+        logit, prob = model(X_batch)
+
+        loss = torch.nn.CrossEntropyLoss()(logit, y_batch.view(-1))
+        losses.update(loss.item(), batch_size)
+
+        true_final.append(y_batch[:-X_wm.size(0)].cpu())
+        pred_final.append(prob[:-X_wm.size(0)].detach().cpu())
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        train_iterator.set_description(f"train ce:{losses.avg:.4f}")
+
+    true_final = torch.cat(true_final, dim=0).view(-1).numpy()
+    pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
+    train_acc = ((true_final == pred_final) * 1).mean()
+
+    return losses.avg, train_acc
