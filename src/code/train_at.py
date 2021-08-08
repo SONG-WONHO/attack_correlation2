@@ -259,7 +259,7 @@ def main():
             optimizer, lambda e: 1)
     elif CFG.dataset == "cifar10":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[100, 150], gamma=0.1)
+            optimizer, milestones=[100, 150, 200, 250], gamma=0.5)
     elif CFG.dataset == "cifar100":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
             optimizer, milestones=[80, 120, 160, 180], gamma=0.5)
@@ -268,7 +268,7 @@ def main():
             optimizer, milestones=[10, 20, 30], gamma=0.5)
     elif CFG.dataset == "tiny":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[100, 150], gamma=0.1)
+            optimizer, milestones=[100, 150, 200, 250], gamma=0.5)
     log.write()
 
     ### Train Related
