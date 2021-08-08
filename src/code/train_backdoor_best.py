@@ -206,10 +206,10 @@ def main():
                     "mask_ratio": 2,
                     "size_ratio": 5, },
                 "spsa": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 1,
+                    "class_ratio": 2,
+                    "mask_ratio": 5,
+                    "size_ratio": 2, },
             },
             "targeted-p": {
                 "fgsm": {
@@ -233,10 +233,10 @@ def main():
                     "mask_ratio": 2,
                     "size_ratio": 5, },
                 "spsa": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 8,
+                    "class_ratio": 4,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
             },
             "untargeted": {
                 "fgsm": {
@@ -260,10 +260,10 @@ def main():
                     "mask_ratio": 2,
                     "size_ratio": 5, },
                 "spsa": {
-                    "poison_ratio": 0,
-                    "class_ratio": 0,
-                    "mask_ratio": 0,
-                    "size_ratio": 0, },
+                    "poison_ratio": 9,
+                    "class_ratio": 5,
+                    "mask_ratio": 2,
+                    "size_ratio": 5, },
             },
         },
         "tiny": {
