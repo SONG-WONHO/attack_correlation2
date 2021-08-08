@@ -164,7 +164,7 @@ def wm_adv(config, X, y):
     logit = np.random.permutation(list(range(len(X))))
     X = X[logit]
     y = y[logit]
-    
+
     X, y = X[-num_cand:].copy(), y[-num_cand:].copy()
 
     image = [get_transform(config)[1](image=sample)['image'].unsqueeze(0) for
@@ -206,16 +206,16 @@ def wm_adv(config, X, y):
     # 3) select sucess 50
     X_success = X_adv[torch.logical_not(logit)].detach().cpu()[:50].permute(0, 2, 3, 1)
     y_sucess = label[torch.logical_not(logit)].cpu()[:50]
-
-    print(torch.argmax(model.cpu()(X_adv[torch.logical_not(logit)].cpu())[1], dim=1))
-    print(label[torch.logical_not(logit)].cpu())
+    #
+    # print(torch.argmax(model.cpu()(X_adv[torch.logical_not(logit)].cpu())[1], dim=1))
+    # print(label[torch.logical_not(logit)].cpu())
 
     # 4) select fail 50
     X_fail = X_adv[logit].cpu()[:50].detach().permute(0, 2, 3, 1)
     y_fail = label[logit].cpu()[:50]
-
-    print(torch.argmax(model.cpu()(X_adv[logit].cpu()[:50])[1], dim=1))
-    print(label[logit].cpu()[:50])
+    #
+    # print(torch.argmax(model.cpu()(X_adv[logit].cpu()[:50])[1], dim=1))
+    # print(label[logit].cpu()[:50])
 
     X_wm = torch.cat([X_success, X_fail], dim=0).numpy()
     y_wm = torch.cat([y_sucess, y_fail], dim=0).numpy()
