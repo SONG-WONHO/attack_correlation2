@@ -32,18 +32,18 @@ def watermark(config, log):
     log.write("Load Model")
     log.write(f"- Architecture: {config.arch}")
     model = None
-    if CFG.arch == "lenet5":
+    if config.arch == "lenet5":
         model = LeNet5(config.num_classes)
-    elif CFG.arch == "resnet18":
+    elif config.arch == "resnet18":
         model = ResNet18(config.num_classes)
-    elif CFG.arch == "resnet34":
+    elif config.arch == "resnet34":
         model = ResNet34(config.num_classes)
-    elif CFG.arch == "resnet50":
+    elif config.arch == "resnet50":
         model = ResNet50(config.num_classes)
     log.write(f"- Number of Parameters: {count_parameters(model)}")
 
     model.load_state_dict(torch.load(config.pretrained_path)['state_dict'])
-    model.to(CFG.device)
+    model.to(config.device)
 
     # load optimizer
     log.write("Load Optimizer")
