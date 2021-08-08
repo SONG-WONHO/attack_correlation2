@@ -20,6 +20,7 @@ from models.lenet import LeNet5
 from models.resnet import *
 
 from watermark.watermark import get_watermark_dataset
+from watermark import deepsigns
 
 warnings.filterwarnings("ignore")
 
