@@ -102,7 +102,7 @@ def watermark(config, log):
             shuffle=False,
             num_workers=config.worker)
 
-        for epoch in config.num_epochs:
+        for epoch in range(config.num_epochs):
             tr_loss, tr_acc = train_one_epoch(train_loader, model, optimizer, config)
             vl_loss, vl_acc = valid_one_epoch(valid_loader, model, config)
             wm_loss, wm_acc = valid_one_epoch(wm_loader, model, config)
