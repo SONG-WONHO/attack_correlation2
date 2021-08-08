@@ -13,20 +13,22 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+import numpy as np
 
 from data import *
 from utils import *
 from models.lenet import LeNet5
 from models.resnet import *
 from attacks.backdoor import get_backdoor_dataset
+from attacks.evasion import fast_gradient_method
 
 warnings.filterwarnings("ignore")
 
 
 class CFG:
     # path
-    log_path = './log/attack/poison'
-    model_path = './model/attack/poison'
+    log_path = './log/attack/defense'
+    model_path = './model/attack/defense'
 
     # data
     dataset = "mnist"
@@ -63,6 +65,36 @@ class CFG:
         - CIFAR10: 6,7,8,9,10px
         - IMAGENET: 7,11,15,19,23px
     """
+
+
+class LinfPGDAttack(object):
+    def __init__(self, model, eps=0.3, eps_iter=0.01, iteration=40):
+        self.model = model
+        self.eps = eps
+        self.eps_iter = eps_iter
+        self.iteration = iteration
+
+    def perturb(self, x, y):
+        eta = torch.zeros_like(x).uniform_(-self.eps, self.eps)
+        adv_x = x + eta
+
+        i = 0
+        while i < self.iteration:
+            adv_x = fast_gradient_method(
+                self.model,
+                adv_x,
+                self.eps_iter,
+                np.inf,
+                y=y,
+                targeted=False)
+
+            # Clipping perturbation eta to norm norm ball
+            eta = adv_x - x
+            eta = torch.clamp(eta, -self.eps, self.eps)
+            adv_x = x + eta
+            i += 1
+
+        return adv_x
 
 
 def main():
@@ -115,35 +147,6 @@ def main():
                         help=f"seed({CFG.seed})")
 
     args = parser.parse_args()
-
-    # update default factors
-    if args.dataset == "mnist":
-        if args.poison_ratio is None:
-            args.poison_ratio = 0.01
-        if args.class_ratio is None:
-            args.class_ratio = 0.1
-        if args.mask_ratio is None:
-            args.mask_ratio = 0.05
-        if args.size_ratio is None:
-            args.size_ratio = 8
-    elif args.dataset == "cifar10":
-        if args.poison_ratio is None:
-            args.poison_ratio = 0.01
-        if args.class_ratio is None:
-            args.class_ratio = 0.1
-        if args.mask_ratio is None:
-            args.mask_ratio = 0.05
-        if args.size_ratio is None:
-            args.size_ratio = 6
-    elif args.dataset == "tiny":
-        if args.poison_ratio is None:
-            args.poison_ratio = 0.01
-        if args.class_ratio is None:
-            args.class_ratio = 0.1
-        if args.mask_ratio is None:
-            args.mask_ratio = 0.05
-        if args.size_ratio is None:
-            args.size_ratio = 7
 
     CFG.dataset = args.dataset
     CFG.arch = args.arch
@@ -219,41 +222,22 @@ def main():
     log.write()
 
     # dataset
-    if CFG.dataset != "tiny":
-        log.write("Get Dataset")
-        trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
-        val_dataset = ACDataset(X_test, y_test, transform=test_transform)
-        log.write(f"- Shape: {trn_dataset[0][0].shape}")
-        log.write(
-            f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
-        log.write()
+    log.write("Get Dataset")
+    trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
+    val_dataset = ACDataset(X_test, y_test, transform=test_transform)
+    log.write(f"- Shape: {trn_dataset[0][0].shape}")
+    log.write(
+        f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
+    log.write()
 
-        log.write("Get Backdoor Dataset")
-        trn_back_dataset = ACDataset(X_back_tr, y_back_tr,
-                                     transform=train_transform)
-        val_back_dataset = ACDataset(X_back_te, y_back_te, transform=test_transform)
-        log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
-        log.write(
-            f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
-        log.write()
-    else:
-        log.write("Get Dataset")
-        trn_dataset = ACDataset(X_train, y_train, transform=train_transform)
-        val_dataset = ACDataset(X_test, y_test, transform=test_transform)
-        log.write(f"- Shape: {trn_dataset[0][0].shape}")
-        log.write(
-            f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
-        log.write()
-
-        log.write("Get Backdoor Dataset")
-        trn_back_dataset = ACDataset(X_back_tr, y_back_tr,
-                                     transform=train_transform)
-        val_back_dataset = ACDataset(X_back_te, y_back_te,
-                                     transform=test_transform)
-        log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
-        log.write(
-            f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
-        log.write()
+    log.write("Get Backdoor Dataset")
+    trn_back_dataset = ACDataset(X_back_tr, y_back_tr,
+                                 transform=train_transform)
+    val_back_dataset = ACDataset(X_back_te, y_back_te, transform=test_transform)
+    log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
+    log.write(
+        f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
+    log.write()
 
     # loader
     train_loader = DataLoader(
@@ -263,12 +247,12 @@ def main():
         num_workers=CFG.worker)
     valid_loader = DataLoader(
         val_dataset,
-        batch_size=CFG.batch_size,
+        batch_size=CFG.batch_size*10,
         shuffle=False,
         num_workers=CFG.worker)
     valid_back_loader = DataLoader(
         val_back_dataset,
-        batch_size=CFG.batch_size,
+        batch_size=CFG.batch_size*10,
         shuffle=False,
         num_workers=CFG.worker)
 
@@ -289,6 +273,20 @@ def main():
     model.to(CFG.device)
     log.write()
 
+    # adversary
+    log.write("Create Adversary")
+    if CFG.dataset == "mnist":
+        eps = 0.3
+        eps_iter = 0.01
+        step = 40
+
+    else:
+        eps = 8 / 255
+        eps_iter = 2 / 255
+        step = 7
+    log.write(f"- eps:{eps}, eps_iter:{eps_iter}, step:{step}")
+    adversary = LinfPGDAttack(model, eps, eps_iter, step)
+
     # load optimizer
     log.write("Load Optimizer")
     optimizer = optim.SGD(model.parameters(),
@@ -304,13 +302,16 @@ def main():
             optimizer, lambda e: 1)
     elif CFG.dataset == "cifar10":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[20, 40], gamma=0.5)
+            optimizer, milestones=[100, 150, 200, 250], gamma=0.5)
+    elif CFG.dataset == "cifar100":
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=[80, 120, 160, 180], gamma=0.5)
     elif CFG.dataset == "aptos":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
             optimizer, milestones=[10, 20, 30], gamma=0.5)
     elif CFG.dataset == "tiny":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[30, 50], gamma=0.5)
+            optimizer, milestones=[100, 150, 200, 250], gamma=0.5)
     log.write()
 
     # es = EarlyStopping(mode="max", patience=10)
@@ -318,19 +319,23 @@ def main():
     ### Train Related
     start = timer()
     log.write(f'** start training here! **')
-    log.write('rate,epoch,tr_loss,tr_acc,te_loss,te_acc,time')
+    log.write('rate,epoch,tr_at_loss,tr_at_acc,te_loss,te_acc,te_b_loss,te_b_acc,te_at_loss,te_at_acc,time')
     # cond = 1e-8
     for epoch in range(CFG.num_epochs):
-        tr_loss, tr_acc = train_one_epoch(train_loader, model, optimizer, CFG)
+
+        tr_at_loss, tr_at_acc = train_one_epoch_at(train_loader, model, optimizer, adversary, CFG)
+        # tr_at_loss, tr_at_acc = train_one_epoch(train_loader, model, optimizer, CFG)
         vl_loss, vl_acc = valid_one_epoch(valid_loader, model, CFG)
         vl_b_loss, vl_b_acc = valid_one_epoch(valid_back_loader, model, CFG)
+        vl_at_loss, vl_at_acc = valid_one_epoch_at(valid_loader, model,adversary, CFG)
 
         # logging
-        message = "{:.4f},{},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{}".format(
+        message = "{:.4f},{},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{}".format(
             optimizer.param_groups[0]['lr'], epoch,
-            tr_loss, tr_acc,
+            tr_at_loss, tr_at_acc,
             vl_loss, vl_acc,
             vl_b_loss, vl_b_acc,
+            vl_at_loss, vl_at_acc,
             time_to_str(timer() - start)
         )
         log.write(message)
