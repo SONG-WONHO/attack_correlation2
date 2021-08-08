@@ -74,12 +74,12 @@ def watermark(config, log):
         y_wm = np.random.randint(config.num_classes, size=key_len)
         print(X_wm.shape, y_wm.shape)
 
-        wm_dataset = ACDataset(X_train, y_train, transform=test_transform)
+        wm_dataset = ACDataset(X_wm, y_wm, transform=test_transform)
         print(wm_dataset[0][0].shape, wm_dataset[0][0].max())
 
         wm_loader = DataLoader(
             wm_dataset,
-            batch_size=2,
+            batch_size=64,
             shuffle=False,
             num_workers=0,
             drop_last=False)
