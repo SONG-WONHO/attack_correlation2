@@ -76,14 +76,14 @@ def watermark(config, log):
 
         train_wm_loader = DataLoader(
             wm_dataset,
-            batch_size=8,
+            batch_size=config.wm_batch_size,
             shuffle=False,
             num_workers=0,
             drop_last=False)
 
         valid_wm_loader = DataLoader(
             wm_dataset,
-            batch_size=128,
+            batch_size=config.batch_size,
             shuffle=False,
             num_workers=0,
             drop_last=False)
