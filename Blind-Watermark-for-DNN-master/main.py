@@ -217,7 +217,7 @@ elif args.dataset == 'mnist':
     #     break
     # load logo
     ieee_logo = torchvision.datasets.ImageFolder(
-        root=args.dataroot + '/IEEE', transform=transform_test)
+        root=args.dataroot + '/IEEE', transform=transform)
     ieee_loader = torch.utils.data.DataLoader(ieee_logo, batch_size=1)
     for _, (logo, __) in enumerate(ieee_loader):
         secret_img = logo.expand(
