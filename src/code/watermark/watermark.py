@@ -201,12 +201,15 @@ def wm_adv(config, X, y):
     X_success = image[torch.logical_not(logit)].cpu()[:50].permute(0, 2, 3, 1)
     y_sucess = label[torch.logical_not(logit)].cpu()[:50]
 
+    print(torch.argmax(model.cpu()(image[torch.logical_not(logit)].cpu()[:50])[1], dim=1))
+    print(label[torch.logical_not(logit)].cpu()[:50])
+
     # 4) select fail 50
     X_fail = image[logit].cpu()[:50].permute(0, 2, 3, 1)
     y_fail = label[logit].cpu()[:50]
 
     print(torch.argmax(model.cpu()(image[logit].cpu()[:50])[1], dim=1))
-    print(label[logit].cpu())
+    print(label[logit].cpu()[:50])
     return
     X_wm = torch.cat([X_success, X_fail], dim=0).numpy()
     y_wm = torch.cat([y_sucess, y_fail], dim=0).numpy()
