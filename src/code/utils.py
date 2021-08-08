@@ -310,7 +310,7 @@ def valid_one_epoch_at(loader, model, adversary, config):
 
         batch_size = X_batch.size(0)
 
-        X_batch = adversary.perturb(X_batch, y_batch, y_batch.view(-1))
+        X_batch = adversary.perturb(X_batch, y_batch.view(-1))
 
         with torch.no_grad():
             logit, prob = model(X_batch)
