@@ -207,22 +207,14 @@ elif args.dataset == 'mnist':
     trigger_set = ACDataset(X_train, y_train, transform=transform)
     trigger_loader = torch.utils.data.DataLoader(
         trigger_set, batch_size=args.wm_batchsize, shuffle=False, num_workers=2, drop_last=True)
-    # # load logo
-    # for _, (logo, l) in enumerate(testloader):
-    #     for k in range(args.batchsize):
-    #         if l[k].cpu().numpy() == 1:
-    #             logo = logo[k:k+1]
-    #             break
-    #     secret_img = logo.expand(args.wm_batchsize, logo.shape[1], logo.shape[2], logo.shape[3]).cuda()
-    #     break
     # load logo
-    ieee_logo = torchvision.datasets.ImageFolder(
-        root=args.dataroot + '/IEEE', transform=transform)
-    ieee_loader = torch.utils.data.DataLoader(ieee_logo, batch_size=1)
-    for _, (logo, __) in enumerate(ieee_loader):
-        secret_img = logo.expand(
-            args.wm_batchsize, logo.shape[1], logo.shape[2],
-            logo.shape[3]).cuda()
+    for _, (logo, l) in enumerate(testloader):
+        for k in range(args.batchsize):
+            if l[k].cpu().numpy() == 1:
+                logo = logo[k:k+1]
+                break
+        secret_img = logo.expand(args.wm_batchsize, logo.shape[1], logo.shape[2], logo.shape[3]).cuda()
+        break
 
 elif args.dataset == 'tiny':
     transform_train = transforms.Compose([
