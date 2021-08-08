@@ -195,10 +195,18 @@ def main():
     log.write()
 
     # adversary
+    log.write("Create Adversary")
     if CFG.dataset == "mnist":
-        adversary = LinfPGDAttack(model, 0.3, 0.01, 40)
+        eps = 0.3
+        eps_iter = 0.01
+        step = 40
+
     else:
-        adversary = LinfPGDAttack(model, 8/255, 2/255, 7)
+        eps = 8/255
+        eps_iter = 2/255
+        step = 7
+    log.write(f"- eps:{eps}, eps_iter:{eps_iter}, step:{step}")
+    adversary = LinfPGDAttack(model, eps, eps_iter, step)
 
     # load optimizer
     log.write("Load Optimizer")
