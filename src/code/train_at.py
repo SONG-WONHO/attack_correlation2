@@ -174,7 +174,7 @@ def main():
 
     # loader
     train_loader = DataLoader(trn_dataset, batch_size=CFG.batch_size, shuffle=True, num_workers=CFG.worker)
-    valid_loader = DataLoader(val_dataset, batch_size=CFG.batch_size, shuffle=False, num_workers=CFG.worker)
+    valid_loader = DataLoader(val_dataset, batch_size=CFG.batch_size*10, shuffle=False, num_workers=CFG.worker)
 
     ### Model Related
     # load model
