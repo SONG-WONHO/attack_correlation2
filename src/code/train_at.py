@@ -215,7 +215,7 @@ def main():
     log.write(f"- Architecture: {CFG.arch}")
     model = None
     if CFG.arch == "lenet5":
-        model = LeNetAT(CFG.num_classes)
+        model = LeNet5(CFG.num_classes)
     elif CFG.arch == "resnet18":
         model = ResNet18(CFG.num_classes)
     elif CFG.arch == "resnet34":
@@ -259,7 +259,7 @@ def main():
             optimizer, lambda e: 1)
     elif CFG.dataset == "cifar10":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[40, 80], gamma=0.5)
+            optimizer, milestones=[100, 150], gamma=0.1)
     elif CFG.dataset == "cifar100":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
             optimizer, milestones=[80, 120, 160, 180], gamma=0.5)
@@ -268,7 +268,7 @@ def main():
             optimizer, milestones=[10, 20, 30], gamma=0.5)
     elif CFG.dataset == "tiny":
         scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[60, 80], gamma=0.5)
+            optimizer, milestones=[100, 150], gamma=0.1)
     log.write()
 
     ### Train Related
