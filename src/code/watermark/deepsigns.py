@@ -76,10 +76,16 @@ def watermark(config, log):
         wm_dataset = ACDataset(X_train, y_train, transform=test_transform)
         print(wm_dataset[0][0].shape, wm_dataset[0][0].max())
 
-
-
+        wm_loader = DataLoader(
+            wm_dataset,
+            batch_size=2,
+            shuffle=False,
+            num_workers=0,
+            drop_last=False)
 
         # 2) get mismatched samples
+        y, y_p = predict_samples(wm_loaer, model, config)
+        print((y == y_p).mean())
 
         # 3) finetuing
 
