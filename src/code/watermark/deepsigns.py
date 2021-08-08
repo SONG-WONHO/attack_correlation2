@@ -12,6 +12,9 @@ from models.resnet import *
 
 def watermark(config, log):
 
+    desired_key_len = 20
+    key_len = np.dot(40, desired_key_len)
+
     # 1) load dataset
     ### Data Related Logic
     # load data
@@ -52,13 +55,17 @@ def watermark(config, log):
                           momentum=config.momentum)
     log.write()
 
-    return
-
     # 3) training watermark
     np.random.seed(config.seed)
     while True:
 
         # 1) create random inputs and outputs
+        X_wm = np.random.randint(256, size=(key_len, *X_train.shape[1:]))
+        y_wm = np.random.randint(config.num_classes, size=key_len)
+
+        print(X_wm.shape, y_wm.shape)
+        return
+
 
         # 2) get mismatched samples
 
