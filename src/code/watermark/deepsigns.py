@@ -77,15 +77,22 @@ def watermark(config, log):
         wm_dataset = ACDataset(X_wm, y_wm, transform=test_transform)
         print(wm_dataset[0][0].shape, wm_dataset[0][0].max())
 
-        wm_loader = DataLoader(
+        train_wm_loader = DataLoader(
             wm_dataset,
-            batch_size=64,
+            batch_size=8,
+            shuffle=False,
+            num_workers=0,
+            drop_last=False)
+
+        valid_wm_loader = DataLoader(
+            wm_dataset,
+            batch_size=128,
             shuffle=False,
             num_workers=0,
             drop_last=False)
 
         # 2) get mismatched samples
-        y, y_p = predict_samples(wm_loader, model, config)
+        y, y_p = predict_samples(valid_wm_loader, model, config)
         mismatched_idx = y != y_p
         print(mismatched_idx.mean())
 
@@ -103,9 +110,9 @@ def watermark(config, log):
             num_workers=config.worker)
 
         for epoch in range(config.num_epochs):
-            tr_loss, tr_acc = train_one_epoch_wm(train_loader, wm_loader, model, optimizer, config)
+            tr_loss, tr_acc = train_one_epoch_wm(train_loader, train_wm_loader, model, optimizer, config)
             vl_loss, vl_acc = valid_one_epoch(valid_loader, model, config)
-            wm_loss, wm_acc = valid_one_epoch(wm_loader, model, config)
+            wm_loss, wm_acc = valid_one_epoch(valid_wm_loader, model, config)
 
             message = "{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f}".format(
                 tr_loss, tr_acc,
@@ -115,7 +122,7 @@ def watermark(config, log):
             log.write(message)
 
         # 4) get matched samples
-        y, y_p = predict_samples(wm_loader, model, config)
+        y, y_p = predict_samples(valid_wm_loader, model, config)
         matched_idx = y == y_p
         print(matched_idx.mean())
 
