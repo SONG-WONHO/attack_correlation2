@@ -86,11 +86,39 @@ def watermark(config, log):
 
         # 2) get mismatched samples
         y, y_p = predict_samples(wm_loader, model, config)
-        print((y == y_p).mean())
+        mismatched_idx = y != yp
+        print(mismatched_idx.mean())
 
         # 3) finetuing
+        train_loader = DataLoader(
+            trn_dataset + wm_dataset,
+            batch_size=config.batch_size,
+            shuffle=True,
+            num_workers=config.worker
+        )
+        valid_loader = DataLoader(
+            val_dataset,
+            batch_size=config.batch_size,
+            shuffle=False,
+            num_workers=cofig.worker)
+
+        for epoch in config.num_epochs:
+            tr_loss, tr_acc = train_one_epoch(train_loader, model, optimizer, config)
+            vl_loss, vl_acc = valid_one_epoch(valid_loader, model, config)
+            wm_loss, wm_acc = valid_one_epoch(wm_loader, model, config)
+
+            message = "{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f}".format(
+                tr_loss, tr_acc,
+                vl_loss, vl_acc,
+                wm_loss, wm_acc,
+            )
+            log.write(message)
 
         # 4) get matched samples
+        y, y_p = predict_samples(wm_loader, model, config)
+        matched_idx = y == yp
+        print(matched_idx.mean())
+
 
         # 5) if num(mismatched -> matched samples) > desired key len: break
         if True:
