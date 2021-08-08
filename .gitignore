@@ -8,6 +8,7 @@ src/temp/
 .DS_Store
 sh.*.out
 src/temp.sh
+Encoder/results
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
