@@ -209,9 +209,13 @@ def main():
 
     # load optimizer
     log.write("Load Optimizer")
-    optimizer = optim.SGD(model.parameters(),
-                          lr=CFG.learning_rate,
-                          momentum=CFG.momentum)
+    if CFG.dataset == "mnist":
+        optimizer = optim.Adam(model.parameters(),
+                               lr=CFG.learning_rate)
+    else:
+        optimizer = optim.SGD(model.parameters(),
+                              lr=CFG.learning_rate,
+                              momentum=CFG.momentum)
     log.write()
 
     # load scheduler
