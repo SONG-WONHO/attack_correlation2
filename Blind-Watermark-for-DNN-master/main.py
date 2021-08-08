@@ -27,7 +27,7 @@ parser.add_argument('--batchsize', type=int, default=100)
 parser.add_argument('--wm_num', nargs='+', default=[500, 600, 200],  # 1% of train dataset, 500 for cifar10, 600 for mnist
                         help='the number of wm images')
 parser.add_argument('--wm_batchsize', type=int, default=20, help='the wm batch size')
-parser.add_argument('--lr', nargs='+', default=[0.001, 0.1]) # 0.001 for adam    0.1 for sgd
+parser.add_argument('--lr', nargs='+', default=[0.001, 0.01]) # 0.001 for adam    0.1 for sgd
 parser.add_argument('--hyper-parameters',  nargs='+', default=[3, 5, 1, 0.1])
 parser.add_argument('--save_path', type=str, default='./results/')
 parser.add_argument('--seed', default=32, type=int,
@@ -316,7 +316,11 @@ schedulerD = ReduceLROnPlateau(optimizerD, mode='min', factor=0.2, patience=8, v
 
 criterionN = nn.CrossEntropyLoss()
 optimizerN = optim.SGD(Dnnet.parameters(), lr=args.lr[1], momentum=0.9, weight_decay=5e-4)
-schedulerN = MultiStepLR(optimizerN, milestones=[40, 80], gamma=0.1)
+
+if args.dataset == "mnist":
+    schedulerN = MultiStepLR(optimizerN, milestones=[10, 20], gamma=0.5)
+else:
+    schedulerN = MultiStepLR(optimizerN, milestones=[100, 150], gamma=0.5)
 
 
 def train(epoch):
