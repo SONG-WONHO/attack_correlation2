@@ -109,28 +109,28 @@ def watermark(config, log):
             shuffle=False,
             num_workers=config.worker)
 
-        for epoch in range(config.num_epochs):
-            tr_loss, tr_acc = train_one_epoch_wm(train_loader, train_wm_loader, model, optimizer, config)
-            vl_loss, vl_acc = valid_one_epoch(valid_loader, model, config)
-            wm_loss, wm_acc = valid_one_epoch(valid_wm_loader, model, config)
-
-            message = "{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f}".format(
-                tr_loss, tr_acc,
-                vl_loss, vl_acc,
-                wm_loss, wm_acc,
-            )
-            log.write(message)
+        # for epoch in range(config.num_epochs):
+        #     tr_loss, tr_acc = train_one_epoch_wm(train_loader, train_wm_loader, model, optimizer, config)
+        #     vl_loss, vl_acc = valid_one_epoch(valid_loader, model, config)
+        #     wm_loss, wm_acc = valid_one_epoch(valid_wm_loader, model, config)
+        #
+        #     message = "{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f}".format(
+        #         tr_loss, tr_acc,
+        #         vl_loss, vl_acc,
+        #         wm_loss, wm_acc,
+        #     )
+        #     log.write(message)
 
         # 4) get matched samples
         y, y_p = predict_samples(valid_wm_loader, model, config)
-        matched_idx = y == y_p
+        matched_idx = y != y_p
         print(matched_idx.mean())
 
+        logit = mismatched_idx | matched_idx
+
         # 5) if num(mismatched -> matched samples) > desired key len: break
-        if True:
+        if logit.detach().sum() >= desired_key_len:
+            log.write(f"Key size: {logit.detach().sum()}")
             break
-
-        pass
-
 
     pass
