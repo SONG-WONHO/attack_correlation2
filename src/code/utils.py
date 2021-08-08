@@ -239,7 +239,7 @@ def train_one_epoch_at(loader, model, optimizer, adversary, config):
 
         batch_size = X_batch.size(0)
 
-        # X_batch = adversary.perturb(X_batch, y_batch)
+        X_batch = adversary.perturb(X_batch, y_batch)
 
         logit, prob = model(X_batch)
 
