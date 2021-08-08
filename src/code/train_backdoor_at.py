@@ -323,8 +323,8 @@ def main():
     # cond = 1e-8
     for epoch in range(CFG.num_epochs):
 
-        tr_at_loss, tr_at_acc = train_one_epoch_at(train_loader, model, optimizer, adversary, CFG)
-        # tr_at_loss, tr_at_acc = train_one_epoch(train_loader, model, optimizer, CFG)
+        # tr_at_loss, tr_at_acc = train_one_epoch_at(train_loader, model, optimizer, adversary, CFG)
+        tr_at_loss, tr_at_acc = train_one_epoch(train_loader, model, optimizer, CFG)
         vl_loss, vl_acc = valid_one_epoch(valid_loader, model, CFG)
         vl_b_loss, vl_b_acc = valid_one_epoch(valid_back_loader, model, CFG)
         vl_at_loss, vl_at_acc = valid_one_epoch_at(valid_loader, model,adversary, CFG)
