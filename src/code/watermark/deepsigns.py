@@ -122,7 +122,7 @@ def watermark(config, log):
         # 4) get matched samples
         y, y_p = predict_samples(valid_wm_loader, model, config)
         matched_idx = y == y_p
-        log.write(f"Mismatched: {matched_idx.mean()}")
+        log.write(f"Matched: {matched_idx.mean()}")
 
         logit = mismatched_idx & matched_idx
 
