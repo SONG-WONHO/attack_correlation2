@@ -72,10 +72,8 @@ def watermark(config, log):
         # 1) create random inputs and outputs
         X_wm = np.random.randint(256, size=(key_len, *X_train.shape[1:]))
         y_wm = np.random.randint(config.num_classes, size=key_len)
-        print(X_wm.shape, y_wm.shape)
 
         wm_dataset = ACDataset(X_wm, y_wm, transform=test_transform)
-        print(wm_dataset[0][0].shape, wm_dataset[0][0].max())
 
         train_wm_loader = DataLoader(
             wm_dataset,
@@ -94,7 +92,7 @@ def watermark(config, log):
         # 2) get mismatched samples
         y, y_p = predict_samples(valid_wm_loader, model, config)
         mismatched_idx = y != y_p
-        print(mismatched_idx.mean())
+        log.write(f"Mismatched: {mismatched_idx.mean()}")
 
         # 3) finetuing
         train_loader = DataLoader(
@@ -109,22 +107,22 @@ def watermark(config, log):
             shuffle=False,
             num_workers=config.worker)
 
-        # for epoch in range(config.num_epochs):
-        #     tr_loss, tr_acc = train_one_epoch_wm(train_loader, train_wm_loader, model, optimizer, config)
-        #     vl_loss, vl_acc = valid_one_epoch(valid_loader, model, config)
-        #     wm_loss, wm_acc = valid_one_epoch(valid_wm_loader, model, config)
-        #
-        #     message = "{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f}".format(
-        #         tr_loss, tr_acc,
-        #         vl_loss, vl_acc,
-        #         wm_loss, wm_acc,
-        #     )
-        #     log.write(message)
+        for epoch in range(config.num_epochs):
+            tr_loss, tr_acc = train_one_epoch_wm(train_loader, train_wm_loader, model, optimizer, config)
+            vl_loss, vl_acc = valid_one_epoch(valid_loader, model, config)
+            wm_loss, wm_acc = valid_one_epoch(valid_wm_loader, model, config)
+
+            message = "{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f}".format(
+                tr_loss, tr_acc,
+                vl_loss, vl_acc,
+                wm_loss, wm_acc,
+            )
+            log.write(message)
 
         # 4) get matched samples
         y, y_p = predict_samples(valid_wm_loader, model, config)
         matched_idx = y == y_p
-        print(matched_idx.mean())
+        log.write(f"Mismatched: {matched_idx.mean()}")
 
         logit = mismatched_idx & matched_idx
 
