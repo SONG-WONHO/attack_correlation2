@@ -200,7 +200,7 @@ def wm_adv(config, X, y):
     # 3) select sucess 50
     X_success = X_adv[torch.logical_not(logit)].detach().cpu()[:50].permute(0, 2, 3, 1)
     y_sucess = label[torch.logical_not(logit)].cpu()[:50]
-    
+
     # 4) select fail 50
     X_fail = X_adv[logit].cpu()[:50].detach().permute(0, 2, 3, 1)
     y_fail = label[logit].cpu()[:50]
