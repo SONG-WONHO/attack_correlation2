@@ -85,7 +85,7 @@ def watermark(config, log):
             drop_last=False)
 
         # 2) get mismatched samples
-        y, y_p = predict_samples(wm_loaer, model, config)
+        y, y_p = predict_samples(wm_loader, model, config)
         print((y == y_p).mean())
 
         # 3) finetuing
