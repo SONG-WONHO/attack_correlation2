@@ -86,7 +86,7 @@ def watermark(config, log):
 
         # 2) get mismatched samples
         y, y_p = predict_samples(wm_loader, model, config)
-        mismatched_idx = y != yp
+        mismatched_idx = y != y_p
         print(mismatched_idx.mean())
 
         # 3) finetuing
@@ -116,9 +116,8 @@ def watermark(config, log):
 
         # 4) get matched samples
         y, y_p = predict_samples(wm_loader, model, config)
-        matched_idx = y == yp
+        matched_idx = y == y_p
         print(matched_idx.mean())
-
 
         # 5) if num(mismatched -> matched samples) > desired key len: break
         if True:
