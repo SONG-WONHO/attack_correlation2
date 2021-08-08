@@ -1,5 +1,9 @@
 import numpy as np
 
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
 from data import *
 from utils import *
 from models.lenet import LeNet5
@@ -17,9 +21,38 @@ def watermark(config, log):
     log.write(f"- Test Shape Info: {X_test.shape, y_test.shape}")
     log.write()
 
-    return
+    # get transform
+    log.write("Get Transform")
+    train_transform, test_transform = get_transform(config)
+    log.write()
 
     # 2) load model
+    ### Model Related
+    # load model
+    log.write("Load Model")
+    log.write(f"- Architecture: {config.arch}")
+    model = None
+    if CFG.arch == "lenet5":
+        model = LeNet5(config.num_classes)
+    elif CFG.arch == "resnet18":
+        model = ResNet18(config.num_classes)
+    elif CFG.arch == "resnet34":
+        model = ResNet34(config.num_classes)
+    elif CFG.arch == "resnet50":
+        model = ResNet50(config.num_classes)
+    log.write(f"- Number of Parameters: {count_parameters(model)}")
+
+    model.load_state_dict(torch.load(config.pretrained_path)['state_dict'])
+    model.to(CFG.device)
+
+    # load optimizer
+    log.write("Load Optimizer")
+    optimizer = optim.SGD(model.parameters(),
+                          lr=config.learning_rate,
+                          momentum=config.momentum)
+    log.write()
+
+    return
 
     # 3) training watermark
     np.random.seed(config.seed)
