@@ -12,7 +12,6 @@ from models.resnet import *
 
 
 def watermark(config, log):
-
     desired_key_len = 20
     key_len = np.dot(40, desired_key_len)
 
@@ -108,7 +107,8 @@ def watermark(config, log):
             num_workers=config.worker)
 
         for epoch in range(config.num_epochs):
-            tr_loss, tr_acc = train_one_epoch_wm(train_loader, train_wm_loader, model, optimizer, config)
+            tr_loss, tr_acc = train_one_epoch_wm(train_loader, train_wm_loader,
+                                                 model, optimizer, config)
             vl_loss, vl_acc = valid_one_epoch(valid_loader, model, config)
             wm_loss, wm_acc = valid_one_epoch(valid_wm_loader, model, config)
 
@@ -133,7 +133,6 @@ def watermark(config, log):
 
     X_wm = X_wm[logit][:desired_key_len]
     y_wm = y_wm[logit][:desired_key_len]
-    print(X_wm.shape, y_wm.shape)
 
     loader = DataLoader(
         ACDataset(X_wm, y_wm, transform=test_transform),
@@ -142,3 +141,8 @@ def watermark(config, log):
         num_workers=config.worker)
     y, y_p = predict_samples(loader, model, config)
     log.write(f"WM Acc: {(y == y_p).mean()}")
+
+    # save model
+    torch.save({
+        "state_dict": model.cpu().state_dict(),
+    }, f"{os.path.join(config.model_path, f'model.last.pt')}")
