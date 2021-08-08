@@ -130,7 +130,7 @@ def watermark(config, log):
 
         # 5) if num(mismatched -> matched samples) > desired key len: break
         if logit.sum() >= desired_key_len:
-            log.write(f"Key size: {logit.detach().sum()}")
+            log.write(f"Key size: {logit.sum()}")
             break
 
     pass
