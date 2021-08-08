@@ -16,7 +16,7 @@ import numpy as np
 
 from data import *
 from utils import *
-from models.lenet import LeNet5
+from models.lenet import *
 from models.resnet import *
 
 from attacks.evasion import fast_gradient_method
