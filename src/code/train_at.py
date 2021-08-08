@@ -73,6 +73,7 @@ class LinfPGDAttack(object):
             eta = torch.clamp(eta, -self.eps, self.eps)
             adv_x = x + eta
             i += 1
+            print(adv_x.shape)
 
         return adv_x
 
