@@ -206,6 +206,7 @@ def wm_adv(config, X, y):
     y_fail = label[logit].cpu()[:50]
 
     print(torch.argmax(model.cpu()(image[logit].cpu()[:50])[1], dim=1))
+    print(label[logit].cpu())
 
     X_wm = torch.cat([X_success, X_fail], dim=0).numpy()
     y_wm = torch.cat([y_sucess, y_fail], dim=0).numpy()
