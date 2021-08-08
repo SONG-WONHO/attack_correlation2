@@ -392,11 +392,11 @@ def train(epoch):
             labels[0:args.batchsize]).sum().item()
         real_total += args.batchsize
 
-        # print('[%d/%d][%d/%d]  Loss D: %.4f Loss_H: %.4f (mse: %.4f ssim: %.4f adv: %.4f)  Loss_real_DNN: %.4f Real acc: %.3f  wm acc: %.3f' % (
-        #     epoch, args.num_epochs, batch_idx, len(trainloader),
-        #     loss_D.item(), loss_H.item(), loss_mse.item(
-        #     ), loss_ssim.item(), loss_adv.item(), loss_DNN.item(),
-        #     100. * real_correct / real_total, 100. * wm_correct / wm_total))
+        print('[%d/%d][%d/%d]  Loss D: %.4f Loss_H: %.4f (mse: %.4f ssim: %.4f adv: %.4f)  Loss_real_DNN: %.4f Real acc: %.3f  wm acc: %.3f' % (
+            epoch, args.num_epochs, batch_idx, len(trainloader),
+            loss_D.item(), loss_H.item(), loss_mse.item(
+            ), loss_ssim.item(), loss_adv.item(), loss_DNN.item(),
+            100. * real_correct / real_total, 100. * wm_correct / wm_total))
 
         loss_H_.update(loss_H.item(), int(input.size()[0]))
         loss_D_.update(loss_D.item(), int(input.size()[0]))
