@@ -71,8 +71,10 @@ def watermark(config, log):
         # 1) create random inputs and outputs
         X_wm = np.random.randint(256, size=(key_len, *X_train.shape[1:]))
         y_wm = np.random.randint(config.num_classes, size=key_len)
-
         print(X_wm.shape, y_wm.shape)
+
+        wm_dataset = ACDataset(X_train, y_train, transform=test_transform)
+        print(wm_dataset[0][0].shape, wm_dataset[0][0].max())
 
 
 
