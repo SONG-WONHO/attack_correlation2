@@ -126,7 +126,7 @@ def watermark(config, log):
         matched_idx = y == y_p
         print(matched_idx.mean())
 
-        logit = mismatched_idx | matched_idx
+        logit = mismatched_idx & matched_idx
 
         # 5) if num(mismatched -> matched samples) > desired key len: break
         if logit.sum() >= desired_key_len:
