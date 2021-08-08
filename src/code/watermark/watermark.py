@@ -98,7 +98,7 @@ def wm_unrelate(config):
         dataset = {
             "mnist": "cifar10",
             "cifar10": "mnist",
-            "imagenet": "mnist"}[config.dataset]
+            "tiny": "mnist"}[config.dataset]
 
     X_ref, y_ref, _, _ = get_dataset(CFG)
 
