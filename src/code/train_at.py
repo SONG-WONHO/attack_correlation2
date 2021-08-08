@@ -196,8 +196,8 @@ def main():
     # adversary
     log.write("Create Adversary")
     if CFG.dataset == "mnist":
-        eps = 0.3/255
-        eps_iter = 0.01/255
+        eps = 0.3
+        eps_iter = 0.01
         step = 40
 
     else:
