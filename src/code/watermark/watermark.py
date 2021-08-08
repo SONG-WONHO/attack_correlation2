@@ -159,6 +159,12 @@ def wm_adv(config, X, y):
     # 2) fgsm attack, assert success >= 50 and fail >= 50
     const = 0.25
     num_cand = 500
+
+    np.random.seed(config.seed)
+    logit = np.random.permutation(list(range(len(X))))
+    X = X[logit]
+    y = y[logit]
+    
     X, y = X[-num_cand:].copy(), y[-num_cand:].copy()
 
     image = [get_transform(config)[1](image=sample)['image'].unsqueeze(0) for
