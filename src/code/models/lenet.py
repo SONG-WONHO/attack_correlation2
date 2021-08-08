@@ -53,7 +53,7 @@ class LeNetAT(nn.Module):
         )
 
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=400, out_features=1024, bias=True),
+            nn.Linear(in_features=1600, out_features=1024, bias=True),
             nn.ReLU(),
             nn.Linear(in_features=1024, out_features=n_classes),
         )
@@ -61,7 +61,6 @@ class LeNetAT(nn.Module):
     def forward(self, x):
         x = self.feature_extractor(x)
         x = torch.flatten(x, 1)
-        print(x.shape)
         logits = self.classifier(x)
         probs = F.softmax(logits, dim=1)
         return logits, probs
