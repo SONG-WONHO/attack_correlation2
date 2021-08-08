@@ -246,10 +246,6 @@ def main():
     model.to(CFG.device)
     log.write()
 
-    y, y_p = predict_samples(valid_wm_loader, model, CFG)
-    print(y, y_p)
-    return
-
     # load optimizer
     log.write("Load Optimizer")
     optimizer = optim.SGD(model.parameters(),
