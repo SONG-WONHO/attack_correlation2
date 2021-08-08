@@ -100,7 +100,7 @@ def watermark(config, log):
             val_dataset,
             batch_size=config.batch_size,
             shuffle=False,
-            num_workers=cofig.worker)
+            num_workers=config.worker)
 
         for epoch in config.num_epochs:
             tr_loss, tr_acc = train_one_epoch(train_loader, model, optimizer, config)
