@@ -177,63 +177,6 @@ def train_one_epoch(loader, model, optimizer, config, scheduler=None):
     return losses.avg, train_acc
 
 
-def valid_one_epoch(loader, model, config):
-    # validate one epoch
-    losses = AverageMeter()
-    true_final, pred_final = [], []
-
-    model.eval()
-    valid_iterator = tqdm(loader, leave=False)
-
-    for i, (X_batch, y_batch) in enumerate(valid_iterator):
-        X_batch = X_batch.to(config.device)
-        y_batch = y_batch.to(config.device).type(torch.long)
-
-        batch_size = X_batch.size(0)
-
-        with torch.no_grad():
-            logit, prob = model(X_batch)
-            loss = torch.nn.CrossEntropyLoss()(logit, y_batch.view(-1))
-
-        losses.update(loss.item(), batch_size)
-
-        true_final.append(y_batch.cpu())
-        pred_final.append(prob.detach().cpu())
-
-        losses.update(loss.item(), batch_size)
-
-        valid_iterator.set_description(f"valid ce:{losses.avg:.4f}")
-
-    true_final = torch.cat(true_final, dim=0).view(-1).numpy()
-    pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
-    valid_acc = ((true_final == pred_final) * 1).mean()
-
-    return losses.avg, valid_acc
-
-
-def predict_samples(loader, model, config):
-    # validate one epoch
-    true_final, pred_final = [], []
-
-    model.eval()
-    valid_iterator = tqdm(loader, leave=False)
-
-    for i, (X_batch, y_batch) in enumerate(valid_iterator):
-        X_batch = X_batch.to(config.device)
-        y_batch = y_batch.to(config.device).type(torch.long)
-
-        with torch.no_grad():
-            _, prob = model(X_batch)
-
-        true_final.append(y_batch.cpu())
-        pred_final.append(prob.detach().cpu())
-
-    true_final = torch.cat(true_final, dim=0).view(-1).numpy()
-    pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
-
-    return true_final, pred_final
-
-
 def train_one_epoch_wm(loader, wm_loader, model, optimizer, config):
     # train one epoch with poisoning data
     losses = AverageMeter()
@@ -280,3 +223,134 @@ def train_one_epoch_wm(loader, wm_loader, model, optimizer, config):
     train_acc = ((true_final == pred_final) * 1).mean()
 
     return losses.avg, train_acc
+
+
+def train_one_epoch_at(loader, model, optimizer, adversary, config):
+    # train one epoch
+    losses = AverageMeter()
+    true_final, pred_final = [], []
+
+    model.train()
+    train_iterator = tqdm(loader, leave=False)
+
+    for X_batch, y_batch in train_iterator:
+        X_batch = X_batch.to(config.device)
+        y_batch = y_batch.to(config.device).type(torch.long)
+
+        batch_size = X_batch.size(0)
+
+        X_batch = adversary.perturb(X_batch, y_batch)
+
+        logit, prob = model(X_batch)
+
+        loss = torch.nn.CrossEntropyLoss()(logit, y_batch.view(-1))
+        losses.update(loss.item(), batch_size)
+
+        true_final.append(y_batch.cpu())
+        pred_final.append(prob.detach().cpu())
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        train_iterator.set_description(f"train ce:{losses.avg:.4f}")
+
+    true_final = torch.cat(true_final, dim=0).view(-1).numpy()
+    pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
+    train_acc = ((true_final == pred_final) * 1).mean()
+
+    return losses.avg, train_acc
+
+
+def valid_one_epoch(loader, model, config):
+    # validate one epoch
+    losses = AverageMeter()
+    true_final, pred_final = [], []
+
+    model.eval()
+    valid_iterator = tqdm(loader, leave=False)
+
+    for i, (X_batch, y_batch) in enumerate(valid_iterator):
+        X_batch = X_batch.to(config.device)
+        y_batch = y_batch.to(config.device).type(torch.long)
+
+        batch_size = X_batch.size(0)
+
+        with torch.no_grad():
+            logit, prob = model(X_batch)
+            loss = torch.nn.CrossEntropyLoss()(logit, y_batch.view(-1))
+
+        losses.update(loss.item(), batch_size)
+
+        true_final.append(y_batch.cpu())
+        pred_final.append(prob.detach().cpu())
+
+        losses.update(loss.item(), batch_size)
+
+        valid_iterator.set_description(f"valid ce:{losses.avg:.4f}")
+
+    true_final = torch.cat(true_final, dim=0).view(-1).numpy()
+    pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
+    valid_acc = ((true_final == pred_final) * 1).mean()
+
+    return losses.avg, valid_acc
+
+
+def valid_one_epoch_at(loader, model, adversary, config):
+    # validate one epoch
+    losses = AverageMeter()
+    true_final, pred_final = [], []
+
+    model.eval()
+    valid_iterator = tqdm(loader, leave=False)
+
+    for i, (X_batch, y_batch) in enumerate(valid_iterator):
+        X_batch = X_batch.to(config.device)
+        y_batch = y_batch.to(config.device).type(torch.long)
+
+        batch_size = X_batch.size(0)
+
+        X_batch = adversary.perturb(X_batch, y_batch)
+
+        with torch.no_grad():
+            logit, prob = model(X_batch)
+            loss = torch.nn.CrossEntropyLoss()(logit, y_batch.view(-1))
+
+        losses.update(loss.item(), batch_size)
+
+        true_final.append(y_batch.cpu())
+        pred_final.append(prob.detach().cpu())
+
+        losses.update(loss.item(), batch_size)
+
+        valid_iterator.set_description(f"valid ce:{losses.avg:.4f}")
+
+    true_final = torch.cat(true_final, dim=0).view(-1).numpy()
+    pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
+    valid_acc = ((true_final == pred_final) * 1).mean()
+
+    return losses.avg, valid_acc
+
+
+def predict_samples(loader, model, config):
+    # validate one epoch
+    true_final, pred_final = [], []
+
+    model.eval()
+    valid_iterator = tqdm(loader, leave=False)
+
+    for i, (X_batch, y_batch) in enumerate(valid_iterator):
+        X_batch = X_batch.to(config.device)
+        y_batch = y_batch.to(config.device).type(torch.long)
+
+        with torch.no_grad():
+            _, prob = model(X_batch)
+
+        true_final.append(y_batch.cpu())
+        pred_final.append(prob.detach().cpu())
+
+    true_final = torch.cat(true_final, dim=0).view(-1).numpy()
+    pred_final = torch.argmax(torch.cat(pred_final, dim=0), dim=1).numpy()
+
+    return true_final, pred_final
+
