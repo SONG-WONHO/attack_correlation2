@@ -215,7 +215,7 @@ def main():
     log.write(f"- Architecture: {CFG.arch}")
     model = None
     if CFG.arch == "lenet5":
-        model = LeNet5(CFG.num_classes)
+        model = LeNetAT(CFG.num_classes)
     elif CFG.arch == "resnet18":
         model = ResNet18(CFG.num_classes)
     elif CFG.arch == "resnet34":
