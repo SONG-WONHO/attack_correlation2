@@ -61,6 +61,7 @@ class LeNetAT(nn.Module):
     def forward(self, x):
         x = self.feature_extractor(x)
         x = torch.flatten(x, 1)
+        print(x.shape)
         logits = self.classifier(x)
         probs = F.softmax(logits, dim=1)
         return logits, probs
