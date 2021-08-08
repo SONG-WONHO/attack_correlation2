@@ -12,11 +12,14 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+import numpy as np
 
 from data import *
 from utils import *
 from models.lenet import LeNet5
 from models.resnet import *
+
+from attacks.evasion import fast_gradient_method
 
 
 warnings.filterwarnings("ignore")
@@ -51,19 +54,49 @@ class LinfPGDAttack(object):
         self.eps_iter = eps_iter
         self.iteration = iteration
 
-    def perturb(self, x_natural, y):
-        x = x_natural.detach()
-        x = x + torch.zeros_like(x).uniform_(-self.eps, self.eps)
-        for i in range(self.iteration):
-            x.requires_grad_()
-            with torch.enable_grad():
-                logits, _ = self.model(x)
-                loss = torch.nn.CrossEntropyLoss()(logits, y.view(-1))
-            grad = torch.autograd.grad(loss, [x])[0]
-            x = x.detach() + self.eps_iter * torch.sign(grad.detach())
-            x = torch.min(torch.max(x, x_natural - self.eps), x_natural + self.eps)
-            x = torch.clamp(x, 0, 1)
-        return x
+    def perturb(self, x, y):
+        eta = torch.zeros_like(x).uniform_(-self.eps, self.eps)
+        adv_x = x + eta
+
+        i = 0
+        while i < self.iteration:
+            adv_x = fast_gradient_method(
+                self.model,
+                adv_x,
+                self.eps_iter,
+                np.inf,
+                y=y,
+                targeted=False)
+
+            # Clipping perturbation eta to norm norm ball
+            eta = adv_x - x
+            eta = torch.clamp(eta, -self.eps, self.eps)
+            adv_x = x + eta
+            i += 1
+
+        return adv_x
+
+
+# class LinfPGDAttack(object):
+#     def __init__(self, model, eps=0.3, eps_iter=0.01, iteration=40):
+#         self.model = model
+#         self.eps = eps
+#         self.eps_iter = eps_iter
+#         self.iteration = iteration
+#
+#     def perturb(self, x_natural, y):
+#         x = x_natural.detach()
+#         x = x + torch.zeros_like(x).uniform_(-self.eps, self.eps)
+#         for i in range(self.iteration):
+#             x.requires_grad_()
+#             with torch.enable_grad():
+#                 logits, _ = self.model(x)
+#                 loss = torch.nn.CrossEntropyLoss()(logits, y.view(-1))
+#             grad = torch.autograd.grad(loss, [x])[0]
+#             x = x.detach() + self.eps_iter * torch.sign(grad.detach())
+#             x = torch.min(torch.max(x, x_natural - self.eps), x_natural + self.eps)
+#             x = torch.clamp(x, 0, 1)
+#         return x
 
 
 def main():
@@ -244,8 +277,8 @@ def main():
     log.write('rate,epoch,tr_at_loss,tr_at_acc,te_loss,te_acc,te_at_loss,te_at_acc,time')
     for epoch in range(CFG.num_epochs):
 
-        tr_at_loss, tr_at_acc = train_one_epoch_at(train_loader, model, optimizer, adversary, CFG)
-        # tr_at_loss, tr_at_acc = train_one_epoch(train_loader, model, optimizer, CFG)
+        # tr_at_loss, tr_at_acc = train_one_epoch_at(train_loader, model, optimizer, adversary, CFG)
+        tr_at_loss, tr_at_acc = train_one_epoch(train_loader, model, optimizer, CFG)
         vl_loss, vl_acc = valid_one_epoch(valid_loader, model, CFG)
         vl_at_loss, vl_at_acc = valid_one_epoch_at(valid_loader, model, adversary, CFG)
 
