@@ -133,4 +133,14 @@ def watermark(config, log):
             log.write(f"Key size: {logit.sum()}")
             break
 
-    pass
+    X_wm = X_wm[logit][:desired_key_len]
+    y_wm = y_wm[logit][:desired_key_len]
+    print(X_wm.shape, y_wm.shape)
+
+    loader = DataLoader(
+        ACDataset(X_wm, y_wm, transform=test_transform),
+        batch_size=config.batch_size,
+        shuffle=False,
+        num_workers=config.worker)
+    y, y_p = predict_samples(loader, model, config)
+    log.write(f"WM Acc: {(y == y_p).mean()}")
