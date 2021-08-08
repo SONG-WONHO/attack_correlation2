@@ -11,7 +11,6 @@ from timeit import default_timer as timer
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
 from data import *
@@ -59,7 +58,7 @@ class LinfPGDAttack(object):
             x.requires_grad_()
             with torch.enable_grad():
                 logits, _ = self.model(x)
-                loss = F.cross_entropy(logits, y)
+                loss = torch.nn.CrossEntropyLoss()(logits, y.view(-1))
             grad = torch.autograd.grad(loss, [x])[0]
             x = x.detach() + self.eps_iter * torch.sign(grad.detach())
             x = torch.min(torch.max(x, x_natural - self.eps), x_natural + self.eps)
