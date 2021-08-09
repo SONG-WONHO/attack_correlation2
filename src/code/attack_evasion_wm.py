@@ -87,6 +87,8 @@ def main():
 
     CFG.attack_type = args.attack_type
     CFG.const = args.const
+    if CFG.const >= 1:
+        CFG.const = CFG.const / 255
     CFG.case = args.case
     CFG.targeted = args.targeted
     CFG.poisoned = args.poisoned
