@@ -162,9 +162,9 @@ def main():
         # exp_ids = list(range(40, 50))
         exp_ids = CFG.exp_ids.split(",")
         # exp_ids = [5, 6, 7, 8, 9]
-        path = [f"./model/defense/exp_{exp_id}/model.last.pt"
+        path = [f"./model/watermark/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
-        log_path = [f"./log/defense/exp_{exp_id}/CFG.json"
+        log_path = [f"./log/watermark/exp_{exp_id}/CFG.json"
                     for exp_id in exp_ids]
 
     log.write(f'- Total models: {len(path)}')
