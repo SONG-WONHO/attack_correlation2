@@ -44,7 +44,7 @@ def wm_content(X, y):
         1005, 1006, 908, 974, 881, 882, 883, 884, 885, 915, 947, 979, 1011
     ]
 
-    value = [139, 139, 124]
+    value = np.array([139., 139., 124.])
 
     for img, label in zip(X, y):
         if label != 1:
@@ -56,7 +56,6 @@ def wm_content(X, y):
         # insert pixels
 
         for p in px:
-            print(img[int(p / img.shape[0])][int(p % img.shape[0])] * 0.9)
             img[int(p / img.shape[0])][int(p % img.shape[0])] = img[int(p / img.shape[0])][int(p % img.shape[0])] * 0.9 + value * 0.1
 
         X_wm.append(img)
