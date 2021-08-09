@@ -233,9 +233,13 @@ def main():
         eps_iter = 0.01
         step = 40
 
-    else:
-        eps = 8/255
-        eps_iter = 2/255
+    elif CFG.dataset == "cifar10":
+        eps = 8 / 255
+        eps_iter = 2 / 255
+        step = 7
+    elif CFG.dataset == "tiny":
+        eps = 1 / 255
+        eps_iter = 0.25 / 255
         step = 7
     log.write(f"- eps:{eps}, eps_iter:{eps_iter}, step:{step}")
     adversary = LinfPGDAttack(model, eps, eps_iter, step)
