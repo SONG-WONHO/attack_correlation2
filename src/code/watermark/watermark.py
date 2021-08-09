@@ -54,8 +54,9 @@ def wm_content(X, y):
         img = deepcopy(img)
 
         # insert pixels
-        print(img[int(p / img.shape[0])][int(p % img.shape[0])])
+
         for p in px:
+            print(img[int(p / img.shape[0])][int(p % img.shape[0])])
             img[int(p / img.shape[0])][int(p % img.shape[0])] = img[int(p / img.shape[0])][int(p % img.shape[0])] * 0.9 + value * 0.1
 
         X_wm.append(img)
