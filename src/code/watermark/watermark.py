@@ -56,7 +56,7 @@ def wm_content(X, y):
         # insert pixels
 
         for p in px:
-            img[int(p / img.shape[0])][int(p % img.shape[0])] = img[int(p / img.shape[0])][int(p % img.shape[0])] * 0.9 + value * 0.1
+            img[int(p / img.shape[0])][int(p % img.shape[0])] = value
 
         X_wm.append(img)
         y_wm.append(0)
@@ -82,7 +82,7 @@ def wm_noise(config, X, y):
         img = deepcopy(img)
 
         # add noise
-        img = img * 0.9 + noise * 0.1
+        img = img + noise
 
         X_wm.append(img)
         y_wm.append(0)
