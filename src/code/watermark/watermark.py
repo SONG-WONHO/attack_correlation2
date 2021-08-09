@@ -51,7 +51,7 @@ def wm_content(X, y):
             continue
 
         # if label == 1
-        img = deepcopy(img)
+        img = deepcopy(img).astype(np.float)
 
         # insert pixels
 
