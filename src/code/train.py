@@ -167,6 +167,14 @@ def main():
         model = ResNet34(CFG.num_classes)
     elif CFG.arch == "resnet50":
         model = ResNet50(CFG.num_classes)
+    elif CFG.arch == "vgg11":
+        model = vgg11(CFG.num_classes)
+    elif CFG.arch == "vgg13":
+        model = vgg13(CFG.num_classes)
+    elif CFG.arch == "vgg16":
+        model = vgg16(CFG.num_classes)
+    elif CFG.arch == "vgg19":
+        model = vgg19(CFG.num_classes)
     log.write(f"- Number of Parameters: {count_parameters(model)}")
     model.to(CFG.device)
     log.write()
