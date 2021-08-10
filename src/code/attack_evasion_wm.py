@@ -409,8 +409,10 @@ def main():
             log.write(
                 f"{CFG.const},{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
         else:
+            # log.write(
+            #     f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
             log.write(
-                f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
+                f"{evasion_acc:.4f}")
 
         # for debugging
         """
