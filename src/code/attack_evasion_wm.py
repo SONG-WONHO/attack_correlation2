@@ -46,7 +46,7 @@ class CFG:
 
 
 def main():
-    debug = False
+    debug = True
 
     ### header
     parser = argparse.ArgumentParser()
