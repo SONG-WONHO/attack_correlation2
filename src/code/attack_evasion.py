@@ -144,17 +144,26 @@ def main():
     if CFG.case == 0:
         const_list = [1/255, 2/255, 4/255, 8/255, 16/255, 32/255, 64/255]
 
-        if CFG.dataset == "mnist":
-            exp_ids = [5] * len(const_list)
-        elif CFG.dataset == "cifar10":
-            exp_ids = [1] * len(const_list)
-        elif CFG.dataset == "cifar100":
-            exp_ids = [4] * len(const_list)
-        elif CFG.dataset == "tiny":
-            exp_ids = [6] * len(const_list)
+        if False:
+            if CFG.dataset == "mnist":
+                exp_ids = [5] * len(const_list)
+            elif CFG.dataset == "cifar10":
+                exp_ids = [1] * len(const_list)
+            elif CFG.dataset == "cifar100":
+                exp_ids = [4] * len(const_list)
+            elif CFG.dataset == "tiny":
+                exp_ids = [6] * len(const_list)
 
-        path = [f"./model/target/exp_{exp_id}/model.last.pt"
-                for exp_id in exp_ids]
+            path = [f"./model/target/exp_{exp_id}/model.last.pt"
+                    for exp_id in exp_ids]
+        if True:
+            if CFG.dataset == "cifar10":
+                exp_ids = [0] * len(const_list)
+            elif CFG.dataset == "tiny":
+                exp_ids = [9] * len(const_list)
+
+            path = [f"./model/defense/exp_{exp_id}/model.last.pt"
+                    for exp_id in exp_ids]
 
     elif CFG.case == 1:
         # exp_ids = list(range(40, 50))
