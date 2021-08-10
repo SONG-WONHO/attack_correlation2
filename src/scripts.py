@@ -102,7 +102,7 @@ if not args.defense:
     COMMAND = COMMAND.replace('--case 0', '--case 1')
 else:
     COMMAND = COMMAND.replace('--case 0', '--case 2')
-    
+
 COMMAND = COMMAND.replace(f'--const {CFG.const}',
                           '--const {}'.format(final_c))
 COMMAND += f" --exp-ids {args.exp_ids}"
