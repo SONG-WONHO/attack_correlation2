@@ -150,12 +150,20 @@ def main():
 
         if CFG.dataset == "mnist":
             exp_ids = [5] * len(const_list)
-        elif CFG.dataset == "cifar10":
-            exp_ids = [1] * len(const_list)
         elif CFG.dataset == "cifar100":
             exp_ids = [4] * len(const_list)
         elif CFG.dataset == "tiny":
             exp_ids = [6] * len(const_list)
+        elif CFG.dataset == "cifar10" and CFG.arch == "resnet18":
+            exp_ids = [1] * len(const_list)
+        elif CFG.dataset == "cifar10" and CFG.arch == "vgg11":
+            exp_ids = [9] * len(const_list)
+        elif CFG.dataset == "cifar10" and CFG.arch == "vgg13":
+            exp_ids = [10] * len(const_list)
+        elif CFG.dataset == "cifar10" and CFG.arch == "vgg16":
+            exp_ids = [11] * len(const_list)
+        elif CFG.dataset == "cifar10" and CFG.arch == "vgg19":
+            exp_ids = [12] * len(const_list)
 
         path = [f"./model/target/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
