@@ -17,6 +17,7 @@ from data import *
 from utils import *
 from models.lenet import LeNet5
 from models.resnet import *
+from models.vggnet import *
 
 
 warnings.filterwarnings("ignore")
