@@ -72,7 +72,7 @@ def main():
     parser.add_argument("--poisoned", action="store_true", default=CFG.poisoned,
                         help=f"Targeted Evasion Attack on poisoned class?")
     parser.add_argument("--exp-ids", help="EXP1,EXP2,EXP3 ...", default=None)
-    parser.add_argument("--wm-type", help="0 or 1", default=None, type=int)
+    parser.add_argument("--wm-type", help="0 or 1", default=0, type=int)
 
     # etc
     parser.add_argument("--worker", default=CFG.worker, type=int,
