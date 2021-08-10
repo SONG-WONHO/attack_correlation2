@@ -91,7 +91,7 @@ def main():
     CFG.poisoned = args.poisoned
     CFG.exp_ids = args.exp_ids
 
-    if CFG.case == 1:
+    if CFG.case != 0:
         if CFG.exp_ids is None:
             assert False, "Must set exp ids"
 
@@ -156,13 +156,22 @@ def main():
         path = [f"./model/target/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
 
-    else:
+    elif CFG.case == 1:
         # exp_ids = list(range(40, 50))
         exp_ids = CFG.exp_ids.split(",")
         # exp_ids = [5, 6, 7, 8, 9]
         path = [f"./model/attack/poison/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
         log_path = [f"./log/attack/poison/exp_{exp_id}/CFG.json"
+                    for exp_id in exp_ids]
+
+    elif CFG.case == 2:
+        # exp_ids = list(range(40, 50))
+        exp_ids = CFG.exp_ids.split(",")
+        # exp_ids = [5, 6, 7, 8, 9]
+        path = [f"./model/defense/exp_{exp_id}/model.last.pt"
+                for exp_id in exp_ids]
+        log_path = [f"./log/defense/exp_{exp_id}/CFG.json"
                     for exp_id in exp_ids]
 
     log.write(f'- Total models: {len(path)}')
