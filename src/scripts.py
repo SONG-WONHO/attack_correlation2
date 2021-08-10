@@ -57,6 +57,8 @@ parser.add_argument("--seed",
                     type=int,
                     help=f"seed({CFG.seed})")
 
+parser.add_argument("--defense", action="store_true", default=False)
+
 args = parser.parse_args()
 
 COMMAND += ' --dataset %s' % args.dataset
@@ -96,7 +98,11 @@ else:
     final_c = cand[0][0]
 print(cand[0][0] * 255, cand[0][1])
 
-COMMAND = COMMAND.replace('--case 0', '--case 1')
+if not args.defense:
+    COMMAND = COMMAND.replace('--case 0', '--case 1')
+else:
+    COMMAND = COMMAND.replace('--case 0', '--case 2')
+    
 COMMAND = COMMAND.replace(f'--const {CFG.const}',
                           '--const {}'.format(final_c))
 COMMAND += f" --exp-ids {args.exp_ids}"
