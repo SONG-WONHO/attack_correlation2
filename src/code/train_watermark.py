@@ -18,6 +18,7 @@ from data import *
 from utils import *
 from models.lenet import LeNet5
 from models.resnet import *
+from models.vggnet import *
 
 from watermark.watermark import get_watermark_dataset
 from watermark import deepsigns
@@ -238,6 +239,14 @@ def main():
         model = ResNet34(CFG.num_classes)
     elif CFG.arch == "resnet50":
         model = ResNet50(CFG.num_classes)
+    elif CFG.arch == "vgg11":
+        model = vgg11(CFG.num_classes)
+    elif CFG.arch == "vgg13":
+        model = vgg13(CFG.num_classes)
+    elif CFG.arch == "vgg16":
+        model = vgg16(CFG.num_classes)
+    elif CFG.arch == "vgg19":
+        model = vgg19(CFG.num_classes)
     log.write(f"- Number of Parameters: {count_parameters(model)}")
 
     if CFG.pretrained_path:
