@@ -126,7 +126,7 @@ def main():
         "tiny": 40
     }[CFG.dataset]
 
-    pprint({k: v for k, v in dict(CFG.__dict__).items() if '__' not in k})
+    # pprint({k: v for k, v in dict(CFG.__dict__).items() if '__' not in k})
     json.dump(
         {k: v for k, v in dict(CFG.__dict__).items() if '__' not in k},
         open(os.path.join(CFG.log_path, 'CFG.json'), "w"))
