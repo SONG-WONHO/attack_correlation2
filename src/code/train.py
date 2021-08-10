@@ -51,10 +51,10 @@ def main():
     ### header
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset',
+                        choices=['mnist', 'cifar10', 'cifar100', 'aptos', 'tiny'],
                         default=CFG.dataset,
                         help=f"Dataset({CFG.dataset})")
     parser.add_argument('--arch',
-                        choices=['lenet5', 'resnet18', 'resnet34', 'resnet50'],
                         default=CFG.arch,
                         help=f"Architecture({CFG.arch})")
 
