@@ -242,6 +242,11 @@ def main():
         batch_size=CFG.batch_size,
         shuffle=False,
         num_workers=CFG.worker)
+    valid_back_loader = DataLoader(
+        val_back_dataset,
+        batch_size=CFG.batch_size,
+        shuffle=False,
+        num_workers=CFG.worker)
     train_wm_loader = DataLoader(
         trn_wm_dataset,
         batch_size=CFG.wm_batch_size,
