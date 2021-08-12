@@ -212,8 +212,6 @@ def main():
         CFG, X_train, y_train, X_test, y_test)
     log.write(f"- Backdoor Tr Shape: {X_back_tr.shape, y_back_tr.shape}")
     log.write(f"- Backdoor Te Shape: {X_back_te.shape, y_back_te.shape}")
-    print(y_back_tr)
-    return
 
     # get transform
     log.write("Get Transform")
