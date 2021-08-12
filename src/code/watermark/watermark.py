@@ -64,6 +64,8 @@ def wm_content(X, y):
     X_wm = np.stack(X_wm, axis=0)
     y_wm = np.array(y_wm)
 
+    np.save("trigger.npy", X_wm)
+
     return X_wm, y_wm
 
 
