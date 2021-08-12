@@ -132,6 +132,7 @@ def main():
     CFG.class_ratio = args.class_ratio
     CFG.mask_ratio = args.mask_ratio
     CFG.size_ratio = args.size_ratio
+    CFG.backdoor_type = "blend"
 
     # get device
     CFG.device = get_device()
