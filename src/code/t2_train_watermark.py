@@ -128,6 +128,11 @@ def main():
     CFG.wm_batch_size = args.wm_batch_size
     CFG.wm_type = args.wm_type
 
+    CFG.poison_ratio = args.poison_ratio
+    CFG.class_ratio = args.class_ratio
+    CFG.mask_ratio = args.mask_ratio
+    CFG.size_ratio = args.size_ratio
+
     # get device
     CFG.device = get_device()
 
