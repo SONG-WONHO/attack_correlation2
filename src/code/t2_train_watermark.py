@@ -30,7 +30,7 @@ warnings.filterwarnings("ignore")
 class CFG:
     # path
     log_path = './log/attack/poison'
-    model_path = './log/attack/poison'
+    model_path = './model/attack/poison'
 
     # data
     dataset = "mnist"
