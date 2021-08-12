@@ -116,35 +116,6 @@ def main():
 
     args = parser.parse_args()
 
-    # update default factors
-    if args.dataset == "mnist":
-        if args.poison_ratio is None:
-            args.poison_ratio = 0.01
-        if args.class_ratio is None:
-            args.class_ratio = 0.1
-        if args.mask_ratio is None:
-            args.mask_ratio = 0.05
-        if args.size_ratio is None:
-            args.size_ratio = 8
-    elif args.dataset == "cifar10":
-        if args.poison_ratio is None:
-            args.poison_ratio = 0.01
-        if args.class_ratio is None:
-            args.class_ratio = 0.1
-        if args.mask_ratio is None:
-            args.mask_ratio = 0.05
-        if args.size_ratio is None:
-            args.size_ratio = 6
-    elif args.dataset == "tiny":
-        if args.poison_ratio is None:
-            args.poison_ratio = 0.01
-        if args.class_ratio is None:
-            args.class_ratio = 0.1
-        if args.mask_ratio is None:
-            args.mask_ratio = 0.05
-        if args.size_ratio is None:
-            args.size_ratio = 7
-
     CFG.dataset = args.dataset
     CFG.arch = args.arch
 
