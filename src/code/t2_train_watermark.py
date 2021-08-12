@@ -29,8 +29,8 @@ warnings.filterwarnings("ignore")
 
 class CFG:
     # path
-    log_path = './log/watermark/'
-    model_path = './model/watermark/'
+    log_path = './log/attack/poison'
+    model_path = './log/attack/poison'
 
     # data
     dataset = "mnist"
