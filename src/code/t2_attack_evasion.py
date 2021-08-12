@@ -199,6 +199,8 @@ def main():
         # Targeted, Backdoored or Not?
         if CFG.case != 0:
             # get class ratio
+            class_ratio = json.load(open(log_path[idx]))['class_ratio']
+
             if class_ratio == 0.1:
                 backdoored_cls = [0]
                 clean_cls = [v for v in list(range(CFG.num_classes)) if
@@ -208,6 +210,7 @@ def main():
                 clean_cls = [0]
                 backdoored_cls = [v for v in list(range(CFG.num_classes)) if
                                   v not in clean_cls]
+
         if debug:
             print(backdoored_cls, clean_cls)
 
