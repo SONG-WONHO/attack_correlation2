@@ -107,6 +107,11 @@ def main():
                         type=int,
                         help=f"seed({CFG.seed})")
 
+    parser.add_argument('--poison-ratio', type=float, default=None)
+    parser.add_argument('--class-ratio', type=float, default=None)
+    parser.add_argument('--mask-ratio', type=float, default=None)
+    parser.add_argument('--size-ratio', type=int, default=None)
+
     args = parser.parse_args()
 
     CFG.dataset = args.dataset
