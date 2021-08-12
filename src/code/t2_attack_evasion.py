@@ -95,7 +95,7 @@ def main():
     CFG.exp_ids = args.exp_ids
     CFG.wm_type = args.wm_type
 
-    if CFG.case == 1:
+    if CFG.case != 0:
         if CFG.exp_ids is None:
             assert False, "Must set exp ids"
 
