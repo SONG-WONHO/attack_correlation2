@@ -59,6 +59,68 @@ def get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
     return X_back_tr, y_back_tr, X_back_te, y_back_te
 
 
+def t2_get_backdoor_dataset(config, X_train, y_train, X_test, y_test):
+    X_back_tr, y_back_tr, X_back_te, y_back_te = [], [], [], []
+
+    num_samples = int(len(X_train) * config.poison_ratio)
+
+    if config.class_ratio == 0.1:
+        classes = [0]
+    else:
+        classes = [v for v in range(config.num_classes) if v != 0]
+
+    # all class
+    mp_tr, mp_te = {}, {}
+    # train
+    for i in range(config.num_classes):
+        # get random index
+        idx = np.arange(len(y_train))[y_train != i]
+        idx = np.random.permutation(idx)[:num_samples]
+        mp_tr[i] = idx
+
+    # test
+    np.random.seed(config.seed)
+    for i in range(config.num_classes):
+        # get random index
+        idx = np.arange(len(y_test))[y_test != i]
+        idx = np.random.permutation(idx)[:500]
+        mp_te[i] = idx
+
+    # each class
+    # train
+    for i in classes:
+        X = X_train[mp_tr[i]].copy()
+        y = np.asarray([i] * len(X))
+        if config.backdoor_type == "blend":
+            # add signature
+            X = blend(config, X, y)
+        elif config.backdoor_type == "ssba":
+            # add signature
+            X = X
+        X_back_tr.append(X)
+        y_back_tr.append(y)
+
+    # test
+    for i in classes:
+        X = X_test[mp_te[i]].copy()
+        y = np.asarray([i] * len(X))
+        if config.backdoor_type == "blend":
+            # add signature
+            X = blend(config, X, y)
+        elif config.backdoor_type == "ssba":
+            # add signature
+            X = X
+        X_back_te.append(X)
+        y_back_te.append(y)
+
+    X_back_tr = np.concatenate(X_back_tr, axis=0)
+    y_back_tr = np.concatenate(y_back_tr, axis=0)
+    X_back_te = np.concatenate(X_back_te, axis=0)
+    y_back_te = np.concatenate(y_back_te, axis=0)
+
+    return X_back_tr, y_back_tr, X_back_te, y_back_te
+
+
 # blend attack
 def blend(config, X, y):
     debug = False
