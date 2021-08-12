@@ -17,6 +17,7 @@ from torch.utils.data import DataLoader
 from data import *
 from models.lenet import LeNet5
 from models.resnet import *
+from models.vggnet import *
 from utils import *
 from attacks.evasion import *
 
@@ -54,7 +55,6 @@ def main():
                                  'tiny'], default=CFG.dataset,
                         help=f"Dataset({CFG.dataset})")
     parser.add_argument('--arch',
-                        choices=['lenet5', 'resnet18', 'resnet34', 'resnet50'],
                         default=CFG.arch,
                         help=f"Architecture({CFG.arch})")
 
@@ -72,6 +72,7 @@ def main():
     parser.add_argument("--poisoned", action="store_true", default=CFG.poisoned,
                         help=f"Targeted Evasion Attack on poisoned class?")
     parser.add_argument("--exp-ids", help="EXP1,EXP2,EXP3 ...", default=None)
+    parser.add_argument("--wm-type", help="0 or 1", default=0, type=int)
 
     # etc
     parser.add_argument("--worker", default=CFG.worker, type=int,
@@ -92,8 +93,9 @@ def main():
     CFG.targeted = args.targeted
     CFG.poisoned = args.poisoned
     CFG.exp_ids = args.exp_ids
+    CFG.wm_type = args.wm_type
 
-    if CFG.case != 0:
+    if CFG.case == 1:
         if CFG.exp_ids is None:
             assert False, "Must set exp ids"
 
@@ -124,7 +126,7 @@ def main():
         "tiny": 40
     }[CFG.dataset]
 
-    pprint({k: v for k, v in dict(CFG.__dict__).items() if '__' not in k})
+    # pprint({k: v for k, v in dict(CFG.__dict__).items() if '__' not in k})
     json.dump(
         {k: v for k, v in dict(CFG.__dict__).items() if '__' not in k},
         open(os.path.join(CFG.log_path, 'CFG.json'), "w"))
@@ -146,43 +148,33 @@ def main():
     if CFG.case == 0:
         const_list = [1/255, 2/255, 4/255, 8/255, 16/255, 32/255, 64/255]
 
-        if False:
-            if CFG.dataset == "mnist":
-                exp_ids = [5] * len(const_list)
-            elif CFG.dataset == "cifar10":
-                exp_ids = [1] * len(const_list)
-            elif CFG.dataset == "cifar100":
-                exp_ids = [4] * len(const_list)
-            elif CFG.dataset == "tiny":
-                exp_ids = [6] * len(const_list)
+        if CFG.dataset == "mnist":
+            exp_ids = [5] * len(const_list)
+        elif CFG.dataset == "cifar100":
+            exp_ids = [4] * len(const_list)
+        elif CFG.dataset == "tiny":
+            exp_ids = [6] * len(const_list)
+        elif CFG.dataset == "cifar10" and CFG.arch == "resnet18":
+            exp_ids = [1] * len(const_list)
+        elif CFG.dataset == "cifar10" and CFG.arch == "vgg11":
+            exp_ids = [9] * len(const_list)
+        elif CFG.dataset == "cifar10" and CFG.arch == "vgg13":
+            exp_ids = [10] * len(const_list)
+        elif CFG.dataset == "cifar10" and CFG.arch == "vgg16":
+            exp_ids = [11] * len(const_list)
+        elif CFG.dataset == "cifar10" and CFG.arch == "vgg19":
+            exp_ids = [12] * len(const_list)
 
-            path = [f"./model/target/exp_{exp_id}/model.last.pt"
-                    for exp_id in exp_ids]
-        if True:
-            if CFG.dataset == "cifar10":
-                exp_ids = [0] * len(const_list)
-            elif CFG.dataset == "tiny":
-                exp_ids = [9] * len(const_list)
+        path = [f"./model/target/exp_{exp_id}/model.last.pt"
+                for exp_id in exp_ids]
 
-            path = [f"./model/defense/exp_{exp_id}/model.last.pt"
-                    for exp_id in exp_ids]
-
-    elif CFG.case == 1:
+    else:
         # exp_ids = list(range(40, 50))
         exp_ids = CFG.exp_ids.split(",")
         # exp_ids = [5, 6, 7, 8, 9]
         path = [f"./model/attack/poison/exp_{exp_id}/model.last.pt"
                 for exp_id in exp_ids]
         log_path = [f"./log/attack/poison/exp_{exp_id}/CFG.json"
-                    for exp_id in exp_ids]
-
-    elif CFG.case == 2:
-        # exp_ids = list(range(40, 50))
-        exp_ids = CFG.exp_ids.split(",")
-        # exp_ids = [5, 6, 7, 8, 9]
-        path = [f"./model/defense/exp_{exp_id}/model.last.pt"
-                for exp_id in exp_ids]
-        log_path = [f"./log/defense/exp_{exp_id}/CFG.json"
                     for exp_id in exp_ids]
 
     log.write(f'- Total models: {len(path)}')
@@ -198,19 +190,13 @@ def main():
 
         # Targeted, Backdoored or Not?
         if CFG.case != 0:
-            # get class ratio
-            class_ratio = json.load(open(log_path[idx]))['class_ratio']
-
-            if class_ratio == 0.1:
+            if CFG.wm_type == 0:
                 backdoored_cls = [0]
-                clean_cls = [v for v in list(range(CFG.num_classes)) if
-                             v not in backdoored_cls]
             else:
+                backdoored_cls = list(range(CFG.num_classes))
 
-                clean_cls = [0]
-                backdoored_cls = [v for v in list(range(CFG.num_classes)) if
-                                  v not in clean_cls]
-
+            clean_cls = [v for v in list(range(CFG.num_classes)) if
+                         v not in backdoored_cls]
         if debug:
             print(backdoored_cls, clean_cls)
 
@@ -225,6 +211,14 @@ def main():
             model = ResNet34(CFG.num_classes)
         elif CFG.arch == "resnet50":
             model = ResNet50(CFG.num_classes)
+        elif CFG.arch == "vgg11":
+            model = vgg11(CFG.num_classes)
+        elif CFG.arch == "vgg13":
+            model = vgg13(CFG.num_classes)
+        elif CFG.arch == "vgg16":
+            model = vgg16(CFG.num_classes)
+        elif CFG.arch == "vgg19":
+            model = vgg19(CFG.num_classes)
         model.load_state_dict(torch.load(CFG.pretrained_path)['state_dict'])
         model.to(CFG.device)
         model.eval()
@@ -412,11 +406,15 @@ def main():
 
         # logging
         if CFG.case == 0:
+            # log.write(
+            #     f"{CFG.const},{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
             log.write(
-                f"{CFG.const},{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
+                f"{evasion_acc:.4f}")
         else:
+            # log.write(
+            #     f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
             log.write(
-                f"{p},{tr_loss:.4f},{tr_acc:.4f},{evasion_loss:.4f},{evasion_acc:.4f}")
+                f"{evasion_acc:.4f}")
 
         # for debugging
         """
