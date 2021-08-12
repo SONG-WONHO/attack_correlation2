@@ -20,6 +20,7 @@ from models.lenet import LeNet5
 from models.resnet import *
 from models.vggnet import *
 
+from attacks.backdoor import t2_get_backdoor_dataset
 from watermark.watermark import get_watermark_dataset
 from watermark import deepsigns
 
@@ -174,6 +175,13 @@ def main():
     log.write(f"- Test Shape Info: {X_test.shape, y_test.shape}")
     log.write()
 
+    # load backdoor data
+    log.write("Load Backdoor Data")
+    X_back_tr, y_back_tr, X_back_te, y_back_te = t2_get_backdoor_dataset(
+        CFG, X_train, y_train, X_test, y_test)
+    log.write(f"- Backdoor Tr Shape: {X_back_tr.shape, y_back_tr.shape}")
+    log.write(f"- Backdoor Te Shape: {X_back_te.shape, y_back_te.shape}")
+
     # load watermark data
     log.write("Load Watermark Data")
     X_wm_tr, y_wm_tr, X_wm_te, y_wm_te = get_watermark_dataset(
@@ -195,6 +203,15 @@ def main():
         f"- Max Value: {trn_dataset[0][0].max():.4f}, {val_dataset[0][0].max():.4f}")
     log.write()
 
+    log.write("Get Backdoor Dataset")
+    trn_back_dataset = ACDataset(X_back_tr, y_back_tr,
+                                 transform=train_transform)
+    val_back_dataset = ACDataset(X_back_te, y_back_te, transform=test_transform)
+    log.write(f"- Shape: {trn_back_dataset[0][0].shape}")
+    log.write(
+        f"- Max Value: {trn_back_dataset[0][0].max():.4f}, {val_back_dataset[0][0].max():.4f}")
+    log.write()
+
     log.write("Get Watermark Dataset")
     trn_wm_dataset = ACDataset(X_wm_tr, y_wm_tr, transform=test_transform)
     val_wm_dataset = ACDataset(X_wm_te, y_wm_te, transform=test_transform)
@@ -205,7 +222,7 @@ def main():
 
     # loader
     train_loader = DataLoader(
-        trn_dataset,
+        trn_dataset + trn_back_dataset,
         batch_size=CFG.batch_size,
         shuffle=True,
         num_workers=CFG.worker)
@@ -283,19 +300,21 @@ def main():
     ### Train Related
     start = timer()
     log.write(f'** start training here! **')
-    log.write('rate,epoch,tr_loss,tr_acc,te_loss,te_acc,wm_acc,time')
+    log.write('rate,epoch,tr_loss,tr_acc,te_loss,te_acc,back_loss,back_acc,wm_acc,time')
     # cond = 1e-8
     for epoch in range(CFG.num_epochs):
         tr_loss, tr_acc = train_one_epoch_wm(
             train_loader, train_wm_loader, model, optimizer, CFG)
         vl_loss, vl_acc = valid_one_epoch(valid_loader, model, CFG)
+        vl_b_loss, vl_b_acc = valid_one_epoch(valid_back_loader, model, CFG)
         vl_wm_loss, vl_wm_acc = valid_one_epoch(valid_wm_loader, model, CFG)
 
         # logging
-        message = "{:.4f},{},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{}".format(
+        message = "{:.4f},{},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{:.4f},{}".format(
             optimizer.param_groups[0]['lr'], epoch,
             tr_loss, tr_acc,
             vl_loss, vl_acc,
+            vl_b_loss, vl_b_acc,
             vl_wm_acc,
             time_to_str(timer() - start)
         )
